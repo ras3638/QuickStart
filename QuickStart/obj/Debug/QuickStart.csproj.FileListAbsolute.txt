@@ -1,0 +1,9 @@
+C:\Users\robert_salinas\Documents\Visual Studio 2012\Projects\QuickStart\QuickStart\bin\Debug\QuickStart.exe.config
+C:\Users\robert_salinas\Documents\Visual Studio 2012\Projects\QuickStart\QuickStart\bin\Debug\QuickStart.exe
+C:\Users\robert_salinas\Documents\Visual Studio 2012\Projects\QuickStart\QuickStart\bin\Debug\QuickStart.pdb
+C:\Users\robert_salinas\Documents\Visual Studio 2012\Projects\QuickStart\QuickStart\obj\Debug\QuickStart.csprojResolveAssemblyReference.cache
+C:\Users\robert_salinas\Documents\Visual Studio 2012\Projects\QuickStart\QuickStart\obj\Debug\QuickStart.frmQuickStart.resources
+C:\Users\robert_salinas\Documents\Visual Studio 2012\Projects\QuickStart\QuickStart\obj\Debug\QuickStart.Properties.Resources.resources
+C:\Users\robert_salinas\Documents\Visual Studio 2012\Projects\QuickStart\QuickStart\obj\Debug\QuickStart.csproj.GenerateResource.Cache
+C:\Users\robert_salinas\Documents\Visual Studio 2012\Projects\QuickStart\QuickStart\obj\Debug\QuickStart.exe
+C:\Users\robert_salinas\Documents\Visual Studio 2012\Projects\QuickStart\QuickStart\obj\Debug\QuickStart.pdb

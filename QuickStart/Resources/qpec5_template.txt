@@ -1,0 +1,89 @@
+[QPEC]
+SleepTimeInSecs=5
+ActiveFlagCheckIntervalInSecs=30
+NoDBConnSleepTimeInSecs=1
+AssignedJobsOnly=1
+LogDebugMessages=0
+LogInfoMessages=1
+; Default Module/Metadata Profile defines the module/profile that will be used
+; to lookup metadata if the queued process does not specify a module/profile.
+; All metadata will be loaded for the specified profile, regardless of module.
+DefaultModule=QFCM
+DefaultMetadataProfile=@CLIENTCODE
+CacheLoadTimeInSecs=1
+UseCurrentWorkingDirectory=1
+DoNotCleanQPECIni=1
+IdleQPECMaxMemoryUsage=250
+UseMutex=1
+CleanQPECIni=1
+
+SupportedModules=QRA,QCFS,QCA,QFCM,ENGS,QLS,DO
+
+RUN_FIX_PIK_STATUS_QRY=1
+STUCK_IN_PIK_MINUTES=120
+PIK_STATUS_DAYS_IN_PAST_TO_CHK=3
+
+PROCESS_MSG_LOG_USE_DYNAMIC_SQL=1
+
+CrashedProcessCheckIntervalInSec=60
+UXHungProcessCheckIntervalInSec=60
+RequeuExpiredHoldProcessesCheckIntervalInSec=60
+UseLockStatus=ACT
+ConnectionTimeout=100
+CommandTimeout=3600
+
+UseMSMQ=False
+CommandMSMQ=QPECCommandQueue
+ProcessMonitorCommandMSMQ=
+; Set to terminate to terminate the QPEC
+; Set to legacy to fall back to legacy behavior
+; Set to wait to wait until communications with PM can be re-established
+LostProcessMonitorAction=wait
+; Set to max time to wait for a handshake from the PM.  Should be at least
+; 2 * PM handshake interval
+PMHandShakeMaxSecs=600
+; Set to the amount of time to wait between scans of the queue when there are messages in the queue
+; but none within the priority range supported by the QPEC
+; Smaller values cause more overhead on the server, larger values increase latency when a job becomes available.
+WaitBetweenQueueScanMSec=100
+; Define the amount of time to wait for all QPEC's that support an application to change between using
+; and not using MSMQ.
+ModeChangeWaitMaxSecs=90
+
+[DEBUG]
+;STSTDLLPRC1=D:\Devl\Products\QFCBatch\1.01\QFCCPPBATCHCORE\TestProcessDLL\Debug\TestProcessDllD.dll
+StepRunInSeparateThreadInd=0
+
+[Database]
+; To setup DB in this file, use the following for SQL Server
+ConnectString=Provider=SQLNCLI10;Data Source=QDALDB03;Trusted_Connection=no;Persist Security Info=False;Initial Catalog=@DATABASE;
+UserID=@DATABASE
+Password=@DATABASE
+Schema=@DATABASE
+; To setup the DB in this file, use the following for Oracle
+;ConnectString=Provider=MSDAORA;DATA SOURCE=QHOUDB13;
+;UserID=
+;Password=
+;Schema=
+
+ForceUpperCase=1
+
+[ErrorLog]
+LogFilePath=.\Logs
+ArchiveLogPath=.\Logs
+LogFileName=qpec.log
+MessageLogDll=.\QPDllUpstreamUtil.dll
+MessageLogDllClassName=QPSMsgLogDBWriterUpstream
+
+[ReportLauncher]
+; Set to directory where Crystal reports DLL's are located if not in the location specified in the report engine code table
+;NATIVE_DLL_DIRECTORY_02 = c:\devl\env\3.0\run\common\CrystalReports8.5
+;NATIVE_DLL_DIRECTORY_03 = c:\devl\env\3.0\run\common\CrystalReports9
+
+[SharedMemory]
+UseSharedMemory=0
+NumberPages=4200
+UseSeparateHeaps=0
+
+; Begin QPEC Specific sections
+
