@@ -91,7 +91,7 @@ namespace QuickStart
 			StringBuilder temp0 = CascadeDeleteSingleEngine(dtDatabaseSchema, sFKName, false, sSource);
 
 			//Exit out if there is an error
-			if(temp0.ToString().Contains("@@Error:")) return sb;
+			if(temp0.ToString().Contains("@@Error:")) return temp0;
 			
 			//bUseIncrements will be false in this case.
 			sb.Append(FKRecursionEngine(dtDatabaseSchema, false, temp0.ToString(), FKResultsHashSet, new StringBuilder()));
@@ -150,6 +150,13 @@ namespace QuickStart
 			{
 				string sFK_Name = row["fk_name"].ToString();
 				FKNameHashSet.Add(sFK_Name);
+			}
+
+			if (FKNameHashSet.Count == 0)
+			{
+				sb.Clear();
+				sb.Append("@@Error: The specified FK was not found in the schema.");
+				return sb;
 			}
 
 			foreach (string sFK in FKNameHashSet)
@@ -269,7 +276,9 @@ namespace QuickStart
 				sb.AppendLine(SetIdentityInsert(sIdentityInsert, sTableName));
 			}
 
-			string sRecordSet = sSource;
+			//Allows copy/paste from Excel
+			string sRecordSet = sSource.Trim().Replace("\t\n", "\n"); 
+
 			//Remove the first line. These are columns
 			int iFirstNewLineIndex = sRecordSet.IndexOf("\n");
 			sRecordSet = sRecordSet.Substring(iFirstNewLineIndex);

@@ -9,15 +9,14 @@ namespace QuickStart
 {
 	public static class ThreadHelperUtility
 	{
-		delegate void SetEnableCallback(Form Form, Control Control, bool bEnable);
+		delegate void SetEnableCallbackToolStrip(Form Form, ToolStrip ToolStrip, ToolStripButton ToolStripStatusButton, bool bEnable);
 		delegate void SetTextCallback(Form Form, Control Control, string sText);
+		delegate void SetEnableCallback(Form Form, Control Control, bool bEnable);
+		delegate void SetVisibleCallback(Form Form, StatusStrip StatusStrip, ToolStripStatusLabel ToolStripStatusLabel, bool bVisible);
 		delegate void SetTextCallbackStatusStrip(Form Form, StatusStrip StatusStrip, ToolStripStatusLabel ToolStripStatusLabel, string sText);
 
 		public static void SetEnable(Form Form, Control Control, bool bEnable)
 		{
-			// InvokeRequired required compares the thread ID of the
-			// calling thread to the thread ID of the creating thread.
-			// If these threads are different, it returns true.
 			if (Control.InvokeRequired)
 			{
 				SetEnableCallback d = new SetEnableCallback(SetEnable);
@@ -28,11 +27,21 @@ namespace QuickStart
 				Control.Enabled = bEnable;
 			}
 		}
+
+		public static void SetVisible(Form Form, StatusStrip StatusStrip, ToolStripStatusLabel ToolStripStatusLabel, bool bVisible)
+		{
+			if (StatusStrip.InvokeRequired)
+			{
+				SetVisibleCallback d = new SetVisibleCallback(SetVisible);
+				Form.Invoke(d, new object[] { Form, StatusStrip, ToolStripStatusLabel, bVisible });
+			}
+			else
+			{
+				ToolStripStatusLabel.Visible = bVisible;
+			}
+		}
 		public static void SetText(Form Form, Control Control, string sText)
 		{
-			// InvokeRequired required compares the thread ID of the
-			// calling thread to the thread ID of the creating thread.
-			// If these threads are different, it returns true.
 			if (Control.InvokeRequired)
 			{
 				SetTextCallback d = new SetTextCallback(SetText);
@@ -42,12 +51,23 @@ namespace QuickStart
 			{
 				Control.Text = sText;
 			}
+
+
+		}
+		public static void SetEnable(Form Form, ToolStrip ToolStrip, ToolStripButton ToolStripStatusButton, bool bEnable)
+		{
+			if (ToolStrip.InvokeRequired)
+			{
+				SetEnableCallbackToolStrip d = new SetEnableCallbackToolStrip(SetEnable);
+				Form.Invoke(d, new object[] { Form, ToolStrip, ToolStripStatusButton, bEnable });
+			}
+			else
+			{
+				ToolStripStatusButton.Enabled = bEnable;
+			}
 		}
 		public static void SetText(Form Form, StatusStrip StatusStrip, ToolStripStatusLabel ToolStripStatusLabel, string sText)
 		{
-			// InvokeRequired required compares the thread ID of the
-			// calling thread to the thread ID of the creating thread.
-			// If these threads are different, it returns true.
 			if (StatusStrip.InvokeRequired)
 			{
 				SetTextCallbackStatusStrip d = new SetTextCallbackStatusStrip(SetText);

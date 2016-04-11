@@ -45,7 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Client.cs" />
-    <Compile Include="DataTableHelper.cs" />
+    <Compile Include="DataTableHelperUtility.cs" />
     <Compile Include="Directories.cs" />
     <Compile Include="frmQuickStart.cs">
       <SubType>Form</SubType>
@@ -54,12 +54,16 @@
       <DependentUpon>frmQuickStart.cs</DependentUpon>
     </Compile>
     <Compile Include="IncrementAlphabet.cs" />
+    <Compile Include="MyComboBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Sql.cs" />
     <Compile Include="SqlGenEngine.cs" />
     <Compile Include="StringUtility.cs" />
     <Compile Include="ThreadHelperUtility.cs" />
+    <Compile Include="ToolStripOverride.cs" />
     <EmbeddedResource Include="frmQuickStart.resx">
       <DependentUpon>frmQuickStart.cs</DependentUpon>
     </EmbeddedResource>

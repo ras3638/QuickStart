@@ -10,6 +10,82 @@ namespace QuickStart
 {
 	public static class StringUtility
 	{
+		const long stringMAXByteThreshold = 28000000; //the maximum allowed by the Insert Engine before OOM
+		const long stringByteThreshold = 18000000; //the maximum allowed by SQL Server before OOM
+
+		public static bool IsStringOverMemory(string sSource)
+		{
+			long stringByteCount = System.Text.ASCIIEncoding.Unicode.GetByteCount(sSource);
+
+			if (stringByteCount > stringByteThreshold) //Chnage this later
+			{
+				return true;
+			}
+			return false;
+		}
+		public static decimal StringOverCapacity(string sSource)
+		{
+			long stringByteCount = System.Text.ASCIIEncoding.Unicode.GetByteCount(sSource);
+
+			if (stringByteCount > stringByteThreshold)
+			{
+				decimal overCapacity = stringByteCount - stringByteThreshold;
+				overCapacity /= stringByteThreshold;
+				overCapacity *= 100;
+
+				if (Math.Round(overCapacity, 0) == 0)
+				{
+					return 1;
+				}
+				else
+				{
+					return Math.Round(overCapacity, 0);
+				}
+
+			}
+			return 0;
+		}
+
+		public static List<string> SplitLargeString(string sSource, List<string> RunningList = null)
+		{
+			RunningList = RunningList ?? new List<String>();
+			List<string> Splitter = StringUtility.LowMemSplit(sSource, "\n");
+			double dCount = Splitter.Count();
+
+			//At minimum we want 1 header row and 1 non-header row
+			if (dCount > 2)
+			{
+				int NthCount = StringUtility.NthIndexOf(sSource, "\n", Convert.ToInt32(Math.Ceiling(dCount / 2)));
+				string sFirstHalf = sSource.Substring(0, NthCount);
+				string sSecondHalf = sSource.Substring(NthCount, sSource.Length - sFirstHalf.Length - 1);
+
+				//Append header columns to sSecondHalf;
+				int iFirstNewLineIndex = sFirstHalf.IndexOf("\n");
+				string sHeaders = sFirstHalf.Substring(0,iFirstNewLineIndex);
+				sSecondHalf = sSecondHalf.Insert(0, sHeaders);
+
+				if (!IsStringOverMemory(sFirstHalf))
+				{
+					RunningList.Add(sFirstHalf);
+				}
+
+				if (!IsStringOverMemory(sSecondHalf))
+				{
+					RunningList.Add(sSecondHalf);
+				}
+
+				if (IsStringOverMemory(sFirstHalf))
+				{
+					SplitLargeString(sFirstHalf, RunningList);
+				}
+
+				if (IsStringOverMemory(sSecondHalf))
+				{
+					SplitLargeString(sSecondHalf, RunningList);
+				}
+			}
+			return RunningList;
+		}
 		public static List<string> HighMemSplit(this string s, string sDelimiter)
 		{
 			//Returns a list of delimited strings. 
@@ -146,7 +222,7 @@ namespace QuickStart
 			//More effecient passing around a SB object than the string itself. Resolved OOM issues.
 
 			int iOcurrenceCount = StringUtility.LowMemSplit(sbSource.ToString(), sFinder).Count;
-			for (int i = iNth; i <= iOcurrenceCount; i += iNth)
+			for (int i = iNth; i < iOcurrenceCount; i += iNth)
 			{
 				int NthIndex = NthIndexOf(sbSource.ToString(), sFinder, i);
 				sbSource = sbSource.Remove(NthIndex, sFinder.Length).Insert(NthIndex, sReplacement);

@@ -8,7 +8,7 @@ namespace QuickStart
 {
 	class EnvDefDirectories
 	{
-		public static string EnvDefBase = "C:\\Users\\robert_salinas\\Desktop\\Environment Definitions";
+		public static string EnvDefBase = "C:\\Users\\" + Environment.UserName + "\\Desktop\\Environment Definitions";
 		public static string Core5QPEC = EnvDefBase + "\\5.0\\QPEC\\CORE_5.0_QPEC.txt";
 		public static string Core8QPEC = EnvDefBase + "\\8.0\\QPEC\\CORE_8.0_QPEC.txt";
 		public static string Core16QPEC = EnvDefBase + "\\16.0\\QPEC\\CORE_16.0_QPEC.txt";
@@ -52,5 +52,11 @@ namespace QuickStart
 		public static string Full5UpstreamMainApp = Base5 + GUIBase + GUIUpstreamMainApp;
 		public static string Full8UpstreamMainApp = Base8 + GUIBase + GUIUpstreamMainApp;
 		public static string Full16UpstreamMainApp = Base16 + GUI16Base + GUIUpstreamMainApp;
+	}
+	class GenFiles
+	{
+		public static string EnvironmentDefinitions = "C:\\Users\\" + Environment.UserName + "\\Desktop\\Environment Definitions";
+		public static string GeneratedSchemas = "C:\\Users\\" + Environment.UserName + "\\Desktop\\Environment Definitions\\Generated Schemas";
+		public static string GeneratedScriptFile = "C:\\Users\\" + Environment.UserName + "\\Desktop\\Environment Definitions\\GeneratedScript.txt";
 	}
 }
