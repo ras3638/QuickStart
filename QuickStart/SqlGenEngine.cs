@@ -13,7 +13,7 @@ namespace QuickStart
 		{
 			HashSet<string> FKResultsHashSet = new HashSet<string>();
 			HashSet<string> TableResultsHashSet = new HashSet<string>();
-			
+			HashSet<string> RefTableResultsHashSet = new HashSet<string>();
 			//SQL:
 			//SELECT [table] FROM SchemaDataset WHERE [fk_name] = sFKName
 			//put results in TableResultsHashSet
@@ -27,6 +27,18 @@ namespace QuickStart
 				TableResultsHashSet.Add(sTable.Trim());
 			}
 
+			//Avoid circular reference
+
+			foreach (DataRow row in Query1)
+			{
+				string sRefTable = row["referenced_table"].ToString();
+				RefTableResultsHashSet.Add(sRefTable.Trim());
+			}
+			if (RefTableResultsHashSet.Overlaps(TableResultsHashSet))
+			{
+				//This is a circular reference
+				return FKResultsHashSet;
+			}
 			//SQL:
 			//SELECT [fk_name] FROM SchemaDataset WHERE [referenced_table] IN TableList
 			//put results in FKResultsHashSet
@@ -45,6 +57,7 @@ namespace QuickStart
 		public static StringBuilder GenerateInsertStatement(List<string> ColumnList, string sTableName)
 		{
 			StringBuilder sb = new StringBuilder();
+	
 			sb.Append("INSERT INTO " + sTableName + " (");
 
 			for (int i = 0; i < ColumnList.Count; i++)
@@ -56,7 +69,7 @@ namespace QuickStart
 				}
 				else
 				{
-					sb.Append(ColumnList[i] + ",");
+					sb.Append(ColumnList[i] + ",");		
 				}
 			}
 			return sb;
@@ -121,13 +134,145 @@ namespace QuickStart
 			sb.Insert(0,"--Foriegn Key Cascade: " + sFKName + "\n");
 			
 			return sb;
-		}	
+		}
+		public static string GetTableToDelete(string sSource)
+		{
+			sSource = StringUtility.SqlToUpper(sSource);
+			if (!sSource.Contains("DELETE FROM "))
+			{
+				return String.Empty;
+			}
+			else if (StringUtility.HighMemSplit(sSource, "DELETE ").Count > 2)
+			{
+				return String.Empty;
+			}
+
+			int indexDelete = sSource.IndexOf("DELETE FROM ") + 12;
+			string temp = sSource.Substring(indexDelete);
+
+			List<string> Splitter = StringUtility.HighMemSplit(temp, " ");
+			if (Splitter.Count == 1)
+			{
+				return Splitter[0].Trim();
+			}
+			else if (Splitter.Count >= 1)
+			{
+				if (temp.Contains(")"))
+				{
+					int indexRightPara = temp.IndexOf(")") + 1;
+					//return temp.Substring(indexRightPara); ??
+				}
+
+				return Splitter[0].Trim();
+			}
+			else
+			{
+				return String.Empty;
+			}
+		}
+		public static string GetWhereClause(string sSource)
+		{
+			sSource = StringUtility.SqlToUpper(sSource);
+			if(!sSource.Contains("WHERE "))
+			{
+				return String.Empty;
+			}
+			int iWhereIndex = sSource.IndexOf("WHERE ");
+			return " " + sSource.Substring(iWhereIndex).Trim();
+		}
+		public static StringBuilder CascadeDeleteNoneEngine(DataTable dtDatabaseSchema, string sFKName, bool bUseIncrements, string sSource)
+		{		
+			StringBuilder sb3 = new StringBuilder();
+			sSource = StringUtility.SqlToUpper(sSource);
+			sSource = StringUtility.SqlRemoveExtraWhiteSpace(sSource);
+			sSource = sSource.TrimStart(new char[] { '\n' });
+			sSource = sSource.TrimEnd(new char[] { '\n' });
+			string sAlias = String.Empty;
+			string sWhileExists = String.Empty;
+			string sDeleteTop = String.Empty;
+			string sDeleteAll = String.Empty;
+			List<string> Splitter = new List<string> {sSource};
+
+			if ((bool)SettingManager.GetSettingValue("Cascade Delete Gen", "Multiline support for None cascade option"))
+			{
+				if (sSource.Contains("\n"))
+				{
+					//Multiline
+					Splitter = StringUtility.HighMemSplit(sSource, "\n");
+				}
+			}
+			
+			foreach (string s in Splitter)
+			{
+				StringBuilder sb = new StringBuilder();
+				if (!s.Contains("DELETE "))
+				{
+					sb.Clear();
+					sb.Append("@@Error: Delete keyword not found.");
+					return sb;
+				}
+				else if (StringUtility.HighMemSplit(s, "DELETE ").Count > 2)
+				{
+					sb.Clear();
+					sb.Append("@@Error: Multiple delete keywords are not supported.");
+					return sb;
+				}
+				else if (s.Contains("TOP "))
+				{
+					sb.Clear();
+					sb.Append("@@Error: Top keyword not supported.");
+					return sb;
+				}
+				else if (s.Contains("WHILE "))
+				{
+					sb.Clear();
+					sb.Append("@@Error: While keyword not supported.");
+					return sb;
+				}
+				else
+				{
+					sAlias = GetAlias(s);
+				}
+				IncrementAlphabet A = new IncrementAlphabet(sAlias);
+
+				sWhileExists = "WHILE EXISTS (SELECT 1";
+				sDeleteTop = "DELETE TOP (100000) " + A.GetCurrent();
+				sDeleteAll = "DELETE " + A.GetCurrent();
+
+				sb.Append(" FROM " + GetTableToDelete(s) + " " + A.GetCurrent() + GetWhereClause(s));
+
+				if (bUseIncrements)
+				{
+					//Lets manage two copies of sb.
+					StringBuilder sb2 = new StringBuilder(sb.ToString());
+					sb.Insert(0, sWhileExists);
+					sb.Append(")");
+					sb2.Insert(0, sDeleteTop);
+					sb.Append(sb2);
+				}
+				else
+				{
+					sb.Insert(0, sDeleteAll);
+				}
+				if(Splitter.Count > 1) sb.Append("\n");
+				sb3.Append(sb);
+			}
+			
+			return sb3;
+		}
 		public static StringBuilder CascadeDeleteAllEngine(DataTable dtDatabaseSchema, string sFKName, bool bUseIncrements, string sSource)
 		{
 			StringBuilder sb = new StringBuilder();
 			HashSet<string> RefTableHashSet = new HashSet<string>();
 			HashSet<string> FKNameHashSet = new HashSet<string>();
 
+			//Allow FK name to be optional when selecting cascade "All"
+			if (String.IsNullOrEmpty(sFKName))
+			{
+				//Locate the table to delete in sSource
+				string sReferencedTable = GetTableToDelete(sSource);
+				RefTableHashSet.Add(sReferencedTable);
+			}
 			var Query1 = dtDatabaseSchema.Rows.Cast<DataRow>().Where
 					(p => p.Field<string>("fk_name") == sFKName.Trim());
 
@@ -172,12 +317,14 @@ namespace QuickStart
 		}
 		public static StringBuilder CascadeDeleteSingleEngine(DataTable dtDatabaseSchema, string sFKName, bool bUseIncrements, string sSource)
 		{
-			StringBuilder sb = new StringBuilder(String.Empty);
+			StringBuilder sb = new StringBuilder();
 			sSource = StringUtility.SqlToUpper(sSource);
+			sSource = StringUtility.SqlRemoveExtraWhiteSpace(sSource);
 			string sAlias = String.Empty;
 			string sWhileExists = String.Empty;
 			string sDeleteTop = String.Empty;
 			string sDeleteAll = String.Empty;
+
 			bool bFirstIteration = true;
 			int iIterationCount = 0;
 
@@ -193,6 +340,18 @@ namespace QuickStart
 				sb.Append("@@Error: Multiple delete keywords are not supported.");
 				return sb;
 			}
+			else if (sSource.Contains("TOP "))
+			{
+				sb.Clear();
+				sb.Append("@@Error: Top keyword not supported.");
+				return sb;
+			}
+			else if (sSource.Contains("WHILE "))
+			{
+				sb.Clear();
+				sb.Append("@@Error: While keyword not supported.");
+				return sb;
+			}
 			else
 			{
 				sAlias = GetAlias(sSource);
@@ -201,7 +360,7 @@ namespace QuickStart
 			IncrementAlphabet A = new IncrementAlphabet(sAlias);
 
 			var Query1 = dtDatabaseSchema.Rows.Cast<DataRow>().Where
-				(p => p.Field<string>("fk_name") == sFKName.Trim().ToUpper());
+				(p => p.Field<string>("fk_name") == sFKName.Trim());
 
 			foreach (DataRow row in Query1)
 			{
@@ -219,11 +378,11 @@ namespace QuickStart
 					sb.Append(" FROM " + sTable + " " + A.GetCurrent() + " WHERE EXISTS");
 					
 					sb.Append("(SELECT * FROM " + sReferenced_Table + " " + A.GetPrevious() + " WHERE ");
-					sb.Append(A.GetPrevious() + "." + sColumn + " = " + A.GetCurrent() + "." + sReferenced_Column);
+					sb.Append(A.GetPrevious() + "." + sReferenced_Column + " = " + A.GetCurrent() + "." + sColumn);
 				}
 				else
 				{
-					sb.Append(" AND " + A.GetPrevious() + "." + sColumn + " = " + A.GetCurrent() + "." + sReferenced_Column);
+					sb.Append(" AND " + A.GetPrevious() + "." + sReferenced_Column + " = " + A.GetCurrent() + "." + sColumn);
 				}
 
 				bFirstIteration = false;
@@ -248,6 +407,7 @@ namespace QuickStart
 				return sb;
 			}
 
+			//Added additional parantheses to handle OR cases
 			sb.Append(SetWhereClause(sSource));
 			sb.Append(")");
 
@@ -258,7 +418,7 @@ namespace QuickStart
 				sb.Insert(0, sWhileExists);
 				sb.Append(")\n");
 				sb2.Insert(0, sDeleteTop);
-				sb.Append(sb2.ToString());
+				sb.Append(sb2);
 			}
 			else
 			{
@@ -270,6 +430,9 @@ namespace QuickStart
 		public static StringBuilder InsertEngine(string sSource, string sIdentityInsert, string sTableName)
 		{
 			StringBuilder sb = new StringBuilder();
+			string sRecordSet = sSource;
+			bool bUseOracle = (bool)SettingManager.GetSettingValue("Insert Gen", "Enable Oracle Functionality");
+			bool bUseExcel = (bool)SettingManager.GetSettingValue("Insert Gen", "Enable Excel Functionality");
 
 			if (!string.IsNullOrWhiteSpace(sIdentityInsert))
 			{
@@ -277,22 +440,26 @@ namespace QuickStart
 			}
 
 			//Allows copy/paste from Excel
-			string sRecordSet = sSource.Trim().Replace("\t\n", "\n"); 
+			if (bUseExcel)
+			{
+				sRecordSet = sRecordSet.Trim().Replace("\t\n", "\n"); 
+			}
 
 			//Remove the first line. These are columns
 			int iFirstNewLineIndex = sRecordSet.IndexOf("\n");
 			sRecordSet = sRecordSet.Substring(iFirstNewLineIndex);
 
 			//Handles Apostrophes
-			//RecordSet = RecordSet.Replace("'", "''");
 			sRecordSet = new StringBuilder(sRecordSet).Replace("'", "''").ToString();
 
 			//Handle insert statements and general formatting
-			//RecordSet = RecordSet.Replace("\t", "','");
 			sRecordSet = new StringBuilder(sRecordSet).Replace("\t", "','").ToString();
 
-			//RecordSet = RecordSet.Replace("\n", "')\n");
-			sRecordSet = new StringBuilder(sRecordSet).Replace("\n", "')\n").ToString();
+			//Handle semicolon for Oracle
+			if (bUseOracle)
+				sRecordSet = new StringBuilder(sRecordSet).Replace("\n", "');\n").ToString();
+			else
+				sRecordSet = new StringBuilder(sRecordSet).Replace("\n", "')\n").ToString();
 
 			int iFirstNewLineIndex2 = sSource.IndexOf('\n');
 			string sFirstLine = sSource.Substring(0, iFirstNewLineIndex2);
@@ -302,21 +469,37 @@ namespace QuickStart
 
 			//Handle ending and beginning
 			sRecordSet = sRecordSet.Remove(0, 4);
-			sRecordSet = sRecordSet.Insert(sRecordSet.Length, "')");
+
+			//Handle semicolon for Oracle for last statement
+			if (bUseOracle)
+				sRecordSet = sRecordSet.Insert(sRecordSet.Length, "');");
+			else
+				sRecordSet = sRecordSet.Insert(sRecordSet.Length, "')");			
 
 			//Handle Nulls
-			//RecordSet = RecordSet.Replace("'NULL'", "NULL");
 			sRecordSet = new StringBuilder(sRecordSet).Replace("'NULL'", "NULL").ToString();
 
-			//Handle GO statements every 5000 rows
-			sRecordSet = StringUtility.ReplaceNthOccurrence(new StringBuilder(sRecordSet), "\n", "\nGO\r\n", 5000).ToString();
+			//Handle GO statements every 5000 rows for MSSQL
+			if (!bUseOracle)
+			{
+				sRecordSet = StringUtility.ReplaceNthOccurrence(new StringBuilder(sRecordSet), "\n", "\nGO\r\n", 5000).ToString();
+			}
 			sb.Append(sRecordSet);
 
-			if (!string.IsNullOrWhiteSpace(sIdentityInsert))
+			//Handle Identity Insert for MSSQL
+			if (!string.IsNullOrWhiteSpace(sIdentityInsert) && !bUseOracle)
 			{
 				sb.Append("\r\n" + SetIdentityInsertInverse(sIdentityInsert, sTableName));
 			}
 
+			//RecordSet = RecordSet.Replace("\n", "')\n");
+			//Add Begin/End for Oracle
+			if (bUseOracle)
+			{
+				sb.Insert(0, "BEGIN");
+				sb.Append("\nEND;");	
+			}
+			
 			return sb;
 		}
 		public static string SetWhereClause(string sSource)
@@ -327,7 +510,8 @@ namespace QuickStart
 			{
 				int iWhereIndex = sSource.IndexOf("WHERE") + 5;
 				string CustomWhereClause = sSource.Substring(iWhereIndex).Trim();
-				sTemp = " AND " + CustomWhereClause;
+				//Add paranthesis for cases when 'OR' is used. 
+				sTemp = " AND (" + CustomWhereClause + ")";
 			}
 			return sTemp;
 		}
@@ -363,7 +547,6 @@ namespace QuickStart
 		{
 			sSource = sSource.Replace(@"\", string.Empty).Trim();
 			sSource = "\n" + "--Original delete statement\n" + StringUtility.SqlToUpper(sSource);
-
 			return sSource;
 		}
 	}

@@ -10,14 +10,11 @@ namespace QuickStart
 {
 	public static class StringUtility
 	{
-		const long stringMAXByteThreshold = 28000000; //the maximum allowed by the Insert Engine before OOM
-		const long stringByteThreshold = 18000000; //the maximum allowed by SQL Server before OOM
-
 		public static bool IsStringOverMemory(string sSource)
 		{
 			long stringByteCount = System.Text.ASCIIEncoding.Unicode.GetByteCount(sSource);
-
-			if (stringByteCount > stringByteThreshold) //Chnage this later
+			long lMaxByteThreshold = (long)SettingManager.GetSettingValue("Insert Gen", "Max Byte Threshold");
+			if (stringByteCount > lMaxByteThreshold) //Change this later
 			{
 				return true;
 			}
@@ -26,11 +23,11 @@ namespace QuickStart
 		public static decimal StringOverCapacity(string sSource)
 		{
 			long stringByteCount = System.Text.ASCIIEncoding.Unicode.GetByteCount(sSource);
-
-			if (stringByteCount > stringByteThreshold)
+			long lMaxByteThreshold = (long)SettingManager.GetSettingValue("Insert Gen","Max Byte Threshold");
+			if (stringByteCount > lMaxByteThreshold)
 			{
-				decimal overCapacity = stringByteCount - stringByteThreshold;
-				overCapacity /= stringByteThreshold;
+				decimal overCapacity = stringByteCount - lMaxByteThreshold;
+				overCapacity /= lMaxByteThreshold;
 				overCapacity *= 100;
 
 				if (Math.Round(overCapacity, 0) == 0)
@@ -57,7 +54,7 @@ namespace QuickStart
 			{
 				int NthCount = StringUtility.NthIndexOf(sSource, "\n", Convert.ToInt32(Math.Ceiling(dCount / 2)));
 				string sFirstHalf = sSource.Substring(0, NthCount);
-				string sSecondHalf = sSource.Substring(NthCount, sSource.Length - sFirstHalf.Length - 1);
+				string sSecondHalf = sSource.Substring(NthCount, sSource.Length - sFirstHalf.Length); //Used to be  sSource.Length - sFirstHalf.Length -1
 
 				//Append header columns to sSecondHalf;
 				int iFirstNewLineIndex = sFirstHalf.IndexOf("\n");
@@ -197,6 +194,59 @@ namespace QuickStart
 			}
 			return sb;
 		}
+		public static string RemoveWhiteSpace(string sSource)
+		{
+			//Removes all white space eg "He   llo" -> "Hello"
+			var sb = new StringBuilder();
+			var prevIsWhitespace = false;
+			foreach (var ch in sSource)
+			{
+				var isWhitespace = char.IsWhiteSpace(ch);
+				//if (prevIsWhitespace && isWhitespace)'
+				if(isWhitespace)
+				{
+					continue;
+				}
+				sb.Append(ch);
+				prevIsWhitespace = isWhitespace;
+			}
+			return sb.ToString();
+		}
+		public static string SqlRemoveExtraWhiteSpace(string sSource)
+		{
+			//Removes extra white space eg. "He   llo" -> "He llo"
+			StringBuilder sb2 = new StringBuilder();
+			bool bIterate = true;
+			//Remove double white space not in ''
+			List<string> SplitterList = LowMemSplit(sSource, "'");
+			foreach (string s in SplitterList)
+			{
+				if (bIterate)
+				{
+					StringBuilder sb = new StringBuilder();
+					var prevIsWhitespace = false;
+					foreach (var ch in s)
+					{
+						var isWhitespace = char.IsWhiteSpace(ch);
+						if (prevIsWhitespace && isWhitespace)
+						//if (isWhitespace)
+						{
+							continue;
+						}
+						sb.Append(ch);
+						prevIsWhitespace = isWhitespace;
+						
+					}
+					sb2.Append(sb);
+				}
+				else
+				{
+					sb2.Append("'" + s + "'");
+				}
+				bIterate = !bIterate;
+			}
+			return sb2.ToString();
+		}
 		public static string SqlToUpper(string sSource)
 		{
 			StringBuilder sb = new StringBuilder();
@@ -219,7 +269,7 @@ namespace QuickStart
 		}
 		public static StringBuilder ReplaceNthOccurrence(StringBuilder sbSource, string sFinder, string sReplacement, int iNth)
 		{
-			//More effecient passing around a SB object than the string itself. Resolved OOM issues.
+			//More effecient passing around a SB object than the string itself.
 
 			int iOcurrenceCount = StringUtility.LowMemSplit(sbSource.ToString(), sFinder).Count;
 			for (int i = iNth; i < iOcurrenceCount; i += iNth)

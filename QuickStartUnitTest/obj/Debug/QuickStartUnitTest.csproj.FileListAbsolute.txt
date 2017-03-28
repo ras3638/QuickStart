@@ -1,0 +1,8 @@
+C:\Users\robert_salinas\Documents\Visual Studio 2012\Projects\QuickStart\QuickStartUnitTest\bin\Debug\QuickStartUnitTest.exe.config
+C:\Users\robert_salinas\Documents\Visual Studio 2012\Projects\QuickStart\QuickStartUnitTest\bin\Debug\QuickStartUnitTest.exe
+C:\Users\robert_salinas\Documents\Visual Studio 2012\Projects\QuickStart\QuickStartUnitTest\bin\Debug\QuickStartUnitTest.pdb
+C:\Users\robert_salinas\Documents\Visual Studio 2012\Projects\QuickStart\QuickStartUnitTest\obj\Debug\QuickStartUnitTest.csprojResolveAssemblyReference.cache
+C:\Users\robert_salinas\Documents\Visual Studio 2012\Projects\QuickStart\QuickStartUnitTest\obj\Debug\QuickStartUnitTest.exe
+C:\Users\robert_salinas\Documents\Visual Studio 2012\Projects\QuickStart\QuickStartUnitTest\obj\Debug\QuickStartUnitTest.pdb
+C:\Users\robert_salinas\Documents\Visual Studio 2012\Projects\QuickStart\QuickStartUnitTest\bin\Debug\QuickStart.exe
+C:\Users\robert_salinas\Documents\Visual Studio 2012\Projects\QuickStart\QuickStartUnitTest\bin\Debug\QuickStart.pdb

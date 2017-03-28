@@ -6,28 +6,15 @@ using System.Threading.Tasks;
 
 namespace QuickStart
 {
-	class EnvDefDirectories
-	{
-		public static string EnvDefBase = "C:\\Users\\" + Environment.UserName + "\\Desktop\\Environment Definitions";
-		public static string Core5QPEC = EnvDefBase + "\\5.0\\QPEC\\CORE_5.0_QPEC.txt";
-		public static string Core8QPEC = EnvDefBase + "\\8.0\\QPEC\\CORE_8.0_QPEC.txt";
-		public static string Core16QPEC = EnvDefBase + "\\16.0\\QPEC\\CORE_16.0_QPEC.txt";
 
-		public static string Core5QPECConfig = EnvDefBase + "\\5.0\\QPECConfig\\CORE_5.0_QPEC_Config.txt";
-		public static string Core8QPECConfig = EnvDefBase + "\\8.0\\QPECConfig\\CORE_8.0_QPEC_Config.txt";
-		public static string Core16QPECConfig = EnvDefBase + "\\16.0\\QPECConfig\\CORE_16.0_QPEC_Config.txt";
-
-		public static string Core5QEnvironmentDefinitions = EnvDefBase + "\\5.0\\QEnvironmentDefinitions\\CORE_5.0_QEnvironmentDefinitions.txt";
-
-		public static string Core5UpstreamMainApp = EnvDefBase + "\\5.0\\UpstreamMainApp\\CORE_5.0_UpstreamMainApp.txt";
-		public static string Core8UpstreamMainApp = EnvDefBase + "\\8.0\\UpstreamMainApp\\CORE_8.0_UpstreamMainApp.txt";
-		public static string Core16UpstreamMainApp = EnvDefBase + "\\16.0\\UpstreamMainApp\\CORE_16.0_UpstreamMainApp.txt";
-	}
 	class BaseDirectories
 	{
+		public static string QuickStartBase = "C:\\Program Files\\QuickStart";
 		public static string Base5 = "C:\\Devl\\Products\\Upstream\\5.0.00";
 		public static string Base8 = "C:\\Devl\\Products\\Upstream\\8.0.00";
 		public static string Base16 = "C:\\Devl\\Products\\Upstream\\Main";
+
+		public static string CacheClientBase = QuickStartBase + "\\CachedClient.txt";
 
 		public static string ProcessBase = "\\Packages\\UpstreamSuiteProcess";
 		public static string Process16Base = "\\Packages\\Package.UpstreamSuiteProcess";
@@ -52,11 +39,35 @@ namespace QuickStart
 		public static string Full5UpstreamMainApp = Base5 + GUIBase + GUIUpstreamMainApp;
 		public static string Full8UpstreamMainApp = Base8 + GUIBase + GUIUpstreamMainApp;
 		public static string Full16UpstreamMainApp = Base16 + GUI16Base + GUIUpstreamMainApp;
-	}
-	class GenFiles
-	{
-		public static string EnvironmentDefinitions = "C:\\Users\\" + Environment.UserName + "\\Desktop\\Environment Definitions";
-		public static string GeneratedSchemas = "C:\\Users\\" + Environment.UserName + "\\Desktop\\Environment Definitions\\Generated Schemas";
-		public static string GeneratedScriptFile = "C:\\Users\\" + Environment.UserName + "\\Desktop\\Environment Definitions\\GeneratedScript.txt";
+
+		public static string GeneratedSchemas = QuickStartBase + "\\Generated Schemas";
+		public static string GeneratedScriptFile = QuickStartBase + "\\GeneratedScript.txt";
+
+		public static string Core5QPECBase = QuickStartBase + "\\5.0\\QPEC";
+		public static string Core8QPECBase = QuickStartBase + "\\8.0\\QPEC";
+		public static string Core16QPECBase = QuickStartBase + "\\16.0\\QPEC";
+
+		public static string Core5QPEC = Core5QPECBase + "\\CORE_5.0_QPEC.txt";
+		public static string Core8QPEC = Core8QPECBase + "\\CORE_8.0_QPEC.txt";
+		public static string Core16QPEC = Core16QPECBase + "\\CORE_16.0_QPEC.txt";
+
+		public static string Core5QPECConfigBase = QuickStartBase + "\\5.0\\QPECConfig";
+		public static string Core8QPECConfigBase = QuickStartBase + "\\8.0\\QPECConfig";
+		public static string Core16QPECConfigBase = QuickStartBase + "\\16.0\\QPECConfig";
+
+		public static string Core5QPECConfig = Core5QPECConfigBase + "\\CORE_5.0_QPEC_Config.txt";
+		public static string Core8QPECConfig = Core8QPECConfigBase + "\\CORE_8.0_QPEC_Config.txt";
+		public static string Core16QPECConfig = Core16QPECConfigBase + "\\CORE_16.0_QPEC_Config.txt";
+
+		public static string Core5QEnvironmentDefinitionsBase = QuickStartBase + "\\5.0\\QEnvironmentDefinitions";
+		public static string Core5QEnvironmentDefinitions = Core5QEnvironmentDefinitionsBase + "\\CORE_5.0_QEnvironmentDefinitions.txt";
+
+		public static string Core5UpstreamMainAppBase = QuickStartBase + "\\5.0\\UpstreamMainApp";
+		public static string Core8UpstreamMainAppBase = QuickStartBase + "\\8.0\\UpstreamMainApp";
+		public static string Core16UpstreamMainAppBase = QuickStartBase + "\\16.0\\UpstreamMainApp";
+
+		public static string Core5UpstreamMainApp = Core5UpstreamMainAppBase + "\\CORE_5.0_UpstreamMainApp.txt";
+		public static string Core8UpstreamMainApp = Core8UpstreamMainAppBase + "\\CORE_8.0_UpstreamMainApp.txt";
+		public static string Core16UpstreamMainApp = Core16UpstreamMainAppBase + "\\CORE_16.0_UpstreamMainApp.txt";
 	}
 }

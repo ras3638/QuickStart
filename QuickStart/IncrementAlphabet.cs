@@ -20,6 +20,24 @@ namespace QuickStart
 		{"F", 5},
 		{"G", 6},
 		{"H", 7},
+		{"I", 8},
+		{"J", 9},
+		{"K",10},
+		{"L",11},
+		{"M",12},
+		{"N",13},
+		{"O",14},
+	    {"P",15},
+	    {"Q",16},
+	    {"R",17},
+		{"S",18},
+		{"T",19},
+		{"U",20},
+		{"V",21},
+		{"W",22},
+		{"X",23},
+		{"Y",24},
+		{"Z",25}
 		};
 
 		public IncrementAlphabet(string sTableAlias)
@@ -29,32 +47,27 @@ namespace QuickStart
 
 			if (!String.IsNullOrEmpty(sTableAlias))
 			{
-				int iAliasOrder;
-				this.m_sPreviousAlphabet = sTableAlias;
+				SetNext(sTableAlias);
+			}
+		}
+		public void SetNext(string sInput)
+		{
+			int iAliasOrder;
+			this.m_sPreviousAlphabet = sInput;
 
-				if (m_dictAlphabetOrder.TryGetValue(sTableAlias, out iAliasOrder)) 
-				{
-					var varKey = m_dictAlphabetOrder.FirstOrDefault(x => x.Value == iAliasOrder + 1).Key;
-					this.m_sCurrentAlphabet = (varKey == null) ? "A" : varKey;
-				}
-				else
-				{
-					this.m_sCurrentAlphabet = "A";
-				}			
+			if (m_dictAlphabetOrder.TryGetValue(sInput, out iAliasOrder))
+			{
+				var varKey = m_dictAlphabetOrder.FirstOrDefault(x => x.Value == iAliasOrder + 1).Key;
+				this.m_sCurrentAlphabet = (varKey == null) ? "A" : varKey;
+			}
+			else
+			{
+				this.m_sCurrentAlphabet = "A";
 			}
 		}
 		public void Next()
 		{
-			this.m_sPreviousAlphabet = m_sCurrentAlphabet;
-			if (this.m_sCurrentAlphabet == "A") this.m_sCurrentAlphabet = "B";
-			else if (this.m_sCurrentAlphabet == "B") this.m_sCurrentAlphabet = "C";
-			else if (this.m_sCurrentAlphabet == "C") this.m_sCurrentAlphabet = "D";
-			else if (this.m_sCurrentAlphabet == "D") this.m_sCurrentAlphabet = "E";
-			else if (this.m_sCurrentAlphabet == "E") this.m_sCurrentAlphabet = "F";
-			else if (this.m_sCurrentAlphabet == "F") this.m_sCurrentAlphabet = "G";
-			else if (this.m_sCurrentAlphabet == "G") this.m_sCurrentAlphabet = "H";
-			else this.m_sCurrentAlphabet = "A";
-
+			SetNext(m_sCurrentAlphabet);
 		}
 		public string GetCurrent()
 		{

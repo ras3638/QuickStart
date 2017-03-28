@@ -12,26 +12,28 @@ using System.Windows.Forms;
 using System.Diagnostics;
 using System.Threading;
 using System.Text.RegularExpressions;
-
+using System.IO.Compression;
 namespace QuickStart
 {
-
-
 	public partial class frmQuickStart : Form
 	{
-
 		#region Class Variables
 
-		Dictionary<string, string> ClientDictionary = new Dictionary<string, string>();
 		List<string> Log = new List<string>();
-		List<string> RTTLog = new List<string>();
+		//List<string> RTTLog = new List<string>();
+
+		//Constants
+		public const string QFC = "QFC";
+		public const string DEVL = "Devl";
+		public const string LOAD_SCHEMA = "Load Schema";
+		public const string SCRIPT_GEN = "Script Gen";
+		public const string INSERT_GEN = "Insert Gen";
+		public const string CASCADE_DELETE_GEN = "Cascade Delete Gen";
+
 		//static bool UseActualNulls = true;
-		string sGlobalFile;
-		bool bDirBreak;
-		volatile bool bTimerThreadActive;
-		volatile bool bTimerErrorIndicator;
-		volatile bool bTimerCancelIndicator;
 		volatile List<Thread> ManagedThreadList = new List<Thread>();
+		volatile string sCurrentTab = DEVL;
+
 		Thread TimerThread;
 		Thread SearchStringThread;
 		Thread GenInsertThread;
@@ -44,13 +46,21 @@ namespace QuickStart
 		private void BlockParallelThreads(Thread CurrentThread)
 		{
 			//Blocks the calling thread from running if other parallel threads are ahead of queue.
-			string sThreadName = CurrentThread.Name;
-
 			while (true)
 			{
-				if (ManagedThreadList.Exists(item => item.Name == sThreadName))
+				//Slow down?
+				Thread.Sleep(500);
+
+				List<Thread> temp = new List<Thread>();
+
+				foreach(Thread t in ManagedThreadList.ToList())
 				{
-					if (ManagedThreadList[0].ManagedThreadId == CurrentThread.ManagedThreadId)
+					if (t.Name == CurrentThread.Name) temp.Add(t);
+				}
+
+				if(temp.Any())
+				{
+					if (temp[0].ManagedThreadId == CurrentThread.ManagedThreadId)
 					{
 						//First in Queue. Time to work
 						break;
@@ -58,88 +68,128 @@ namespace QuickStart
 				}
 				else
 				{
-					//There are no parallel threads running. Time to work
+					//Normally this method will be called when ManagedThreadList contains at least 1 thread. 
+					//If that is the case, this should never hit
 					break;
 				}
 			}
 		}
-		private void timerThreadActive(bool KeepActive)
-		{
-			bTimerThreadActive = KeepActive;
-
-			//reset status indicator when restarting the timer
-			if (KeepActive)
-			{
-				bTimerErrorIndicator = false;
-				bTimerCancelIndicator = false;
-			}
-		}
-		private void timerThreadErrorIndicator(bool ErrorInd)
-		{
-			bTimerErrorIndicator = ErrorInd;
-		}
-		private void timerThreadCancelIndicator(bool CacelInd)
-		{
-			bTimerCancelIndicator = CacelInd;
-		}
-		private void TimerThreadProcSafe()
-		{
+		private void TimerThreadProcSafe(TimerObjectManager A)
+		{			
+			A.SetTimerStatusText("Status: Executing...");
 			ThreadHelperUtility.SetText(this, statusStrip1, TSlblStatus, "Status: Executing...");
+
+			A.SetTimerSuccessIconVisible(false);
+			A.SetTimerErrorIconVisible(false);
 			tsSuccessIcon.Visible = false;
 			tsErrorIcon.Visible = false;
-			ThreadHelperUtility.SetEnable(this, tsInsertGen, tsGenerate_Insert, false);
-			ThreadHelperUtility.SetEnable(this, tsCascadeDelete, tsGenerate_CascadeDelete, false);
-			ThreadHelperUtility.SetEnable(this, tsLoadSchema, tsGenerate_SchemaScript, false);
-			ThreadHelperUtility.SetEnable(this, tsLoadSchema, tsSubmit_Schema, false);
-			ThreadHelperUtility.SetEnable(this, tsLoadSchema, tsSearch, false);
-			ThreadHelperUtility.SetEnable(this, tsInsertGen, tsStopGenerate_Insert, true);
 
-			Stopwatch sw = new Stopwatch();
-			string elapsedTimeOld = String.Empty;
+			Stopwatch sw = new Stopwatch();	
 			sw.Start();
-			while (bTimerThreadActive)
+
+			//Disable Execute buttons
+			A.SetTimerExecuteIconEnable(false);	
+			//Enable Stop Buttons
+			A.SetTimerStopIconEnable(true);
+			//Commit
+			UpdateExecuteAndStopIcons(A);
+
+			bool bTrack = true;
+			string elapsedTime = String.Empty;
+			string sLaunchingTabName = A.GetName();
+
+			while (A.GetTimerThreadActive())
 			{
-				TimeSpan ts = sw.Elapsed;
-				string elapsedTimeNew = String.Format("{0:00}:{1:00}:{2:00}",
-					ts.Hours, ts.Minutes, ts.Seconds);
-				if (elapsedTimeOld != elapsedTimeNew)
+				//Timer is active
+				while (A.GetPauseTimerIndicator())
 				{
-					ThreadHelperUtility.SetText(this, statusStrip1, TSlblTime, elapsedTimeNew);
-					elapsedTimeOld = elapsedTimeNew;
+					//Timer is on pause. Wait
+					Thread.Sleep(50);
 				}
-			}
-
-			ThreadHelperUtility.SetEnable(this, tsLoadSchema, tsSearch, true);
-			ThreadHelperUtility.SetEnable(this, tsInsertGen, tsGenerate_Insert, true);
-			ThreadHelperUtility.SetEnable(this, tsCascadeDelete, tsGenerate_CascadeDelete, true);
-			ThreadHelperUtility.SetEnable(this, tsLoadSchema, tsGenerate_SchemaScript, true);
-			ThreadHelperUtility.SetEnable(this, tsLoadSchema, tsSubmit_Schema, true);
-			ThreadHelperUtility.SetEnable(this, tsInsertGen, tsStopGenerate_Insert, false);
-
-			if (bTimerCancelIndicator)
-			{
-				ThreadHelperUtility.SetText(this, statusStrip1, TSlblStatus, "Status: Canceled");
-				tsErrorIcon.Visible = true;
-			}
-			else
-			{
-				if (bTimerErrorIndicator)
+				TimeSpan tsCurrent = sw.Elapsed;
+				elapsedTime = String.Format("{0:00}:{1:00}:{2:00}", tsCurrent.Hours, tsCurrent.Minutes, tsCurrent.Seconds);
+				A.SetTimerText(elapsedTime);
+				if (sCurrentTab == sLaunchingTabName)
 				{
-					ThreadHelperUtility.SetText(this, statusStrip1, TSlblStatus, "Status: Error");
-					tsErrorIcon.Visible = true;
-
-					//ThreadHelperUtility.SetVisible(this, statusStrip1, tsErrorIcon, true);
+					ThreadHelperUtility.SetText(this, statusStrip1, TSlblTime, elapsedTime);
+					bTrack = true;
 				}
 				else
 				{
-					ThreadHelperUtility.SetText(this, statusStrip1, TSlblStatus, "Status: Completed Succesfully");
-					tsSuccessIcon.Visible = true;
+					if (bTrack)
+					{
+						//Limit the number of objects created by using bTrack
+						TimerObjectManager B = TimerObjectState.Retrieve(sCurrentTab);
+						ThreadHelperUtility.SetText(this, statusStrip1, TSlblTime, B.GetTimerText());
+						bTrack = false;
+					}			
+				}
+			}
+			//Enable Execute buttons
+			A.SetTimerExecuteIconEnable(true);
+			//Disable Cancel Buttons
+			A.SetTimerStopIconEnable(false);
+			//Commit
+			UpdateExecuteAndStopIcons(A);
 
-					//ThreadHelperUtility.SetVisible(this, statusStrip1, tsSuccessIcon, true);
+			if (A.GetTimerCancelIndicator())
+			{
+				A.SetTimerStatusText("Status: Canceled");
+				A.SetTimerErrorIconVisible(true);
+				if (sCurrentTab == sLaunchingTabName)
+				{
+					ThreadHelperUtility.SetText(this, statusStrip1, TSlblStatus, "Status: Canceled");
+					tsErrorIcon.Visible = true;
+				}		
+			}
+			else
+			{
+				if (A.GetTimerErrorIndicator())
+				{
+					A.SetTimerStatusText("Status: Error");
+					A.SetTimerErrorIconVisible(true);
+					if (sCurrentTab == sLaunchingTabName)
+					{
+						ThreadHelperUtility.SetText(this, statusStrip1, TSlblStatus, "Status: Error");
+						tsErrorIcon.Visible = true;
+					}			
+				}
+				else
+				{
+					A.SetTimerStatusText("Status: Completed Succesfully");
+					A.SetTimerSuccessIconVisible(true);
+					if (sCurrentTab == sLaunchingTabName)
+					{
+						ThreadHelperUtility.SetText(this, statusStrip1, TSlblStatus, "Status: Completed Succesfully");
+						tsSuccessIcon.Visible = true;
+					}		
 				}
 			}
 		}
-		private void SearchStringThreadProcSafe(string Version, string SearchString, string FilePattern)
+		private void UpdateExecuteAndStopIcons(TimerObjectManager A)
+		{
+			if (A.GetName() == tsInsertGen.Tag.ToString())
+			{
+				ThreadHelperUtility.SetEnable(this, tsInsertGen, tsGenerate_Insert, A.GetTimerExecuteIconEnable());
+				ThreadHelperUtility.SetEnable(this, tsInsertGen, tsStopGenerate_Insert, A.GetTimerStopIconEnable());
+			}
+			else if (A.GetName() == tsCascadeDelete.Tag.ToString()) 
+			{
+				ThreadHelperUtility.SetEnable(this, tsCascadeDelete, tsGenerate_CascadeDelete, A.GetTimerExecuteIconEnable());
+				ThreadHelperUtility.SetEnable(this, tsCascadeDelete, tsStopGenerate_CascadeDelete, A.GetTimerStopIconEnable());
+			}
+			else if (A.GetName() == tsQFC.Tag.ToString()) 
+			{
+				ThreadHelperUtility.SetEnable(this, tsQFC, tsSearch, A.GetTimerExecuteIconEnable());
+				ThreadHelperUtility.SetEnable(this, tsQFC, tsStopSearch, A.GetTimerStopIconEnable());
+			}
+			else if (A.GetName() == tsLoadSchema.Tag.ToString())
+			{
+				ThreadHelperUtility.SetEnable(this, tsLoadSchema, tsGenerate_SchemaScript, A.GetTimerExecuteIconEnable());
+				ThreadHelperUtility.SetEnable(this, tsLoadSchema, tsSubmit_Schema, A.GetTimerExecuteIconEnable());
+			}
+		}
+		private void SearchStringThreadProcSafe(string sVersion, string sSearchString, string sFilePattern, TimerObjectManager A)
 		{
 			ProcessStartInfo cmdStartInfo = new ProcessStartInfo();
 			cmdStartInfo.FileName = @"C:\Windows\System32\cmd.exe";
@@ -160,27 +210,71 @@ namespace QuickStart
 
 			try
 			{
-				if (Version == "5.0")
+				string sPath = String.Empty;
+				if (sVersion == "5.0")
 				{
-					File.Delete("C:\\Devl\\Products\\Upstream\\5.0.00\\Dependencies\\Source\\QFC\\SearchResults.txt");
-					cmdProcess.StandardInput.WriteLine("cd C:\\Devl\\Products\\Upstream\\5.0.00\\Dependencies\\Source\\QFC");
+					sPath = (string)SettingManager.GetSettingValue(QFC, "QFC 5.0 Zip Path");
+
 				}
-				else if (Version == "8.0")
+				else if (sVersion == "8.0")
 				{
-					File.Delete("C:\\Devl\\Products\\Upstream\\8.0.00\\Dependencies\\Source\\QFC\\SearchResults.txt");
-					cmdProcess.StandardInput.WriteLine("cd C:\\Devl\\Products\\Upstream\\8.0.00\\Dependencies\\Source\\QFC");
+					sPath = (string)SettingManager.GetSettingValue(QFC, "QFC 8.0 Zip Path");
 				}
-				else if (Version == "16.0")
+				else if (sVersion == "16.0")
 				{
-					File.Delete("C:\\Devl\\Products\\Upstream\\Main\\Dependencies\\Source\\QFC\\SearchResults.txt");
-					cmdProcess.StandardInput.WriteLine("cd C:\\Devl\\Products\\Upstream\\Main\\Dependencies\\Source\\QFC");
+					sPath = (string)SettingManager.GetSettingValue(QFC, "QFC 16.0 Zip Path");
+				}
+				File.Delete(sPath + "\\SearchResults.txt");
+				cmdProcess.StandardInput.WriteLine("cd " + sPath);
+
+				List<string> ZipFilesListFull = Directory.GetFiles(sPath, "*.zip*", SearchOption.TopDirectoryOnly).ToList();
+				List<string> ZipFilesListNoExt = new List<string>();
+				List<string> DirectoriesList = Directory.GetDirectories(sPath, "*.*", SearchOption.TopDirectoryOnly).ToList();
+
+				//Remove the zip extension
+				foreach (string s in ZipFilesListFull)
+				{
+					ZipFilesListNoExt.Add(s.Substring(0, s.Length - 4));
+				}
+
+				List<string> DiffsList = ZipFilesListNoExt.Except(DirectoriesList).ToList();
+
+				if (DiffsList.Count > 0 && (bool)SettingManager.GetSettingValue(QFC, "Enable Zip Functionality"))
+				{
+					A.SetPauseTimerInidicator(true);
+					if (MessageBox.Show("Search functionality requires all QFC zip files to be unzipped but found " + DiffsList.Count() + " unzipped files. Application will start unzip operation.  \nContinue?",
+						"Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
+					{
+						A.SetTimerThreadActive(false);
+						return;
+					}
+					A.SetPauseTimerInidicator(false);
+					foreach (string sZipToExtract in DiffsList)
+					{
+						int iStartIndex = sZipToExtract.LastIndexOf("\\") + 1;
+						string sZipFile = sZipToExtract.Substring(iStartIndex, sZipToExtract.Length - iStartIndex);
+						string UnzipCommand = "unzip -o -d " + sZipFile + " " + sZipFile + ".zip";
+						cmdProcess.StandardInput.WriteLine(UnzipCommand);
+					}
+				}
+			}
+			catch (ThreadAbortException ex)
+			{
+				cmdProcess.StandardInput.WriteLine("exit");
+				if (!A.GetTimerCancelIndicator())
+				{
+					//We got an unrequested Abort
+					A.SetTimerErrorIndicator(true);
+					MessageBox.Show(ex.ToString(), "Error");
 				}
 			}
 			catch (Exception ex)
 			{
+				cmdProcess.StandardInput.WriteLine("exit");
 				MessageBox.Show(ex.ToString(), "Error");
-				timerThreadErrorIndicator(true);
-				timerThreadActive(false);		
+
+				A.SetTimerErrorIndicator(true);
+				A.SetTimerThreadActive(false);
 				return;
 			}
 
@@ -188,7 +282,7 @@ namespace QuickStart
 			{
 				string SearchCommand = "findstr /s /n /i /p /c:";
 				string OutputFile = ">> SearchResults.txt";
-				string sFull = string.Format("{0}\"{1}\" {2} {3}", SearchCommand, SearchString, FilePattern, OutputFile);
+				string sFull = string.Format("{0}\"{1}\" {2} {3}", SearchCommand, sSearchString, sFilePattern, OutputFile);
 				cmdProcess.StandardInput.WriteLine(sFull);
 				cmdProcess.StandardInput.WriteLine("start SearchResults.txt");
 				cmdProcess.StandardInput.WriteLine("exit");                  //Execute exit.
@@ -196,17 +290,27 @@ namespace QuickStart
 				cmdProcess.WaitForExit();
 
 			}
+			catch (ThreadAbortException ex)
+			{
+				if (!A.GetTimerCancelIndicator())
+				{
+					//We got an unrequested Abort
+					A.SetTimerErrorIndicator(true);
+					MessageBox.Show(ex.ToString(), "Error");
+				}
+			}
 			catch (Exception ex)
 			{
-				MessageBox.Show(ex.ToString(),"Error");
-				timerThreadErrorIndicator(true);
+				MessageBox.Show(ex.ToString(), "Error");
+				A.SetTimerErrorIndicator(true);
 			}
-
-			timerThreadActive(false);
-			
+			finally
+			{
+				cmdProcess.StandardInput.WriteLine("exit");
+				A.SetTimerThreadActive(false);
+			}
 		}
-		
-		private void GenInsertThreadProcSafe(string InputString, string IDInsert, string TableName, string GenFile)
+		private void GenInsertThreadProcSafe(string sInputString, string sIDInsert, string sTableName, string sGenFile, TimerObjectManager A)
 		{
 			//Only want one GenInsertThread thread running at any time
 			BlockParallelThreads(Thread.CurrentThread);
@@ -215,30 +319,30 @@ namespace QuickStart
 			{
 				StringBuilder sb = new StringBuilder();
 
-				if (!InputString.Contains("\n"))
+				if (!sInputString.Contains("\n"))
 				{
-					sb.Append("Improper input");
+					sb.Append("@@Error:Improper input");
 				}
 				else
 				{
-					sb.Append(SqlGenEngine.InsertEngine(InputString, IDInsert, TableName));
+					sb.Append(SqlGenEngine.InsertEngine(sInputString, sIDInsert, sTableName));
 				}
-
-				CreateGeneratedScriptFile(sb, GenFile);
+				string x = sb.ToString();
+				CreateGeneratedScriptFile(sb, sGenFile);
 			}
 			catch (ThreadAbortException ex)
 			{
-				if (!bTimerCancelIndicator)
+				if (!A.GetTimerCancelIndicator())
 				{
 					//We got an unrequested Abort
-					timerThreadErrorIndicator(true);
+					A.SetTimerErrorIndicator(true);
 					MessageBox.Show(ex.ToString(), "Error");
 				}
 			}
 			catch (Exception ex)
 			{
 				MessageBox.Show(ex.ToString(), "Error");
-				timerThreadErrorIndicator(true);
+				A.SetTimerErrorIndicator(true);
 			}
 			finally
 			{
@@ -247,70 +351,69 @@ namespace QuickStart
 					ManagedThreadList.Remove(Thread.CurrentThread);
 				}
 
-				if (ManagedThreadList.Find(item => item.Name == "GenInsertThread") == null)
+				if (ManagedThreadList.Find(item => item.Name == INSERT_GEN) == null)
 				{
 					//There are no more active GenInsertThread. Stop the timer
-					timerThreadActive(false);
+					A.SetTimerThreadActive(false);
 				}
-
-			}
-			
+			}		
 		}
-		private void GenCascadeDeleteThreadProcSafe(string sFKName, bool bUseIncrements, string sInput, string sCascadeOption, string sSchema)
+		private void GenCascadeDeleteThreadProcSafe(string sFKName, bool bUseIncrements, string sInput, string sCascadeOption, string sSchema, TimerObjectManager A)
 		{
-			string GenFile = "GeneratedScript.txt";
 			try
 			{
-				StreamReader streamReader = new StreamReader(GenFiles.GeneratedSchemas + "\\" + GetSchemaFileName(sSchema));
-				string line;
+				StreamReader streamReader = new StreamReader(BaseDirectories.GeneratedSchemas + "\\" + GetSchemaFileName(sSchema));
+				string sReadLine;
 				DataTable dtDatabaseSchema = new DataTable("Database Schema");
-				bool FirstIteration = true;
+				bool bFirstIteration = true;
 				StringBuilder sb = new StringBuilder();
-
-				while ((line = streamReader.ReadLine()) != null)
+				
+				while ((sReadLine = streamReader.ReadLine()) != null)
 				{
-					if (FirstIteration) dtDatabaseSchema = DataTableHelperUtility.AddColumns(dtDatabaseSchema, line);
-					if (!FirstIteration) dtDatabaseSchema = DataTableHelperUtility.AddRows(dtDatabaseSchema, line);
-					FirstIteration = false;
+					if (bFirstIteration) dtDatabaseSchema = DataTableHelperUtility.AddColumns(dtDatabaseSchema, sReadLine);
+					if (!bFirstIteration) dtDatabaseSchema = DataTableHelperUtility.AddRows(dtDatabaseSchema, sReadLine);
+					bFirstIteration = false;
 				}
+
 				if (sCascadeOption == "Single")
 				{
-					sb = SqlGenEngine.CascadeDeleteSingleEngine(dtDatabaseSchema, sFKName, bUseIncrements, sInput);
-					
+					sb = SqlGenEngine.CascadeDeleteSingleEngine(dtDatabaseSchema, sFKName, bUseIncrements, sInput);				
 				}
 				else if (sCascadeOption == "Full")
 				{
 					sb = SqlGenEngine.CascadeDeleteFullEngine(dtDatabaseSchema,sFKName, bUseIncrements, sInput);
-
 				}
 				else if (sCascadeOption == "All")
 				{
 					sb = SqlGenEngine.CascadeDeleteAllEngine(dtDatabaseSchema,sFKName, bUseIncrements, sInput);
-	
+				}
+				else if (sCascadeOption == "None")
+				{
+					sb = SqlGenEngine.CascadeDeleteNoneEngine(dtDatabaseSchema, sFKName, bUseIncrements, sInput);
 				}
 
 				if (sb.ToString().Contains("@@Error:"))
 				{
-					timerThreadErrorIndicator(true);
+					A.SetTimerErrorIndicator(true);
 				}
 				else
 				{
 					if(sCascadeOption == "Single") sb.Insert(0, "--Foriegn Key Cascade: " + sFKName + "\n");
-					sb.Append(SqlGenEngine.AppendOriginalDelStatement(sInput));
-								
+					//sb.Append(SqlGenEngine.AppendOriginalDelStatement(sInput));							
 				}
 
 				sb = StringUtility.CleanSB(sb);
-				CreateGeneratedScriptFile(sb, GenFile);
+
+				CreateGeneratedScriptFile(sb, "GeneratedScript.txt");
 			}
 			catch (Exception ex)
 			{
 				MessageBox.Show(ex.ToString(),"Error");
-				timerThreadErrorIndicator(true);
+				A.SetTimerErrorIndicator(true);
 			}
 			finally
 			{
-				timerThreadActive(false);
+				A.SetTimerThreadActive(false);
 			}
 		}
 		#endregion
@@ -328,72 +431,146 @@ namespace QuickStart
 			cmbVersion.SelectedIndex = 0;
 			cmbFilePattern.SelectedIndex = 0;
 			cmbLoadDB.SelectedIndex = 0;
-			ClientDictionary.Add("", "");
-			ClientDictionary.Add("CORE 5.0", "QBS");
-			ClientDictionary.Add("CORE 8.0", "QBS");
-			ClientDictionary.Add("CORE 16.0", "QBS");
+			LoadBaseDirectories();
 			LoadSchemas();
+			LoadSettings();
+
+			new TimerObjectManager(CASCADE_DELETE_GEN);
+			new TimerObjectManager(INSERT_GEN);
+			new TimerObjectManager(LOAD_SCHEMA);
+			new TimerObjectManager(DEVL);
+			new TimerObjectManager(QFC);
+
+			var dataSource = new List<Client>();
+			var dataSource2 = new List<Client>();
+			var dataSource3 = new List<Client>();
+
+			IDictionary<string, string> ClientDictionary = new Dictionary<string, string>();
+			ClientDictionary.Add("", "");
 
 			try
 			{
-				string[] files = Directory.GetDirectories("R:\\InternalClientInstallers\\Projects",
-					"*.*", SearchOption.TopDirectoryOnly);
-
-				// Display all the files.
-				foreach (string file in files)
+				//throw new  NotImplementedException();
+				if (!UseCachedClient())
 				{
-					sGlobalFile = file;
-					bDirBreak = true;
-					int RecursionLevelMax= 2; //the max number of times DirSearch will recurse unto itself		
-					DirSearch(file, RecursionLevelMax);
-				}
+					ClientDictionary.Add("CORE 5.0", "QBS");
+					ClientDictionary.Add("CORE 8.0", "QBS");
+					ClientDictionary.Add("CORE 16.0", "QBS");
 
-				var dataSource = new List<Client>();
-				var dataSource2 = new List<Client>();
-				var dataSource3 = new List<Client>();
+					string[] files = Directory.GetDirectories("R:\\InternalClientInstallers\\Projects",
+						"*.*", SearchOption.TopDirectoryOnly);
 
-				foreach (var pair in ClientDictionary)
-				{
-					dataSource.Add(new Client() { CmbName = pair.Key + " - " + pair.Value, Name = pair.Key, Code = pair.Value });
-					dataSource2.Add(new Client() { CmbName = pair.Key + " - " + pair.Value, Name = pair.Key, Code = pair.Value });
-					if (pair.Key != "")
+					// Display all the files.
+					foreach (string f in files)
 					{
-						dataSource3.Add(new Client() { CmbName = pair.Key + " - " + pair.Value, Name = pair.Key, Code = pair.Value });
-					}	
+						int iRecursionLevelMax = 2; //the max number of times DirSearch will recurse unto itself		
+						KeyValuePair<string, string> kvp = FindClient(f, iRecursionLevelMax, new KeyValuePair<string, string>());
+						if (kvp.Key != null) ClientDictionary.Add(kvp);
+					}
 				}
-
+				else
+				{
+					StreamReader streamReader = new StreamReader(BaseDirectories.CacheClientBase);
+					string sReadLine;
+					while ((sReadLine = streamReader.ReadLine()) != null)
+					{
+						List<string> Split = StringUtility.HighMemSplit(sReadLine, " - ");
+						if (Split.Count == 2 && !String.IsNullOrWhiteSpace(Split[0]) && !String.IsNullOrWhiteSpace(Split[1]))
+						{
+							ClientDictionary.Add(Split[0], Split[1]);
+						}
+					}
+					streamReader.Dispose();
+				}
+				using (var writer = new StreamWriter(BaseDirectories.CacheClientBase))
+				{
+					foreach (var pair in ClientDictionary)
+					{
+						
+						dataSource.Add(new Client() { CmbName = pair.Key + " - " + pair.Value, Name = pair.Key, Code = pair.Value });
+						dataSource2.Add(new Client() { CmbName = pair.Key + " - " + pair.Value, Name = pair.Key, Code = pair.Value });
+						if (pair.Key != "")
+						{
+							writer.WriteLine(pair.Key + " - " + pair.Value);
+							dataSource3.Add(new Client() { CmbName = pair.Key + " - " + pair.Value, Name = pair.Key, Code = pair.Value });
+						}
+					}			
+				}
 				//Setup data binding
 				this.cmbProcess.DataSource = dataSource;
-				this.cmbProcess.DisplayMember = "CmbName";
-				this.cmbProcess.ValueMember = null;//"Value";
-
 				this.cmbGUI.DataSource = dataSource2;
-				this.cmbGUI.DisplayMember = "CmbName";
-				this.cmbGUI.ValueMember = null;//"Value";
-
 				this.cmbLoadEnv.DataSource = dataSource3;
-				this.cmbLoadEnv.DisplayMember = "CmbName";
-				this.cmbLoadEnv.ValueMember = null;//"Value";
+			}
+			catch (IOException)
+			{
+				tsSetup.Enabled = false;
+				tsSubmit_Schema.Enabled = false;
+				dataSource.Add(new Client() { CmbName = "Could not connect to R drive", Name = "", Code = "" });
+				this.cmbProcess.DataSource = dataSource;
+				this.cmbGUI.DataSource = dataSource;
+				this.cmbLoadEnv.DataSource = dataSource;
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show(ex.ToString(), "Error");
-				tsSetup.Enabled = false;
+				MessageBox.Show(ex.ToString());
+			}
+			finally
+			{
+				this.cmbProcess.DisplayMember = "CmbName";
+				this.cmbGUI.DisplayMember = "CmbName";
+				this.cmbLoadEnv.DisplayMember = "CmbName";
+				this.cmbProcess.ValueMember = null;
+				this.cmbGUI.ValueMember = null;
+				this.cmbLoadEnv.ValueMember = null;
 			}
 		}
 		#endregion
+		private bool UseCachedClient()
+		{
+			if (!File.Exists(BaseDirectories.CacheClientBase))
+			{
+				File.Create(BaseDirectories.CacheClientBase);
+				return false;
+			}
+			else
+			{
+				DateTime FileDateCreated = File.GetCreationTime(BaseDirectories.CacheClientBase);
+				DateTime CurrentDate = DateTime.Now;
 
+				if (FileDateCreated.AddDays(30) < CurrentDate)
+				{
+					//Overwrite and clear the file
+					File.Create(BaseDirectories.CacheClientBase);
+					return false;
+				}
+			}
+			return true;
+		}
+		private void LoadBaseDirectories()
+		{
+			if (!Directory.Exists(BaseDirectories.QuickStartBase)) Directory.CreateDirectory(BaseDirectories.QuickStartBase);
+			if (!Directory.Exists(BaseDirectories.Core5QPECBase)) Directory.CreateDirectory(BaseDirectories.Core5QPECBase);
+			if (!Directory.Exists(BaseDirectories.Core8QPECBase)) Directory.CreateDirectory(BaseDirectories.Core8QPECBase);
+			if (!Directory.Exists(BaseDirectories.Core16QPECBase)) Directory.CreateDirectory(BaseDirectories.Core16QPECBase);
+			if (!Directory.Exists(BaseDirectories.Core5QPECConfigBase)) Directory.CreateDirectory(BaseDirectories.Core5QPECConfigBase);
+			if (!Directory.Exists(BaseDirectories.Core8QPECConfigBase)) Directory.CreateDirectory(BaseDirectories.Core8QPECConfigBase);
+			if (!Directory.Exists(BaseDirectories.Core16QPECConfigBase)) Directory.CreateDirectory(BaseDirectories.Core16QPECConfigBase);
+			if (!Directory.Exists(BaseDirectories.Core5QEnvironmentDefinitionsBase)) Directory.CreateDirectory(BaseDirectories.Core5QEnvironmentDefinitionsBase);
+			if (!Directory.Exists(BaseDirectories.Core5UpstreamMainAppBase)) Directory.CreateDirectory(BaseDirectories.Core5UpstreamMainAppBase);
+			if (!Directory.Exists(BaseDirectories.Core8UpstreamMainAppBase)) Directory.CreateDirectory(BaseDirectories.Core8UpstreamMainAppBase);
+			if (!Directory.Exists(BaseDirectories.Core16UpstreamMainAppBase)) Directory.CreateDirectory(BaseDirectories.Core16UpstreamMainAppBase);
+			if (!Directory.Exists(BaseDirectories.GeneratedSchemas)) Directory.CreateDirectory(BaseDirectories.GeneratedSchemas);		
+		}
 		private void LoadSchemas()
 		{
 			var dataSource4 = new List<Client>();
 			Dictionary<string, string> ClientSchemaDictionary = new Dictionary<string, string>();
 
-			string[] files = Directory.GetFiles(GenFiles.GeneratedSchemas,
+			string[] files = Directory.GetFiles(BaseDirectories.GeneratedSchemas,
 				"*.*", SearchOption.TopDirectoryOnly);
 			
 			foreach (string f in files)
 			{
-				//string FileDateCreated = File.GetCreationTime(f).ToString("MM/dd/yyyy");
 				string FileDateCreated = File.GetLastWriteTime(f).ToString("MM/dd/yyyy");
 				int index = f.LastIndexOf('\\') + 1;
 				string SchemaFileName = f.Substring(index, f.Length - index);
@@ -411,7 +588,7 @@ namespace QuickStart
 		}
 		private string GetSchemaFileName(string Schema)
 		{
-			string[] files = Directory.GetFiles(GenFiles.GeneratedSchemas,
+			string[] files = Directory.GetFiles(BaseDirectories.GeneratedSchemas,
 				"*.*", SearchOption.TopDirectoryOnly);
 
 			foreach (string f in files)
@@ -432,15 +609,15 @@ namespace QuickStart
 			}
 			return String.Empty;
 		}
-		private void DirSearch(string sDir, int RecursionLevelMax, int RecursionLevelCurrent = 0)
+		private KeyValuePair<string, string> FindClient(string sDir, int iRecursionLevelMax, KeyValuePair<string, string> RunningKVP, int iRecursionLevelCurrent = 0)
 		{
 			string[] files = Directory.GetDirectories(sDir, "*.*", SearchOption.TopDirectoryOnly);
 
+			//Loop through all the files and try to find a code
 			foreach (string f in files)
-			{
-				if (!bDirBreak) return;
+			{			
+				if (RunningKVP.Key != null) return RunningKVP;
 				int index = f.LastIndexOf('\\') + 1;
-
 				if (
 						(f.Contains("DEV") || f.Contains("REL") || f.Contains("TST") || f.Contains("CNV")) &&
 						(!f.Substring(index, f.Length - index).Contains("2015")) &&
@@ -455,27 +632,30 @@ namespace QuickStart
 						finalindex = lastindex - index;
 					}
 
-					string code = f.Substring(index, finalindex);
+					string sClientCode = f.Substring(index, finalindex);
 					//One final check if code is over 3 characters
-					if (code.Length > 3 && code.Contains('_'))
+					if (sClientCode.Length > 3 && sClientCode.Contains('_'))
 					{
-						code = code.Substring(0, 3);
+						sClientCode = sClientCode.Substring(0, 3);
 					}
-					
-					ClientDictionary.Add(sGlobalFile.Substring(37), code);
-					bDirBreak = false;
+		
+					int iIndexOfClientName = f.Substring(37).IndexOf("\\");
+					string sClientName = f.Substring(37).Substring(0, iIndexOfClientName);
+					return new KeyValuePair<string, string>(sClientName, sClientCode);
 				}
+			}
 
-				if (RecursionLevelCurrent >= RecursionLevelMax) 
-				{
-					bDirBreak = false;
-				}
-				DirSearch(f,RecursionLevelMax,RecursionLevelCurrent++);
-			}	
-		}
-		private void btnSetup_Click(object sender, EventArgs e)
-		{
+			//Exit out if we are too deep
+			if (iRecursionLevelCurrent >= iRecursionLevelMax) return RunningKVP;
 
+			//Did not find a code. Go down a layer
+			foreach (string f in files)
+			{		
+				iRecursionLevelCurrent++;
+				RunningKVP = FindClient(f, iRecursionLevelMax, RunningKVP, iRecursionLevelCurrent);
+			}
+
+			return RunningKVP;
 		}
 		private bool UpstreamMainAppHandler(Client Client)
 		{
@@ -485,17 +665,17 @@ namespace QuickStart
 				{
 					if (Client.Name == "CORE 5.0")
 					{
-						string[] lines = File.ReadAllLines(EnvDefDirectories.Core5UpstreamMainApp);
+						string[] lines = File.ReadAllLines(BaseDirectories.Core5UpstreamMainApp);
 						File.WriteAllLines(BaseDirectories.Full5UpstreamMainApp, lines);
 					}
 					else if (Client.Name == "CORE 8.0")
 					{
-						string[] lines = File.ReadAllLines(EnvDefDirectories.Core8UpstreamMainApp);
+						string[] lines = File.ReadAllLines(BaseDirectories.Core8UpstreamMainApp);
 						File.WriteAllLines(BaseDirectories.Full8UpstreamMainApp, lines);
 					}
 					else if (Client.Name == "CORE 16.0")
 					{
-						string[] lines = File.ReadAllLines(EnvDefDirectories.Core16UpstreamMainApp);
+						string[] lines = File.ReadAllLines(BaseDirectories.Core16UpstreamMainApp);
 						File.WriteAllLines(BaseDirectories.Full16UpstreamMainApp, lines);
 					}
 					else
@@ -504,13 +684,11 @@ namespace QuickStart
 
 						if (ClientDirectories.Count() == 0)
 						{
-							//MessageBox.Show("Could not find any templates in UpstreamMainApp directory");
 							Log.Add("UpstreamMainApp: No change - Could not find any templates in directory");
 							return false;
 						}
 						else if (ClientDirectories.Count() > 1)
 						{
-							//MessageBox.Show("Found more than 1 template for selected environment in UpstreamMainApp directory");
 							Log.Add("UpstreamMainApp: No change - Found more than 1 template for selected environment in directory");
 							return false;
 						}
@@ -520,7 +698,6 @@ namespace QuickStart
 							File.WriteAllLines(GetBaseDirectoryWithVersion(ClientDirectories[0], "UpstreamMainApp"), lines);
 						}
 					}
-					//MessageBox.Show("Successfully changed UpstreamMainApp.exe.config environment definition.");
 					Log.Add("UpstreamMainApp: Changed succesfully");
 					return true;
 				}
@@ -540,17 +717,17 @@ namespace QuickStart
 				{
 					if (Client.Name == "CORE 5.0")
 					{
-						string[] lines = File.ReadAllLines(EnvDefDirectories.Core5QPEC);
+						string[] lines = File.ReadAllLines(BaseDirectories.Core5QPEC);
 						File.WriteAllLines(BaseDirectories.Full5QPEC, lines);
 					}
 					else if (Client.Name == "CORE 8.0")
 					{
-						string[] lines = File.ReadAllLines(EnvDefDirectories.Core8QPEC);
+						string[] lines = File.ReadAllLines(BaseDirectories.Core8QPEC);
 						File.WriteAllLines(BaseDirectories.Full8QPEC, lines);
 					}
 					else if (Client.Name == "CORE 16.0")
 					{
-						string[] lines = File.ReadAllLines(EnvDefDirectories.Core16QPEC);
+						string[] lines = File.ReadAllLines(BaseDirectories.Core16QPEC);
 						File.WriteAllLines(BaseDirectories.Full16QPEC, lines);
 					}
 					else
@@ -559,13 +736,11 @@ namespace QuickStart
 
 						if (ClientDirectories.Count() == 0)
 						{
-							//MessageBox.Show("Could not find any templates in QPEC directory");
 							Log.Add("QPEC: No change - Could not find any templates in directory");
 							return false;
 						}
 						else if (ClientDirectories.Count() > 1)
 						{
-							//MessageBox.Show("Found more than 1 template for selected environment in QPEC directory");
 							Log.Add("QPEC: No change - Found more than 1 template for selected environment in directory");
 							return false;
 						}
@@ -576,7 +751,6 @@ namespace QuickStart
 						}
 
 					}
-					//MessageBox.Show("Successfully changed QPEC environment definition.");
 					Log.Add("QPEC: Changed succesfully");
 					return true;
 				}
@@ -596,32 +770,30 @@ namespace QuickStart
 				{
 					if (Client.Name == "CORE 5.0")
 					{
-						string[] lines = File.ReadAllLines(EnvDefDirectories.Core5QPECConfig);
+						string[] lines = File.ReadAllLines(BaseDirectories.Core5QPECConfig);
 						File.WriteAllLines(BaseDirectories.Full5QPECConfig, lines);
 					}
 					else if (Client.Name == "CORE 8.0")
 					{
-						string[] lines = File.ReadAllLines(EnvDefDirectories.Core8QPECConfig);
+						string[] lines = File.ReadAllLines(BaseDirectories.Core8QPECConfig);
 						File.WriteAllLines(BaseDirectories.Full8QPECConfig, lines);
 					}
 					else if (Client.Name == "CORE 16.0")
 					{
-						string[] lines = File.ReadAllLines(EnvDefDirectories.Core16QPECConfig);
+						string[] lines = File.ReadAllLines(BaseDirectories.Core16QPECConfig);
 						File.WriteAllLines(BaseDirectories.Full16QPECConfig, lines);
 					}
 					else
 					{
-						List<string> ClientDirectories = GetClientDirectories("QPEC", Client);
+						List<string> ClientDirectories = GetClientDirectories("QPEC Config", Client);
 
 						if (ClientDirectories.Count() == 0)
 						{
-							//MessageBox.Show("Could not find any templates in QPEC Config directory");
 							Log.Add("QPEC Config: No change - Could not find any templates in directory");
 							return false;
 						}
 						else if (ClientDirectories.Count() > 1)
 						{
-							//MessageBox.Show("Found more than 1 template for selected environment in QPEC Config directory");
 							Log.Add("QPEC Config: No change - Found more than 1 template for selected environment in directory");
 							return false;
 						}
@@ -632,7 +804,6 @@ namespace QuickStart
 						}
 
 					}
-					//MessageBox.Show("Successfully changed QPEC config environment definition.");
 					Log.Add("QPEC Config: Changed succesfully");
 					return true;
 				}
@@ -652,18 +823,18 @@ namespace QuickStart
 				{
 					if (Client.Name == "CORE 5.0")
 					{
-						string[] lines = File.ReadAllLines(EnvDefDirectories.Core5QEnvironmentDefinitions);
+						string[] lines = File.ReadAllLines(BaseDirectories.Core5QEnvironmentDefinitions);
 						File.WriteAllLines(BaseDirectories.Full5QEnvironmentDefinitions, lines);
 					}
 					else if (Client.Name == "CORE 8.0")
 					{
-						//Do nothing
+						//Version 8.0 does not use QEnvironmentDefinitions
 						Log.Add("QEnvironmentDefinitions: No change - Could not find any templates in directory");
 						return false;
 					}
 					else if (Client.Name == "CORE 16.0")
 					{
-						//Do nothing
+						//Version 16.0 does not use QEnvironmentDefinitions
 						Log.Add("QEnvironmentDefinitions: No change - Could not find any templates in directory");
 						return false;
 					}
@@ -673,13 +844,11 @@ namespace QuickStart
 
 						if (ClientDirectories.Count() == 0)
 						{
-							//MessageBox.Show("Could not find any templates in QEnvironmentDefinitions directory");
 							Log.Add("QEnvironmentDefinitions: No change - Could not find any templates in directory");
 							return false;
 						}
 						else if (ClientDirectories.Count() > 1)
 						{
-							//MessageBox.Show("Found more than 1 template for selected environment in QEnvironmentDefinitions directory");
 							Log.Add("QEnvironmentDefinitions: No change - Found more than 1 template for selected environment in directory");
 							return false;
 						}
@@ -690,7 +859,6 @@ namespace QuickStart
 						}
 
 					}
-					//MessageBox.Show("Successfully changed QEnvironmentDefinitions environment definition.");
 					Log.Add("QEnvironmentDefinitions: Changed succesfully");
 					return true;
 				}
@@ -704,8 +872,8 @@ namespace QuickStart
 		}
 		private string GetBaseDirectoryWithVersion(string sDir, string sFile)
 		{
-			int index = EnvDefDirectories.EnvDefBase.LastIndexOf('\\') + 1;
-			string sBaseFolder = EnvDefDirectories.EnvDefBase.Substring(index, EnvDefDirectories.EnvDefBase.Length - index);
+			int index = BaseDirectories.QuickStartBase.LastIndexOf('\\') + 1;
+			string sBaseFolder = BaseDirectories.QuickStartBase.Substring(index, BaseDirectories.QuickStartBase.Length - index);
 
 			index = sDir.IndexOf(sBaseFolder);
 			string Directory = sDir.Substring(index, sDir.Length - index);
@@ -738,7 +906,7 @@ namespace QuickStart
 		private List<string> GetClientDirectories(string Search, Client Client)
 		{
 			List<string> ClientDirectory = new List<string>();
-			string[] files = Directory.GetDirectories(EnvDefDirectories.EnvDefBase,
+			string[] files = Directory.GetDirectories(BaseDirectories.QuickStartBase,
 				"*.*", SearchOption.AllDirectories);
 
 			// Display all the files.
@@ -765,10 +933,10 @@ namespace QuickStart
 		{
 			Console.WriteLine("Output from other process");
 			Console.WriteLine(e.Data);
-			if(!String.IsNullOrWhiteSpace(e.Data))
-			{
-				RTTLog.Add(e.Data);
-			}		
+			//if(!String.IsNullOrWhiteSpace(e.Data))
+			//{
+			//	RTTLog.Add(e.Data);
+			//}		
 		}
 		static void cmd_Error(object sender, DataReceivedEventArgs e)
 		{
@@ -804,17 +972,15 @@ namespace QuickStart
 			cmdProcess.WaitForExit(50);
 			cmdProcess.Kill();
 
-			using (FileStream stream = File.Open(GenFiles.EnvironmentDefinitions + "\\" + GenFile, FileMode.Create))
-			//using (FileStream stream = File.Open(GenFiles.GeneratedScriptFile, FileMode.Create))
-			{
-			}
-			using (var writer = new StreamWriter(GenFiles.EnvironmentDefinitions + "\\" + GenFile))
+			using (FileStream stream = File.Open(BaseDirectories.QuickStartBase + "\\" + GenFile, FileMode.Create))
+			{}
+			using (var writer = new StreamWriter(BaseDirectories.QuickStartBase + "\\" + GenFile))
 			{
 				writer.Write(sb.ToString());
 			}
 
 			cmdProcess.Start();
-			cmdProcess.StandardInput.WriteLine("cd " + GenFiles.EnvironmentDefinitions);
+			cmdProcess.StandardInput.WriteLine("cd " + BaseDirectories.QuickStartBase);
 			cmdProcess.StandardInput.WriteLine("start " + GenFile);
 			cmdProcess.StandardInput.WriteLine("exit");
 			cmdProcess.WaitForExit();
@@ -822,7 +988,9 @@ namespace QuickStart
 		private void frmQuickStart_Load(object sender, EventArgs e)
 		{
 			Application.ApplicationExit += new EventHandler(this.OnApplicationExit);
+			panelSettings.Hide();
 		}
+		
 		private void OnApplicationExit(object sender, EventArgs e)
 		{
 			Environment.Exit(Environment.ExitCode);
@@ -838,7 +1006,7 @@ namespace QuickStart
 		private void tsRightClickRemove_Click(object sender, EventArgs e)
 		{
 			string sSchema = cmbSchema.Text;
-			File.Delete(GenFiles.GeneratedSchemas + "\\" + GetSchemaFileName(sSchema));
+			File.Delete(BaseDirectories.GeneratedSchemas + "\\" + GetSchemaFileName(sSchema));
 			LoadSchemas();
 			cmbSchema.SelectedIndex = -1;
 		}
@@ -847,7 +1015,7 @@ namespace QuickStart
 			if (e.KeyCode == Keys.Delete && cmbSchema.DroppedDown)
 			{
 				string sSchema = cmbSchema.Text;
-				File.Delete(GenFiles.GeneratedSchemas + "\\" + GetSchemaFileName(sSchema));
+				File.Delete(BaseDirectories.GeneratedSchemas + "\\" + GetSchemaFileName(sSchema));
 				LoadSchemas();
 				cmbSchema.SelectedIndex = -1;
 
@@ -859,26 +1027,19 @@ namespace QuickStart
 				cmbSchema.DroppedDown = true;
 			}	
 		}
-		private void myComboBox1_DropdownItemSelected_1(object sender, MyComboBox.DropdownItemSelectedEventArgs e)
-		{
-			if (e.SelectedItem < 0 || e.Scrolled)
-			{
-				//toolTip1.Hide(myComboBox1);
-			}
-			else
-			{			
-				//toolTip1.Show(SelectedClient.CmbName, myComboBox1, e.Bounds.Location);
-			}
-		}
 
 		private void tsGenerate_Insert_Click(object sender, EventArgs e)
 		{
-			string InputString = rttInput.Text;
-			string IDInsert = cmbIDInsert.Text;
-			string TableName = txtTableName_Insert.Text;
+			//string sInputString = rttInput.Text.Trim();
+			string sInputString = rttInput.Text; //Trim causes an issue if last columns are empty strings. Really we should be trimming new lines only.
+
+			string sIDInsert = cmbIDInsert.Text;
+			string sTableName = txtTableName_Insert.Text;
 			bool bProcessed = false;
-			
-			if (string.IsNullOrWhiteSpace(TableName))
+			string sTabName = tabControl2.SelectedTab.Tag.ToString();
+			TimerObjectManager A = new TimerObjectManager(sTabName);
+
+			if (string.IsNullOrWhiteSpace(sTableName))
 			{
 				errorProvider1.SetError(txtTableName_Insert, "Please Enter Table Name");
 				return;
@@ -891,27 +1052,29 @@ namespace QuickStart
 			
 			if (chkSplit.Checked)
 			{
-				if (StringUtility.IsStringOverMemory(InputString))
+				if (StringUtility.IsStringOverMemory(sInputString))
 				{
-					List<string> ListToProcess = StringUtility.SplitLargeString(InputString);
+					List<string> ListToProcess = StringUtility.SplitLargeString(sInputString);
+					int iFileNumber = 1;
 
-					for (int i = 0; i < ListToProcess.Count; i++)
+					foreach (string sInput in ListToProcess)
 					{
-						string sFileNumber = (i + 1).ToString();
-						string sGenFile = "GeneratedScript" + sFileNumber + ".txt";
-						GenInsertThread = new Thread(() => GenInsertThreadProcSafe(ListToProcess[i], IDInsert, TableName, sGenFile));
+						string sGenFile = "GeneratedScript" + iFileNumber.ToString() + ".txt";	
+						GenInsertThread = new Thread(() => GenInsertThreadProcSafe(sInput, sIDInsert, sTableName, sGenFile, A));
 						GenInsertThread.Start();
-						GenInsertThread.Name = "GenInsertThread";
+						GenInsertThread.Name = INSERT_GEN;
 						ManagedThreadList.Add(GenInsertThread);
+						
 						bProcessed = true;
+						iFileNumber++;
 					}
 				}
 			}
 			else
 			{
-				if (StringUtility.IsStringOverMemory(InputString))
+				if (StringUtility.IsStringOverMemory(sInputString))
 				{
-					if (MessageBox.Show("Dataset is large and may cause memory issues.\n" + StringUtility.StringOverCapacity(InputString).ToString() + "% over recommended capacity.\nContinue?",
+					if (MessageBox.Show("Dataset is large and may cause memory issues.\n" + StringUtility.StringOverCapacity(sInputString).ToString() + "% over recommended capacity.\nContinue?",
 							"Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
 					{
 						return;
@@ -921,14 +1084,17 @@ namespace QuickStart
 
 			if (!bProcessed)
 			{
-				GenInsertThread = new Thread(() => GenInsertThreadProcSafe(InputString, IDInsert, TableName, "GeneratedScript1.txt"));
+				
+				GenInsertThread = new Thread(() => GenInsertThreadProcSafe(sInputString, sIDInsert, sTableName, "GeneratedScript1.txt", A));
 				GenInsertThread.Start();
-				GenInsertThread.Name = "GenInsertThread";
-				ManagedThreadList.Add(GenInsertThread);
+				GenInsertThread.Name = INSERT_GEN;
+				ManagedThreadList.Add(GenInsertThread);				
 			}
 
-			TimerThread = new Thread(new ThreadStart(this.TimerThreadProcSafe));
-			timerThreadActive(true);
+			//TimerThread = new Thread(new ThreadStart(this.TimerThreadProcSafe));
+			A.SetTimerThreadActive(true);
+
+			TimerThread = new Thread(() => TimerThreadProcSafe(A));	
 			TimerThread.Start();
 		}
 		
@@ -940,13 +1106,14 @@ namespace QuickStart
 			bool bUseIncrements = chkUseIncrements.Checked;
 			string sInput = rttInput.Text;
 			string sSchema = cmbSchema.Text;
+			string sTabName = tabControl2.SelectedTab.Tag.ToString();
 
 			if (sCascadeOption == "Single" || sCascadeOption == "Full" || sCascadeOption == "All")
 			{
 				//Error Handling
 				bool bSuccess = true;
 
-				if (string.IsNullOrWhiteSpace(sFKName))
+				if (string.IsNullOrWhiteSpace(sFKName) && sCascadeOption != "All")
 				{
 					errorProvider3.SetError(txtFKName, "Please Enter FK Name");
 					bSuccess = false;
@@ -967,12 +1134,15 @@ namespace QuickStart
 				if (!bSuccess) return;
 			}
 
-			TimerThread = new Thread(new ThreadStart(this.TimerThreadProcSafe));
-			timerThreadActive(true);
+			//TimerThread = new Thread(new ThreadStart(this.TimerThreadProcSafe));
+			TimerObjectManager A = TimerObjectState.Retrieve(sTabName);
+			A.SetTimerThreadActive(true);
+			TimerThread = new Thread(() => TimerThreadProcSafe(A));	
 			TimerThread.Start();
 
-			GenCascadeDeleteThread = new Thread(() => GenCascadeDeleteThreadProcSafe(sFKName, bUseIncrements, sInput, sCascadeOption, sSchema));
-			GenCascadeDeleteThread.Start();	
+			GenCascadeDeleteThread = new Thread(() => GenCascadeDeleteThreadProcSafe(sFKName, bUseIncrements, sInput, sCascadeOption, sSchema, A));
+			GenCascadeDeleteThread.Start();
+			ManagedThreadList.Add(GenCascadeDeleteThread);
 		}
 
 		private void tsGenerate_SchemaScript_Click(object sender, EventArgs e)
@@ -985,23 +1155,37 @@ namespace QuickStart
 
 		private void tsSubmit_Schema_Click(object sender, EventArgs e)
 		{
+			string sTabName = tabControl2.SelectedTab.Tag.ToString();
+			TimerObjectManager A = TimerObjectState.Retrieve(sTabName);
+
 			try
 			{
+				A.SetTimerThreadActive(true);
+				TimerThread = new Thread(() => TimerThreadProcSafe(A));
+				
+				TimerThread.Start();
+
 				Client SelectedClient = (Client)cmbLoadEnv.SelectedValue;
 				string sSchemaFileName = SelectedClient.Name + "_" + SelectedClient.Code + "_" + cmbLoadDB.Text + ".txt";
-				using (FileStream stream = File.Open(GenFiles.GeneratedSchemas + "\\" + sSchemaFileName, FileMode.Create))
+				using (FileStream stream = File.Open(BaseDirectories.GeneratedSchemas + "\\" + sSchemaFileName, FileMode.Create))
 				{
 				}
-				using (var writer = new StreamWriter(GenFiles.GeneratedSchemas + "\\" + sSchemaFileName))
+				using (var writer = new StreamWriter(BaseDirectories.GeneratedSchemas + "\\" + sSchemaFileName))
 				{
 					writer.Write(rttInput.Text);
 				}
 				LoadSchemas();
 				MessageBox.Show("Successfully uploaded schema", "Success");
+				A.SetTimerErrorIndicator(false);
 			}
 			catch (Exception ex)
-			{
+			{	
 				MessageBox.Show(ex.ToString(), "Error");
+				A.SetTimerErrorIndicator(true);
+			}
+			finally
+			{
+				A.SetTimerThreadActive(false);
 			}
 		}
 
@@ -1030,27 +1214,32 @@ namespace QuickStart
 				errorProvider2.SetError(txtSearchString, "");
 			}
 
-			TimerThread = new Thread(new ThreadStart(this.TimerThreadProcSafe));
-			timerThreadActive(true);
+			string sTabName = tabControl1.SelectedTab.Tag.ToString();
+
+			TimerObjectManager A = TimerObjectState.Retrieve(sTabName);
+			A.SetTimerThreadActive(true);
+
+			TimerThread = new Thread(() => TimerThreadProcSafe(A));	
 			TimerThread.Start();
 
 			string Version = cmbVersion.Text;
 			string SearchString = txtSearchString.Text;
 			string FilePattern = cmbFilePattern.Text;
-			SearchStringThread = new Thread(() => SearchStringThreadProcSafe(Version, SearchString, FilePattern));
-			SearchStringThread.Start(); 
+			SearchStringThread = new Thread(() => SearchStringThreadProcSafe(Version, SearchString, FilePattern, A));
+			SearchStringThread.Start();
+			SearchStringThread.Name = QFC;
+			ManagedThreadList.Add(SearchStringThread);
 		}
-
-		private void tsStopGenerate_Insert_Click(object sender, EventArgs e)
+		private void StopCurrentThread(string sLaunchingTab)
 		{
-			timerThreadCancelIndicator(true);
-			timerThreadActive(false);
+			TimerObjectManager A = TimerObjectState.Retrieve(sLaunchingTab);
+			A.SetTimerCancelIndicator(true);
 
 			lock (ManagedThreadList)
 			{
 				foreach (Thread t in ManagedThreadList.ToList())
 				{
-					if (t.Name == "GenInsertThread")
+					if(t.Name == sLaunchingTab)
 					{
 						t.Abort();
 						t.Join();
@@ -1058,8 +1247,71 @@ namespace QuickStart
 					}
 				}
 			}
-
+			
+			A.SetTimerThreadActive(false);
 		}
 
+		private void tsStopGenerate_Insert_Click(object sender, EventArgs e)
+		{
+			string sTabName = tabControl2.SelectedTab.Tag.ToString();
+			StopCurrentThread(sTabName);
+		}
+
+		private void tsStopGenerate_CascadeDelete_Click(object sender, EventArgs e)
+		{
+			string sTabName = tabControl2.SelectedTab.Tag.ToString();
+			StopCurrentThread(sTabName);
+		}
+
+		private void tsStopSearch_Click(object sender, EventArgs e)
+		{
+			string sTabName = tabControl1.SelectedTab.Tag.ToString();
+			StopCurrentThread(sTabName);
+		}
+
+		private void tsStopSetup_Click(object sender, EventArgs e)
+		{
+			string sTabName = tabControl2.SelectedTab.Tag.ToString();
+			StopCurrentThread(sTabName);
+		}
+
+		private void tabControl2_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			string sNewTabName = tabControl2.SelectedTab.Tag.ToString();
+			
+			TimerObjectManager A = TimerObjectState.Retrieve(sNewTabName);
+
+			TSlblStatus.Text = A.GetTimerStatusText();
+			tsSuccessIcon.Visible = A.GetTimerSuccessIconVisible();
+			tsErrorIcon.Visible = A.GetTimerErrorIconVisible();
+			TSlblTime.Text = A.GetTimerText();
+
+			sCurrentTab = sNewTabName;	
+		}
+
+		private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			string sNewTabName1 = tabControl1.SelectedTab.Tag.ToString();
+			string sNewTabName2 = tabControl2.SelectedTab.Tag.ToString();
+
+			if (sNewTabName1 == SCRIPT_GEN)
+			{
+				TimerObjectManager B = TimerObjectState.Retrieve(sNewTabName2);
+				TSlblStatus.Text = B.GetTimerStatusText();
+				tsSuccessIcon.Visible = B.GetTimerSuccessIconVisible();
+				tsErrorIcon.Visible = B.GetTimerErrorIconVisible();
+				TSlblTime.Text = B.GetTimerText();
+				sCurrentTab = sNewTabName2;
+			}
+			else
+			{
+				TimerObjectManager A = TimerObjectState.Retrieve(sNewTabName1);
+				TSlblStatus.Text = A.GetTimerStatusText();
+				tsSuccessIcon.Visible = A.GetTimerSuccessIconVisible();
+				tsErrorIcon.Visible = A.GetTimerErrorIconVisible();
+				TSlblTime.Text = A.GetTimerText();
+				sCurrentTab = sNewTabName1;
+			}
+		}
 	}	 
 }

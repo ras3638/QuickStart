@@ -30,12 +30,20 @@
 		{
 			this.components = new System.ComponentModel.Container();
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmQuickStart));
+			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
+			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
 			this.tabControl1 = new System.Windows.Forms.TabControl();
 			this.tabPage1 = new System.Windows.Forms.TabPage();
 			this.label18 = new System.Windows.Forms.Label();
 			this.tsDevl = new System.Windows.Forms.ToolStrip();
 			this.tsSetup = new System.Windows.Forms.ToolStripButton();
 			this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
+			this.tsStopSetup = new System.Windows.Forms.ToolStripButton();
 			this.cmbGUI = new System.Windows.Forms.ComboBox();
 			this.cmbProcess = new System.Windows.Forms.ComboBox();
 			this.label4 = new System.Windows.Forms.Label();
@@ -50,6 +58,7 @@
 			this.tsGenerate_Insert = new System.Windows.Forms.ToolStripButton();
 			this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
 			this.tsStopGenerate_Insert = new System.Windows.Forms.ToolStripButton();
+			this.tsSettingsGenerate_Insert = new System.Windows.Forms.ToolStripButton();
 			this.cmbIDInsert = new System.Windows.Forms.ComboBox();
 			this.label10 = new System.Windows.Forms.Label();
 			this.txtTableName_Insert = new System.Windows.Forms.TextBox();
@@ -59,6 +68,8 @@
 			this.tsCascadeDelete = new System.Windows.Forms.ToolStrip();
 			this.tsGenerate_CascadeDelete = new System.Windows.Forms.ToolStripButton();
 			this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+			this.tsStopGenerate_CascadeDelete = new System.Windows.Forms.ToolStripButton();
+			this.tsSettingsCascade_Delete = new System.Windows.Forms.ToolStripButton();
 			this.chkUseIncrements = new System.Windows.Forms.CheckBox();
 			this.cmbSchema = new System.Windows.Forms.ComboBox();
 			this.rightClickMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
@@ -74,7 +85,6 @@
 			this.tsGenerate_SchemaScript = new System.Windows.Forms.ToolStripButton();
 			this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
 			this.tsSubmit_Schema = new System.Windows.Forms.ToolStripButton();
-			this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
 			this.cmbLoadDB = new System.Windows.Forms.ComboBox();
 			this.label15 = new System.Windows.Forms.Label();
 			this.label14 = new System.Windows.Forms.Label();
@@ -84,6 +94,8 @@
 			this.tsQFC = new System.Windows.Forms.ToolStrip();
 			this.tsSearch = new System.Windows.Forms.ToolStripButton();
 			this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
+			this.tsStopSearch = new System.Windows.Forms.ToolStripButton();
+			this.tsSettingsQFC = new System.Windows.Forms.ToolStripButton();
 			this.label19 = new System.Windows.Forms.Label();
 			this.label9 = new System.Windows.Forms.Label();
 			this.txtSearchString = new System.Windows.Forms.TextBox();
@@ -102,6 +114,21 @@
 			this.tsSpace = new System.Windows.Forms.ToolStripStatusLabel();
 			this.TSlblTime = new System.Windows.Forms.ToolStripStatusLabel();
 			this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+			this.panelSettings = new System.Windows.Forms.Panel();
+			this.gridSettingsQFC = new System.Windows.Forms.DataGridView();
+			this.dataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.dataGridViewTextBoxColumn2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.toolStrip1 = new System.Windows.Forms.ToolStrip();
+			this.tsSettingsBack = new System.Windows.Forms.ToolStripButton();
+			this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
+			this.tsSettingsReset = new System.Windows.Forms.ToolStripButton();
+			this.gridSettingsCascadeDel = new System.Windows.Forms.DataGridView();
+			this.Setting2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.Value2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.gridSettingsInsGen = new System.Windows.Forms.DataGridView();
+			this.Setting = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.Value = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.panelMainTab = new System.Windows.Forms.Panel();
 			this.tabControl1.SuspendLayout();
 			this.tabPage1.SuspendLayout();
 			this.tsDevl.SuspendLayout();
@@ -120,6 +147,12 @@
 			((System.ComponentModel.ISupportInitialize)(this.errorProvider2)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.errorProvider3)).BeginInit();
 			this.statusStrip1.SuspendLayout();
+			this.panelSettings.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.gridSettingsQFC)).BeginInit();
+			this.toolStrip1.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.gridSettingsCascadeDel)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.gridSettingsInsGen)).BeginInit();
+			this.panelMainTab.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// tabControl1
@@ -127,15 +160,17 @@
 			this.tabControl1.Controls.Add(this.tabPage1);
 			this.tabControl1.Controls.Add(this.tabPage2);
 			this.tabControl1.Controls.Add(this.tabPage3);
-			this.tabControl1.Location = new System.Drawing.Point(1, 0);
+			this.tabControl1.Location = new System.Drawing.Point(2, 0);
 			this.tabControl1.Name = "tabControl1";
 			this.tabControl1.SelectedIndex = 0;
-			this.tabControl1.Size = new System.Drawing.Size(657, 493);
+			this.tabControl1.Size = new System.Drawing.Size(657, 483);
 			this.tabControl1.TabIndex = 0;
+			this.tabControl1.SelectedIndexChanged += new System.EventHandler(this.tabControl1_SelectedIndexChanged);
 			// 
 			// tabPage1
 			// 
 			this.tabPage1.BackColor = System.Drawing.SystemColors.Control;
+			this.tabPage1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
 			this.tabPage1.Controls.Add(this.label18);
 			this.tabPage1.Controls.Add(this.tsDevl);
 			this.tabPage1.Controls.Add(this.cmbGUI);
@@ -145,8 +180,9 @@
 			this.tabPage1.Controls.Add(this.label1);
 			this.tabPage1.Location = new System.Drawing.Point(4, 25);
 			this.tabPage1.Name = "tabPage1";
-			this.tabPage1.Size = new System.Drawing.Size(649, 464);
+			this.tabPage1.Size = new System.Drawing.Size(649, 454);
 			this.tabPage1.TabIndex = 0;
+			this.tabPage1.Tag = "Devl";
 			this.tabPage1.Text = "Devl";
 			// 
 			// label18
@@ -163,11 +199,13 @@
 			this.tsDevl.BackColor = System.Drawing.SystemColors.Control;
 			this.tsDevl.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.tsSetup,
-            this.toolStripSeparator5});
+            this.toolStripSeparator5,
+            this.tsStopSetup});
 			this.tsDevl.Location = new System.Drawing.Point(0, 0);
 			this.tsDevl.Name = "tsDevl";
-			this.tsDevl.Size = new System.Drawing.Size(649, 27);
+			this.tsDevl.Size = new System.Drawing.Size(645, 27);
 			this.tsDevl.TabIndex = 23;
+			this.tsDevl.Tag = "Devl";
 			this.tsDevl.Text = "toolStrip1";
 			// 
 			// tsSetup
@@ -184,6 +222,16 @@
 			this.toolStripSeparator5.Name = "toolStripSeparator5";
 			this.toolStripSeparator5.Size = new System.Drawing.Size(6, 27);
 			// 
+			// tsStopSetup
+			// 
+			this.tsStopSetup.Enabled = false;
+			this.tsStopSetup.Image = ((System.Drawing.Image)(resources.GetObject("tsStopSetup.Image")));
+			this.tsStopSetup.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.tsStopSetup.Name = "tsStopSetup";
+			this.tsStopSetup.Size = new System.Drawing.Size(60, 24);
+			this.tsStopSetup.Text = "Stop";
+			this.tsStopSetup.Click += new System.EventHandler(this.tsStopSetup_Click);
+			// 
 			// cmbGUI
 			// 
 			this.cmbGUI.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
@@ -197,9 +245,6 @@
 			// 
 			this.cmbProcess.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.cmbProcess.FormattingEnabled = true;
-			this.cmbProcess.Items.AddRange(new object[] {
-            "5.0",
-            "8.0"});
 			this.cmbProcess.Location = new System.Drawing.Point(210, 48);
 			this.cmbProcess.Name = "cmbProcess";
 			this.cmbProcess.Size = new System.Drawing.Size(225, 24);
@@ -237,13 +282,15 @@
 			// tabPage2
 			// 
 			this.tabPage2.BackColor = System.Drawing.SystemColors.Control;
+			this.tabPage2.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
 			this.tabPage2.Controls.Add(this.tabControl2);
 			this.tabPage2.Controls.Add(this.rttInput);
 			this.tabPage2.Location = new System.Drawing.Point(4, 25);
 			this.tabPage2.Name = "tabPage2";
 			this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-			this.tabPage2.Size = new System.Drawing.Size(649, 464);
+			this.tabPage2.Size = new System.Drawing.Size(649, 454);
 			this.tabPage2.TabIndex = 1;
+			this.tabPage2.Tag = "Script Gen";
 			this.tabPage2.Text = "Script Gen";
 			// 
 			// tabControl2
@@ -256,10 +303,12 @@
 			this.tabControl2.SelectedIndex = 0;
 			this.tabControl2.Size = new System.Drawing.Size(624, 223);
 			this.tabControl2.TabIndex = 17;
+			this.tabControl2.SelectedIndexChanged += new System.EventHandler(this.tabControl2_SelectedIndexChanged);
 			// 
 			// tabPage4
 			// 
 			this.tabPage4.BackColor = System.Drawing.SystemColors.Control;
+			this.tabPage4.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
 			this.tabPage4.Controls.Add(this.chkSplit);
 			this.tabPage4.Controls.Add(this.label7);
 			this.tabPage4.Controls.Add(this.tsInsertGen);
@@ -272,6 +321,7 @@
 			this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
 			this.tabPage4.Size = new System.Drawing.Size(616, 194);
 			this.tabPage4.TabIndex = 0;
+			this.tabPage4.Tag = "Insert Gen";
 			this.tabPage4.Text = "Insert Gen";
 			// 
 			// chkSplit
@@ -299,11 +349,13 @@
 			this.tsInsertGen.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.tsGenerate_Insert,
             this.toolStripSeparator1,
-            this.tsStopGenerate_Insert});
+            this.tsStopGenerate_Insert,
+            this.tsSettingsGenerate_Insert});
 			this.tsInsertGen.Location = new System.Drawing.Point(3, 3);
 			this.tsInsertGen.Name = "tsInsertGen";
-			this.tsInsertGen.Size = new System.Drawing.Size(610, 27);
+			this.tsInsertGen.Size = new System.Drawing.Size(606, 27);
 			this.tsInsertGen.TabIndex = 22;
+			this.tsInsertGen.Tag = "Insert Gen";
 			this.tsInsertGen.Text = "toolStrip1";
 			// 
 			// tsGenerate_Insert
@@ -329,6 +381,17 @@
 			this.tsStopGenerate_Insert.Size = new System.Drawing.Size(60, 24);
 			this.tsStopGenerate_Insert.Text = "Stop";
 			this.tsStopGenerate_Insert.Click += new System.EventHandler(this.tsStopGenerate_Insert_Click);
+			// 
+			// tsSettingsGenerate_Insert
+			// 
+			this.tsSettingsGenerate_Insert.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
+			this.tsSettingsGenerate_Insert.Image = ((System.Drawing.Image)(resources.GetObject("tsSettingsGenerate_Insert.Image")));
+			this.tsSettingsGenerate_Insert.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.tsSettingsGenerate_Insert.Name = "tsSettingsGenerate_Insert";
+			this.tsSettingsGenerate_Insert.Size = new System.Drawing.Size(82, 24);
+			this.tsSettingsGenerate_Insert.Tag = "Insert Gen";
+			this.tsSettingsGenerate_Insert.Text = "Settings";
+			this.tsSettingsGenerate_Insert.Click += new System.EventHandler(this.tsSettingsGenerate_Insert_Click);
 			// 
 			// cmbIDInsert
 			// 
@@ -373,6 +436,7 @@
 			// tabPage5
 			// 
 			this.tabPage5.BackColor = System.Drawing.SystemColors.Control;
+			this.tabPage5.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
 			this.tabPage5.Controls.Add(this.label16);
 			this.tabPage5.Controls.Add(this.tsCascadeDelete);
 			this.tabPage5.Controls.Add(this.chkUseIncrements);
@@ -387,6 +451,7 @@
 			this.tabPage5.Padding = new System.Windows.Forms.Padding(3);
 			this.tabPage5.Size = new System.Drawing.Size(616, 194);
 			this.tabPage5.TabIndex = 1;
+			this.tabPage5.Tag = "Cascade Delete Gen";
 			this.tabPage5.Text = "Cascade Delete Gen";
 			// 
 			// label16
@@ -403,11 +468,14 @@
 			this.tsCascadeDelete.BackColor = System.Drawing.SystemColors.Control;
 			this.tsCascadeDelete.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.tsGenerate_CascadeDelete,
-            this.toolStripSeparator2});
+            this.toolStripSeparator2,
+            this.tsStopGenerate_CascadeDelete,
+            this.tsSettingsCascade_Delete});
 			this.tsCascadeDelete.Location = new System.Drawing.Point(3, 3);
 			this.tsCascadeDelete.Name = "tsCascadeDelete";
-			this.tsCascadeDelete.Size = new System.Drawing.Size(610, 27);
+			this.tsCascadeDelete.Size = new System.Drawing.Size(606, 27);
 			this.tsCascadeDelete.TabIndex = 29;
+			this.tsCascadeDelete.Tag = "Cascade Delete Gen";
 			this.tsCascadeDelete.Text = "toolStrip1";
 			// 
 			// tsGenerate_CascadeDelete
@@ -424,6 +492,27 @@
 			this.toolStripSeparator2.Name = "toolStripSeparator2";
 			this.toolStripSeparator2.Size = new System.Drawing.Size(6, 27);
 			// 
+			// tsStopGenerate_CascadeDelete
+			// 
+			this.tsStopGenerate_CascadeDelete.Enabled = false;
+			this.tsStopGenerate_CascadeDelete.Image = ((System.Drawing.Image)(resources.GetObject("tsStopGenerate_CascadeDelete.Image")));
+			this.tsStopGenerate_CascadeDelete.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.tsStopGenerate_CascadeDelete.Name = "tsStopGenerate_CascadeDelete";
+			this.tsStopGenerate_CascadeDelete.Size = new System.Drawing.Size(60, 24);
+			this.tsStopGenerate_CascadeDelete.Text = "Stop";
+			this.tsStopGenerate_CascadeDelete.Click += new System.EventHandler(this.tsStopGenerate_CascadeDelete_Click);
+			// 
+			// tsSettingsCascade_Delete
+			// 
+			this.tsSettingsCascade_Delete.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
+			this.tsSettingsCascade_Delete.Image = ((System.Drawing.Image)(resources.GetObject("tsSettingsCascade_Delete.Image")));
+			this.tsSettingsCascade_Delete.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.tsSettingsCascade_Delete.Name = "tsSettingsCascade_Delete";
+			this.tsSettingsCascade_Delete.Size = new System.Drawing.Size(82, 24);
+			this.tsSettingsCascade_Delete.Tag = "Cascade Delete Gen";
+			this.tsSettingsCascade_Delete.Text = "Settings";
+			this.tsSettingsCascade_Delete.Click += new System.EventHandler(this.tsSettingsCascade_Delete_Click);
+			// 
 			// chkUseIncrements
 			// 
 			this.chkUseIncrements.AutoSize = true;
@@ -439,9 +528,6 @@
 			this.cmbSchema.ContextMenuStrip = this.rightClickMenuStrip;
 			this.cmbSchema.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.cmbSchema.FormattingEnabled = true;
-			this.cmbSchema.Items.AddRange(new object[] {
-            "Single",
-            "Full"});
 			this.cmbSchema.Location = new System.Drawing.Point(212, 114);
 			this.cmbSchema.Name = "cmbSchema";
 			this.cmbSchema.Size = new System.Drawing.Size(225, 24);
@@ -497,7 +583,8 @@
 			this.cmbCascadeOption.Items.AddRange(new object[] {
             "Single",
             "Full",
-            "All"});
+            "All",
+            "None"});
 			this.cmbCascadeOption.Location = new System.Drawing.Point(212, 46);
 			this.cmbCascadeOption.Name = "cmbCascadeOption";
 			this.cmbCascadeOption.Size = new System.Drawing.Size(225, 24);
@@ -516,6 +603,7 @@
 			// tabPage6
 			// 
 			this.tabPage6.BackColor = System.Drawing.SystemColors.Control;
+			this.tabPage6.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
 			this.tabPage6.Controls.Add(this.label17);
 			this.tabPage6.Controls.Add(this.tsLoadSchema);
 			this.tabPage6.Controls.Add(this.cmbLoadDB);
@@ -527,6 +615,7 @@
 			this.tabPage6.Padding = new System.Windows.Forms.Padding(3);
 			this.tabPage6.Size = new System.Drawing.Size(616, 194);
 			this.tabPage6.TabIndex = 2;
+			this.tabPage6.Tag = "Load Schema";
 			this.tabPage6.Text = "Load Schema";
 			// 
 			// label17
@@ -544,12 +633,12 @@
 			this.tsLoadSchema.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.tsGenerate_SchemaScript,
             this.toolStripSeparator3,
-            this.tsSubmit_Schema,
-            this.toolStripSeparator4});
+            this.tsSubmit_Schema});
 			this.tsLoadSchema.Location = new System.Drawing.Point(3, 3);
 			this.tsLoadSchema.Name = "tsLoadSchema";
-			this.tsLoadSchema.Size = new System.Drawing.Size(610, 27);
+			this.tsLoadSchema.Size = new System.Drawing.Size(606, 27);
 			this.tsLoadSchema.TabIndex = 27;
+			this.tsLoadSchema.Tag = "Load Schema";
 			this.tsLoadSchema.Text = "toolStrip1";
 			// 
 			// tsGenerate_SchemaScript
@@ -575,11 +664,6 @@
 			this.tsSubmit_Schema.Text = "Submit";
 			this.tsSubmit_Schema.Click += new System.EventHandler(this.tsSubmit_Schema_Click);
 			// 
-			// toolStripSeparator4
-			// 
-			this.toolStripSeparator4.Name = "toolStripSeparator4";
-			this.toolStripSeparator4.Size = new System.Drawing.Size(6, 27);
-			// 
 			// cmbLoadDB
 			// 
 			this.cmbLoadDB.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
@@ -590,7 +674,8 @@
             "QCFS",
             "ESUITE",
             "QFC",
-            "ESUITE QFC"});
+            "ESUITE QFC",
+            "SCR"});
 			this.cmbLoadDB.Location = new System.Drawing.Point(212, 80);
 			this.cmbLoadDB.Name = "cmbLoadDB";
 			this.cmbLoadDB.Size = new System.Drawing.Size(225, 24);
@@ -620,9 +705,6 @@
 			// 
 			this.cmbLoadEnv.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.cmbLoadEnv.FormattingEnabled = true;
-			this.cmbLoadEnv.Items.AddRange(new object[] {
-            "5.0",
-            "8.0"});
 			this.cmbLoadEnv.Location = new System.Drawing.Point(212, 44);
 			this.cmbLoadEnv.Name = "cmbLoadEnv";
 			this.cmbLoadEnv.Size = new System.Drawing.Size(225, 24);
@@ -639,6 +721,7 @@
 			// tabPage3
 			// 
 			this.tabPage3.BackColor = System.Drawing.SystemColors.Control;
+			this.tabPage3.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
 			this.tabPage3.Controls.Add(this.tsQFC);
 			this.tabPage3.Controls.Add(this.label19);
 			this.tabPage3.Controls.Add(this.label9);
@@ -650,8 +733,9 @@
 			this.tabPage3.Controls.Add(this.cmbVersion);
 			this.tabPage3.Location = new System.Drawing.Point(4, 25);
 			this.tabPage3.Name = "tabPage3";
-			this.tabPage3.Size = new System.Drawing.Size(649, 464);
+			this.tabPage3.Size = new System.Drawing.Size(649, 454);
 			this.tabPage3.TabIndex = 2;
+			this.tabPage3.Tag = "QFC";
 			this.tabPage3.Text = "QFC";
 			// 
 			// tsQFC
@@ -659,11 +743,14 @@
 			this.tsQFC.BackColor = System.Drawing.SystemColors.Control;
 			this.tsQFC.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.tsSearch,
-            this.toolStripSeparator6});
+            this.toolStripSeparator6,
+            this.tsStopSearch,
+            this.tsSettingsQFC});
 			this.tsQFC.Location = new System.Drawing.Point(0, 0);
 			this.tsQFC.Name = "tsQFC";
-			this.tsQFC.Size = new System.Drawing.Size(649, 27);
+			this.tsQFC.Size = new System.Drawing.Size(645, 27);
 			this.tsQFC.TabIndex = 27;
+			this.tsQFC.Tag = "QFC";
 			this.tsQFC.Text = "toolStrip1";
 			// 
 			// tsSearch
@@ -679,6 +766,28 @@
 			// 
 			this.toolStripSeparator6.Name = "toolStripSeparator6";
 			this.toolStripSeparator6.Size = new System.Drawing.Size(6, 27);
+			// 
+			// tsStopSearch
+			// 
+			this.tsStopSearch.Enabled = false;
+			this.tsStopSearch.Image = ((System.Drawing.Image)(resources.GetObject("tsStopSearch.Image")));
+			this.tsStopSearch.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.tsStopSearch.Name = "tsStopSearch";
+			this.tsStopSearch.Size = new System.Drawing.Size(60, 24);
+			this.tsStopSearch.Text = "Stop";
+			this.tsStopSearch.Click += new System.EventHandler(this.tsStopSearch_Click);
+			// 
+			// tsSettingsQFC
+			// 
+			this.tsSettingsQFC.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
+			this.tsSettingsQFC.Image = ((System.Drawing.Image)(resources.GetObject("tsSettingsQFC.Image")));
+			this.tsSettingsQFC.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.tsSettingsQFC.Name = "tsSettingsQFC";
+			this.tsSettingsQFC.Padding = new System.Windows.Forms.Padding(0, 0, 10, 0);
+			this.tsSettingsQFC.Size = new System.Drawing.Size(92, 24);
+			this.tsSettingsQFC.Tag = "QFC";
+			this.tsSettingsQFC.Text = "Settings";
+			this.tsSettingsQFC.Click += new System.EventHandler(this.tsSettingsQFC_Click);
 			// 
 			// label19
 			// 
@@ -790,6 +899,7 @@
 			this.statusStrip1.Location = new System.Drawing.Point(0, 487);
 			this.statusStrip1.Name = "statusStrip1";
 			this.statusStrip1.Size = new System.Drawing.Size(656, 25);
+			this.statusStrip1.SizingGrip = false;
 			this.statusStrip1.TabIndex = 1;
 			this.statusStrip1.Text = "statusStrip1";
 			// 
@@ -817,22 +927,254 @@
 			// tsSpace
 			// 
 			this.tsSpace.Name = "tsSpace";
-			this.tsSpace.Size = new System.Drawing.Size(526, 20);
+			this.tsSpace.Size = new System.Drawing.Size(536, 20);
 			this.tsSpace.Spring = true;
 			// 
 			// TSlblTime
 			// 
+			this.TSlblTime.Margin = new System.Windows.Forms.Padding(0, 3, -10, 2);
 			this.TSlblTime.Name = "TSlblTime";
 			this.TSlblTime.Size = new System.Drawing.Size(63, 20);
 			this.TSlblTime.Text = "00:00:00";
+			// 
+			// panelSettings
+			// 
+			this.panelSettings.Controls.Add(this.gridSettingsQFC);
+			this.panelSettings.Controls.Add(this.toolStrip1);
+			this.panelSettings.Controls.Add(this.gridSettingsCascadeDel);
+			this.panelSettings.Controls.Add(this.gridSettingsInsGen);
+			this.panelSettings.Location = new System.Drawing.Point(0, 0);
+			this.panelSettings.Name = "panelSettings";
+			this.panelSettings.Size = new System.Drawing.Size(653, 484);
+			this.panelSettings.TabIndex = 2;
+			// 
+			// gridSettingsQFC
+			// 
+			this.gridSettingsQFC.AllowUserToAddRows = false;
+			this.gridSettingsQFC.AllowUserToDeleteRows = false;
+			this.gridSettingsQFC.AllowUserToResizeColumns = false;
+			this.gridSettingsQFC.AllowUserToResizeRows = false;
+			this.gridSettingsQFC.BackgroundColor = System.Drawing.SystemColors.Control;
+			this.gridSettingsQFC.BorderStyle = System.Windows.Forms.BorderStyle.None;
+			dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+			dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.ControlDark;
+			dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
+			dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+			dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+			dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+			this.gridSettingsQFC.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+			this.gridSettingsQFC.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+			this.gridSettingsQFC.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.dataGridViewTextBoxColumn1,
+            this.dataGridViewTextBoxColumn2});
+			this.gridSettingsQFC.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
+			this.gridSettingsQFC.EnableHeadersVisualStyles = false;
+			this.gridSettingsQFC.Location = new System.Drawing.Point(-5, 280);
+			this.gridSettingsQFC.MultiSelect = false;
+			this.gridSettingsQFC.Name = "gridSettingsQFC";
+			this.gridSettingsQFC.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
+			this.gridSettingsQFC.RowTemplate.Height = 24;
+			this.gridSettingsQFC.Size = new System.Drawing.Size(626, 120);
+			this.gridSettingsQFC.TabIndex = 24;
+			this.gridSettingsQFC.Tag = "QFC";
+			this.gridSettingsQFC.SelectionChanged += new System.EventHandler(this.gridSettingsQFC_SelectionChanged);
+			this.gridSettingsQFC.Click += new System.EventHandler(this.gridSettingsQFC_Click);
+			// 
+			// dataGridViewTextBoxColumn1
+			// 
+			this.dataGridViewTextBoxColumn1.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+			dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Control;
+			dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Control;
+			dataGridViewCellStyle2.SelectionForeColor = System.Drawing.Color.Black;
+			this.dataGridViewTextBoxColumn1.DefaultCellStyle = dataGridViewCellStyle2;
+			this.dataGridViewTextBoxColumn1.HeaderText = "QFC";
+			this.dataGridViewTextBoxColumn1.Name = "dataGridViewTextBoxColumn1";
+			this.dataGridViewTextBoxColumn1.ReadOnly = true;
+			this.dataGridViewTextBoxColumn1.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+			this.dataGridViewTextBoxColumn1.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+			this.dataGridViewTextBoxColumn1.Width = 175;
+			// 
+			// dataGridViewTextBoxColumn2
+			// 
+			this.dataGridViewTextBoxColumn2.HeaderText = "";
+			this.dataGridViewTextBoxColumn2.Name = "dataGridViewTextBoxColumn2";
+			this.dataGridViewTextBoxColumn2.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+			this.dataGridViewTextBoxColumn2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+			this.dataGridViewTextBoxColumn2.Width = 400;
+			// 
+			// toolStrip1
+			// 
+			this.toolStrip1.BackColor = System.Drawing.SystemColors.Control;
+			this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.tsSettingsBack,
+            this.toolStripSeparator4,
+            this.tsSettingsReset});
+			this.toolStrip1.Location = new System.Drawing.Point(0, 0);
+			this.toolStrip1.Name = "toolStrip1";
+			this.toolStrip1.Size = new System.Drawing.Size(653, 27);
+			this.toolStrip1.TabIndex = 23;
+			this.toolStrip1.Text = "toolStrip1";
+			// 
+			// tsSettingsBack
+			// 
+			this.tsSettingsBack.Image = ((System.Drawing.Image)(resources.GetObject("tsSettingsBack.Image")));
+			this.tsSettingsBack.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.tsSettingsBack.Name = "tsSettingsBack";
+			this.tsSettingsBack.Size = new System.Drawing.Size(60, 24);
+			this.tsSettingsBack.Text = "Back";
+			this.tsSettingsBack.Click += new System.EventHandler(this.tsSettingsReturn_Click);
+			// 
+			// toolStripSeparator4
+			// 
+			this.toolStripSeparator4.Name = "toolStripSeparator4";
+			this.toolStripSeparator4.Size = new System.Drawing.Size(6, 27);
+			// 
+			// tsSettingsReset
+			// 
+			this.tsSettingsReset.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.tsSettingsReset.Name = "tsSettingsReset";
+			this.tsSettingsReset.Size = new System.Drawing.Size(49, 24);
+			this.tsSettingsReset.Text = "Reset";
+			this.tsSettingsReset.Click += new System.EventHandler(this.tsSettingsReset_Click);
+			// 
+			// gridSettingsCascadeDel
+			// 
+			this.gridSettingsCascadeDel.AllowUserToAddRows = false;
+			this.gridSettingsCascadeDel.AllowUserToDeleteRows = false;
+			this.gridSettingsCascadeDel.AllowUserToResizeColumns = false;
+			this.gridSettingsCascadeDel.AllowUserToResizeRows = false;
+			this.gridSettingsCascadeDel.BackgroundColor = System.Drawing.SystemColors.Control;
+			this.gridSettingsCascadeDel.BorderStyle = System.Windows.Forms.BorderStyle.None;
+			dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+			dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.ControlDark;
+			dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
+			dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+			dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+			dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+			this.gridSettingsCascadeDel.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle3;
+			this.gridSettingsCascadeDel.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+			this.gridSettingsCascadeDel.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.Setting2,
+            this.Value2});
+			this.gridSettingsCascadeDel.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
+			this.gridSettingsCascadeDel.EnableHeadersVisualStyles = false;
+			this.gridSettingsCascadeDel.Location = new System.Drawing.Point(-4, 156);
+			this.gridSettingsCascadeDel.MultiSelect = false;
+			this.gridSettingsCascadeDel.Name = "gridSettingsCascadeDel";
+			this.gridSettingsCascadeDel.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
+			this.gridSettingsCascadeDel.RowTemplate.Height = 24;
+			this.gridSettingsCascadeDel.Size = new System.Drawing.Size(626, 120);
+			this.gridSettingsCascadeDel.TabIndex = 2;
+			this.gridSettingsCascadeDel.Tag = "Cascade Delete Gen";
+			this.gridSettingsCascadeDel.SelectionChanged += new System.EventHandler(this.gridSettingsCascadeDel_SelectionChanged);
+			this.gridSettingsCascadeDel.Click += new System.EventHandler(this.gridSettingsCascadeDel_Click);
+			// 
+			// Setting2
+			// 
+			this.Setting2.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+			dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Control;
+			dataGridViewCellStyle4.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Control;
+			dataGridViewCellStyle4.SelectionForeColor = System.Drawing.Color.Black;
+			this.Setting2.DefaultCellStyle = dataGridViewCellStyle4;
+			this.Setting2.HeaderText = "Cascade Delete";
+			this.Setting2.Name = "Setting2";
+			this.Setting2.ReadOnly = true;
+			this.Setting2.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+			this.Setting2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+			this.Setting2.Width = 175;
+			// 
+			// Value2
+			// 
+			this.Value2.HeaderText = "";
+			this.Value2.Name = "Value2";
+			this.Value2.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+			this.Value2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+			this.Value2.Width = 400;
+			// 
+			// gridSettingsInsGen
+			// 
+			this.gridSettingsInsGen.AllowUserToAddRows = false;
+			this.gridSettingsInsGen.AllowUserToDeleteRows = false;
+			this.gridSettingsInsGen.AllowUserToResizeColumns = false;
+			this.gridSettingsInsGen.AllowUserToResizeRows = false;
+			this.gridSettingsInsGen.BackgroundColor = System.Drawing.SystemColors.Control;
+			this.gridSettingsInsGen.BorderStyle = System.Windows.Forms.BorderStyle.None;
+			dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+			dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.ControlDark;
+			dataGridViewCellStyle5.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			dataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.WindowText;
+			dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+			dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+			dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+			this.gridSettingsInsGen.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle5;
+			this.gridSettingsInsGen.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+			this.gridSettingsInsGen.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.Setting,
+            this.Value});
+			this.gridSettingsInsGen.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
+			this.gridSettingsInsGen.EnableHeadersVisualStyles = false;
+			this.gridSettingsInsGen.Location = new System.Drawing.Point(-1, 33);
+			this.gridSettingsInsGen.MultiSelect = false;
+			this.gridSettingsInsGen.Name = "gridSettingsInsGen";
+			dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+			dataGridViewCellStyle7.BackColor = System.Drawing.SystemColors.Control;
+			dataGridViewCellStyle7.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			dataGridViewCellStyle7.ForeColor = System.Drawing.SystemColors.WindowText;
+			dataGridViewCellStyle7.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+			dataGridViewCellStyle7.SelectionForeColor = System.Drawing.SystemColors.ControlDark;
+			dataGridViewCellStyle7.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+			this.gridSettingsInsGen.RowHeadersDefaultCellStyle = dataGridViewCellStyle7;
+			this.gridSettingsInsGen.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
+			this.gridSettingsInsGen.RowTemplate.Height = 24;
+			this.gridSettingsInsGen.Size = new System.Drawing.Size(623, 120);
+			this.gridSettingsInsGen.TabIndex = 1;
+			this.gridSettingsInsGen.Tag = "Insert Gen";
+			this.gridSettingsInsGen.SelectionChanged += new System.EventHandler(this.gridSettingsInsGen_SelectionChanged);
+			this.gridSettingsInsGen.Click += new System.EventHandler(this.gridSettings_Click);
+			// 
+			// Setting
+			// 
+			this.Setting.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+			dataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.Control;
+			dataGridViewCellStyle6.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			dataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.Control;
+			dataGridViewCellStyle6.SelectionForeColor = System.Drawing.Color.Black;
+			this.Setting.DefaultCellStyle = dataGridViewCellStyle6;
+			this.Setting.HeaderText = "Insert Gen";
+			this.Setting.Name = "Setting";
+			this.Setting.ReadOnly = true;
+			this.Setting.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+			this.Setting.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+			this.Setting.Width = 175;
+			// 
+			// Value
+			// 
+			this.Value.HeaderText = "";
+			this.Value.Name = "Value";
+			this.Value.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+			this.Value.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+			this.Value.Width = 400;
+			// 
+			// panelMainTab
+			// 
+			this.panelMainTab.Controls.Add(this.tabControl1);
+			this.panelMainTab.Location = new System.Drawing.Point(0, 0);
+			this.panelMainTab.Name = "panelMainTab";
+			this.panelMainTab.Size = new System.Drawing.Size(644, 484);
+			this.panelMainTab.TabIndex = 3;
 			// 
 			// frmQuickStart
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(656, 512);
+			this.Controls.Add(this.panelMainTab);
+			this.Controls.Add(this.panelSettings);
 			this.Controls.Add(this.statusStrip1);
-			this.Controls.Add(this.tabControl1);
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
 			this.MaximizeBox = false;
 			this.Name = "frmQuickStart";
@@ -867,6 +1209,14 @@
 			((System.ComponentModel.ISupportInitialize)(this.errorProvider3)).EndInit();
 			this.statusStrip1.ResumeLayout(false);
 			this.statusStrip1.PerformLayout();
+			this.panelSettings.ResumeLayout(false);
+			this.panelSettings.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.gridSettingsQFC)).EndInit();
+			this.toolStrip1.ResumeLayout(false);
+			this.toolStrip1.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.gridSettingsCascadeDel)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.gridSettingsInsGen)).EndInit();
+			this.panelMainTab.ResumeLayout(false);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -932,7 +1282,6 @@
 		private System.Windows.Forms.ToolStripButton tsGenerate_SchemaScript;
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
 		private System.Windows.Forms.ToolStripButton tsSubmit_Schema;
-		private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
 		private System.Windows.Forms.ToolStripStatusLabel tsSuccessIcon;
 		private System.Windows.Forms.ToolStripStatusLabel tsErrorIcon;
 		private System.Windows.Forms.ToolStripStatusLabel tsSpace;
@@ -946,6 +1295,27 @@
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
 		private System.Windows.Forms.ToolStripButton tsStopGenerate_Insert;
 		private System.Windows.Forms.CheckBox chkSplit;
+		private System.Windows.Forms.ToolStripButton tsStopGenerate_CascadeDelete;
+		private System.Windows.Forms.ToolStripButton tsStopSearch;
+		private System.Windows.Forms.ToolStripButton tsStopSetup;
+		private System.Windows.Forms.ToolStripButton tsSettingsGenerate_Insert;
+		private System.Windows.Forms.Panel panelSettings;
+		private System.Windows.Forms.DataGridView gridSettingsInsGen;
+		private System.Windows.Forms.DataGridView gridSettingsCascadeDel;
+		private System.Windows.Forms.Panel panelMainTab;
+		private System.Windows.Forms.ToolStrip toolStrip1;
+		private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
+		private System.Windows.Forms.ToolStripButton tsSettingsBack;
+		private System.Windows.Forms.ToolStripButton tsSettingsCascade_Delete;
+		private System.Windows.Forms.DataGridView gridSettingsQFC;
+		private System.Windows.Forms.ToolStripButton tsSettingsQFC;
+		private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn1;
+		private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn2;
+		private System.Windows.Forms.DataGridViewTextBoxColumn Setting2;
+		private System.Windows.Forms.DataGridViewTextBoxColumn Value2;
+		private System.Windows.Forms.DataGridViewTextBoxColumn Setting;
+		private System.Windows.Forms.DataGridViewTextBoxColumn Value;
+		private System.Windows.Forms.ToolStripButton tsSettingsReset;
 
 	}
 }
