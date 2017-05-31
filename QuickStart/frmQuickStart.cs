@@ -30,6 +30,10 @@ namespace QuickStart
 		public const string INSERT_GEN = "Insert Gen";
 		public const string CASCADE_DELETE_GEN = "Cascade Delete Gen";
 
+        List<Client> dataSource = new List<Client>();
+        List<Client> dataSource2 = new List<Client>();
+        List<Client> dataSource3 = new List<Client>();
+
 		//static bool UseActualNulls = true;
 		volatile List<Thread> ManagedThreadList = new List<Thread>();
 		volatile string sCurrentTab = DEVL;
@@ -441,9 +445,7 @@ namespace QuickStart
 			new TimerObjectManager(DEVL);
 			new TimerObjectManager(QFC);
 
-			var dataSource = new List<Client>();
-			var dataSource2 = new List<Client>();
-			var dataSource3 = new List<Client>();
+
 
 			IDictionary<string, string> ClientDictionary = new Dictionary<string, string>();
 			ClientDictionary.Add("", "");
@@ -499,7 +501,25 @@ namespace QuickStart
 				//Setup data binding
 				this.cmbProcess.DataSource = dataSource;
 				this.cmbGUI.DataSource = dataSource2;
-				this.cmbLoadEnv.DataSource = dataSource3;
+
+                bool bUseCustomEnv = (bool)SettingManager.GetSettingValue(LOAD_SCHEMA, "Allow Custom Env");
+
+                if (bUseCustomEnv)
+                {
+                    //Allow user to enter an environment
+                    this.cmbLoadDB.SelectedIndex = -1;
+                    this.cmbLoadEnv.DropDownStyle = ComboBoxStyle.Simple;
+                    this.cmbLoadDB.DropDownStyle = ComboBoxStyle.Simple;
+                    this.cmbLoadEnv.Text = "";
+                    
+                }
+                else
+                {
+                    this.cmbLoadDB.SelectedIndex = 0;
+                    this.cmbLoadEnv.DropDownStyle = ComboBoxStyle.DropDownList;
+                    this.cmbLoadDB.DropDownStyle = ComboBoxStyle.DropDownList;
+                    this.cmbLoadEnv.DataSource = dataSource3;
+                }
 			}
 			catch (IOException)
 			{
@@ -1165,15 +1185,26 @@ namespace QuickStart
 				
 				TimerThread.Start();
 
-				Client SelectedClient = (Client)cmbLoadEnv.SelectedValue;
-				string sSchemaFileName = SelectedClient.Name + "_" + SelectedClient.Code + "_" + cmbLoadDB.Text + ".txt";
-				using (FileStream stream = File.Open(BaseDirectories.GeneratedSchemas + "\\" + sSchemaFileName, FileMode.Create))
-				{
-				}
-				using (var writer = new StreamWriter(BaseDirectories.GeneratedSchemas + "\\" + sSchemaFileName))
-				{
-					writer.Write(rttInput.Text);
-				}
+                bool bUseCustomEnv = (bool)SettingManager.GetSettingValue(LOAD_SCHEMA, "Allow Custom Env");
+                string sSchemaFileName = String.Empty;
+
+                if (bUseCustomEnv)
+                {
+                    sSchemaFileName = cmbLoadEnv.Text + "_" + cmbLoadDB.Text + ".txt";
+                }
+                else
+                {
+                    Client SelectedClient = (Client)cmbLoadEnv.SelectedValue;
+                    sSchemaFileName = SelectedClient.Name + "_" + SelectedClient.Code + "_" + cmbLoadDB.Text + ".txt";
+
+                }
+                using (FileStream stream = File.Open(BaseDirectories.GeneratedSchemas + "\\" + sSchemaFileName, FileMode.Create))
+                {
+                }
+                using (var writer = new StreamWriter(BaseDirectories.GeneratedSchemas + "\\" + sSchemaFileName))
+                {
+                    writer.Write(rttInput.Text);
+                }
 				LoadSchemas();
 				MessageBox.Show("Successfully uploaded schema", "Success");
 				A.SetTimerErrorIndicator(false);

@@ -57,9 +57,15 @@ namespace QuickStart
 			row6.CreateCells(gridSettingsQFC, "Enable Zip Functionality", true);
 			gridSettingsQFC.Rows.Add(row6);
 
+            DataGridViewRow row9 = (DataGridViewRow)gridSettingsLoadSchema.RowTemplate.Clone();
+            SettingManager.AddSetting(gridSettingsLoadSchema.Tag.ToString(), "Allow Custom Env", false);
+            row9.CreateCells(gridSettingsLoadSchema, "Allow Custom Env", false);
+            gridSettingsLoadSchema.Rows.Add(row9);
+
 			gridSettingsInsGen.TopLeftHeaderCell.Value = "v";
 			gridSettingsCascadeDel.TopLeftHeaderCell.Value = "v";
 			gridSettingsQFC.TopLeftHeaderCell.Value = "v";
+            gridSettingsLoadSchema.TopLeftHeaderCell.Value = "v";
 
 			//Fills the row headers
 			gridSettingsInsGen.DefaultCellStyle.SelectionBackColor = gridSettingsInsGen.DefaultCellStyle.BackColor;
@@ -71,11 +77,14 @@ namespace QuickStart
 			gridSettingsQFC.DefaultCellStyle.SelectionBackColor = gridSettingsQFC.DefaultCellStyle.BackColor;
 			gridSettingsQFC.DefaultCellStyle.SelectionForeColor = gridSettingsQFC.DefaultCellStyle.ForeColor;
 
+            gridSettingsLoadSchema.DefaultCellStyle.SelectionBackColor = gridSettingsLoadSchema.DefaultCellStyle.BackColor;
+            gridSettingsLoadSchema.DefaultCellStyle.SelectionForeColor = gridSettingsLoadSchema.DefaultCellStyle.ForeColor;
+
 			//Removes the grid selection arrows
 			gridSettingsInsGen.RowHeadersDefaultCellStyle.Padding = new Padding(this.gridSettingsInsGen.RowHeadersWidth);
 			gridSettingsCascadeDel.RowHeadersDefaultCellStyle.Padding = new Padding(this.gridSettingsCascadeDel.RowHeadersWidth);
 			gridSettingsQFC.RowHeadersDefaultCellStyle.Padding = new Padding(this.gridSettingsQFC.RowHeadersWidth);
-
+            gridSettingsLoadSchema.RowHeadersDefaultCellStyle.Padding = new Padding(this.gridSettingsLoadSchema.RowHeadersWidth);
 			//gridSettingsCascadeDel.EnableHeadersVisualStyles = false;
 
 			//GridAutoSize();
@@ -107,7 +116,37 @@ namespace QuickStart
 				}
 				gridSettingsQFC.Location = new Point(gridSettingsCascadeDel.Location.X, gridSettingsCascadeDel.Location.Y + iGridHeight);
 			}
+
+            iVisibleRows = 0;
+            iGridHeight = gridSettingsQFC.ColumnHeadersHeight;
+            foreach (DataGridViewRow row in gridSettingsQFC.Rows)
+            {
+                if (row.Visible) iVisibleRows++;
+
+                if (iVisibleRows > 0)
+                {
+                    iGridHeight += gridSettingsQFC.Rows[iVisibleRows - 1].Height;
+                }
+                gridSettingsLoadSchema.Location = new Point(gridSettingsQFC.Location.X, gridSettingsQFC.Location.Y + iGridHeight);
+            }
+
+            //Add extra height to grid to avoid vertical scrollbar from appearing
+            AddExtraDataGridHeight(gridSettingsInsGen);
+            AddExtraDataGridHeight(gridSettingsQFC);
+            AddExtraDataGridHeight(gridSettingsCascadeDel);
+            AddExtraDataGridHeight(gridSettingsLoadSchema);
+
 		}
+        private void AddExtraDataGridHeight(DataGridView grid)
+        {
+            int iTotalRowHeight = grid.ColumnHeadersHeight;
+
+            foreach (DataGridViewRow row in grid.Rows)
+                iTotalRowHeight += row.Height;
+
+            grid.Height = iTotalRowHeight;
+            grid.Height += 10;
+        }
 		private void GridAutoSize(string sFromTab)
 		{
 			//Collapse Insert Gen section
@@ -135,6 +174,14 @@ namespace QuickStart
 				}
 				gridSettingsQFC.TopLeftHeaderCell.Value = ">";
 			}
+            if (sFromTab != gridSettingsLoadSchema.Tag.ToString())
+            {
+                for (int i = 0; i < gridSettingsLoadSchema.Rows.Count; i++)
+                {
+                    gridSettingsLoadSchema.Rows[i].Visible = false;
+                }
+                gridSettingsLoadSchema.TopLeftHeaderCell.Value = ">";
+            }
 			////Populate Cascade Delete Section
 			if (sFromTab == gridSettingsCascadeDel.Tag.ToString())
 			{
@@ -162,6 +209,15 @@ namespace QuickStart
 				}
 				gridSettingsQFC.TopLeftHeaderCell.Value = "v";
 			}
+            //Populate Load Schema Section
+            if (sFromTab == gridSettingsLoadSchema.Tag.ToString())
+            {
+                for (int i = 0; i < gridSettingsLoadSchema.Rows.Count; i++)
+                {
+                    gridSettingsLoadSchema.Rows[i].Visible = true;
+                }
+                gridSettingsLoadSchema.TopLeftHeaderCell.Value = "v";
+            }
 
 			GridAutoSize();
 		}
@@ -171,6 +227,7 @@ namespace QuickStart
 			gridSettingsInsGen.EndEdit();
 			gridSettingsCascadeDel.EndEdit();
 			gridSettingsQFC.EndEdit();
+            gridSettingsLoadSchema.EndEdit();
 
 			foreach (DataGridViewRow row in gridSettingsInsGen.Rows)
 			{
@@ -184,6 +241,10 @@ namespace QuickStart
 			{
 				SettingManager.UpdateSetting(gridSettingsQFC.Tag.ToString(), row.Cells[0].Value.ToString(), row.Cells[1].Value);
 			}
+            foreach (DataGridViewRow row in gridSettingsLoadSchema.Rows)
+            {
+                SettingManager.UpdateSetting(gridSettingsLoadSchema.Tag.ToString(), row.Cells[0].Value.ToString(), row.Cells[1].Value);
+            }
 		}
 
 		private void gridSettings_Click(object sender, EventArgs e)
@@ -250,12 +311,34 @@ namespace QuickStart
 		{
 			ShowSettings(tsSettingsGenerate_Insert.Tag.ToString());
 		}
-
+        private void tsSettingsLoad_Schema_Click(object sender, EventArgs e)
+        {
+            ShowSettings(tsSettingsLoad_Schema.Tag.ToString());
+        }
 		private void tsSettingsReturn_Click(object sender, EventArgs e)
 		{
 			panelMainTab.Show();
 			panelSettings.Hide();
 			SaveSettings();
+
+            bool bUseCustomEnv = (bool)SettingManager.GetSettingValue(LOAD_SCHEMA, "Allow Custom Env");
+
+            if (bUseCustomEnv)
+            {
+                //Allow user to enter an environment
+                this.cmbLoadDB.SelectedIndex = -1;
+                this.cmbLoadEnv.DropDownStyle = ComboBoxStyle.Simple;
+                this.cmbLoadDB.DropDownStyle = ComboBoxStyle.Simple;
+                this.cmbLoadEnv.Text = "";
+            }
+            else
+            {
+                this.cmbLoadDB.SelectedIndex = 0;
+                this.cmbLoadEnv.DropDownStyle = ComboBoxStyle.DropDownList;
+                this.cmbLoadDB.DropDownStyle = ComboBoxStyle.DropDownList;
+                this.cmbLoadEnv.DataSource = dataSource3;
+            }
+
 		}
 
 		private void gridSettingsInsGen_SelectionChanged(object sender, EventArgs e)
@@ -267,6 +350,10 @@ namespace QuickStart
 		{
 			gridSettingsCascadeDel.ClearSelection();
 		}
+        private void gridSettingsLoadSchema_SelectionChanged(object sender, EventArgs e)
+        {
+            gridSettingsLoadSchema.ClearSelection();
+        }
 
 		private void tsSettingsCascade_Delete_Click(object sender, EventArgs e)
 		{
@@ -296,5 +383,21 @@ namespace QuickStart
 				GridAutoSize();
 			}
 		}
+        private void gridSettingsLoadSchema_Click(object sender, EventArgs e)
+        {
+            MouseEventArgs args = (MouseEventArgs)e;
+            DataGridView dgv = (DataGridView)sender;
+            DataGridView.HitTestInfo hit = dgv.HitTest(args.X, args.Y);
+            if (hit.Type == DataGridViewHitTestType.TopLeftHeader)
+            {
+                for (int i = 0; i < gridSettingsLoadSchema.Rows.Count; i++)
+                {
+                    gridSettingsLoadSchema.Rows[i].Visible = (gridSettingsLoadSchema.Rows[i].Visible == true) ? false : true;
+                }
+
+                gridSettingsLoadSchema.TopLeftHeaderCell.Value = (gridSettingsLoadSchema.Rows[0].Visible == true) ? "v" : ">";
+                GridAutoSize();
+            }
+        }
 	}
 }
