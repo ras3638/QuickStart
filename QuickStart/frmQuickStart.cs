@@ -547,23 +547,31 @@ namespace QuickStart
 		#endregion
 		private bool UseCachedClient()
 		{
-			if (!File.Exists(BaseDirectories.CacheClientBase))
-			{
-				File.Create(BaseDirectories.CacheClientBase);
-				return false;
-			}
-			else
-			{
-				DateTime FileDateCreated = File.GetCreationTime(BaseDirectories.CacheClientBase);
-				DateTime CurrentDate = DateTime.Now;
+            try
+            {
+                if (!File.Exists(BaseDirectories.CacheClientBase))
+                {
+                    File.Create(BaseDirectories.CacheClientBase);
+                    return false;
+                }
+                else
+                {
+                    DateTime FileDateModified = File.GetLastWriteTime(BaseDirectories.CacheClientBase);
+                    DateTime CurrentDate = DateTime.Now;
 
-				if (FileDateCreated.AddDays(30) < CurrentDate)
-				{
-					//Overwrite and clear the file
-					File.Create(BaseDirectories.CacheClientBase);
-					return false;
-				}
-			}
+                    if (FileDateModified.AddDays(30) < CurrentDate)
+                    {
+                        //Overwrite and clear the file
+                        File.Create(BaseDirectories.CacheClientBase);
+                        return false;
+                    }
+                }
+            }
+            catch
+            {
+                //Some security exception occurred when trying to create cached text file. Skip this functionality
+                return false;
+            }
 			return true;
 		}
 		private void LoadBaseDirectories()
@@ -1025,27 +1033,41 @@ namespace QuickStart
 		}
 		private void tsRightClickRemove_Click(object sender, EventArgs e)
 		{
-			string sSchema = cmbSchema.Text;
-			File.Delete(BaseDirectories.GeneratedSchemas + "\\" + GetSchemaFileName(sSchema));
-			LoadSchemas();
-			cmbSchema.SelectedIndex = -1;
+            try
+            {
+                string sSchema = cmbSchema.Text;
+                File.Delete(BaseDirectories.GeneratedSchemas + "\\" + GetSchemaFileName(sSchema));
+                LoadSchemas();
+                cmbSchema.SelectedIndex = -1;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString(), "Error");
+            }
 		}
 		private void cmbSchema_KeyDown(object sender, KeyEventArgs e)
 		{
-			if (e.KeyCode == Keys.Delete && cmbSchema.DroppedDown)
-			{
-				string sSchema = cmbSchema.Text;
-				File.Delete(BaseDirectories.GeneratedSchemas + "\\" + GetSchemaFileName(sSchema));
-				LoadSchemas();
-				cmbSchema.SelectedIndex = -1;
+            try
+            {
+                if (e.KeyCode == Keys.Delete && cmbSchema.DroppedDown)
+                {
+                    string sSchema = cmbSchema.Text;
+                    File.Delete(BaseDirectories.GeneratedSchemas + "\\" + GetSchemaFileName(sSchema));
+                    LoadSchemas();
+                    cmbSchema.SelectedIndex = -1;
 
-				//Make sure no other processing happens
-				e.Handled = true;
-			}
-			else if (e.KeyCode == Keys.Down && !cmbSchema.DroppedDown)
-			{
-				cmbSchema.DroppedDown = true;
-			}	
+                    //Make sure no other processing happens
+                    e.Handled = true;
+                }
+                else if (e.KeyCode == Keys.Down && !cmbSchema.DroppedDown)
+                {
+                    cmbSchema.DroppedDown = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString(), "Error");
+            }
 		}
 
 		private void tsGenerate_Insert_Click(object sender, EventArgs e)
