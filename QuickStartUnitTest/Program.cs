@@ -22,10 +22,7 @@ namespace QuickStartUnitTest
 			SettingManager.AddSetting(frmQuickStart.INSERT_GEN, "Enable Oracle Functionality", false);
 			SettingManager.AddSetting(frmQuickStart.INSERT_GEN, "Enable Excel Functionality", false);
 			SettingManager.AddSetting(frmQuickStart.CASCADE_DELETE_GEN, "Multiline support for None cascade option", false);
-			SettingManager.AddSetting(frmQuickStart.QFC, "QFC 5.0 Zip Path", "C:\\Devl\\Products\\Upstream\\5.0.00\\Dependencies\\Zip Files");
-			SettingManager.AddSetting(frmQuickStart.QFC, "QFC 8.0 Zip Path", "C:\\Devl\\Products\\Upstream\\8.0.00\\Dependencies\\Zip Files");
-			SettingManager.AddSetting(frmQuickStart.QFC, "QFC 16.0 Zip Path", "C:\\Devl\\Products\\Upstream\\Main\\Dependencies\\Zip Files");
-			SettingManager.AddSetting(frmQuickStart.QFC, "Enable Zip Functionality", true);
+			SettingManager.AddSetting(frmQuickStart.SEARCH_STRING, "Enable Zip Functionality", true);
 		}
 	
 		static void UnitTest()

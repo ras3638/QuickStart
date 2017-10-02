@@ -41,10 +41,13 @@ namespace QuickStart
 		bool bTimerStopIconEnable { get; set; }
 		string sTimerStatusText { get; set; }
 		string sTimerText { get; set; } 
-
 		string sSourceName {get; set; }
 
-		public TimerObjectManager(string sSourceName)
+        Exception exErrorException { get; set; }
+        string sCustomMessage { get; set; }
+
+        string sMessages { get; set; }
+        public TimerObjectManager(string sSourceName)
 		{
 			this.sSourceName = sSourceName;
 			bTimerCancelIndicator = false;
@@ -56,9 +59,13 @@ namespace QuickStart
 			bTimerExecuteIconEnable = true;
 			bTimerStopIconEnable = false;
 			bPauseTimerIndicator = false;
-			sTimerStatusText = "Status:";
+
+            sTimerStatusText = "Status: N/A";
 			sTimerText = "00:00:00";
-			SaveStatus();
+
+            sCustomMessage = null;
+            exErrorException = null;
+            SaveStatus();
 		}
 
 		//// Getters ////
@@ -117,19 +124,44 @@ namespace QuickStart
 			UpdateStatus();
 			return sTimerText;
 		}
-
-		//// Setters ////
-		
-		public void SetTimerCancelIndicator(bool bTimerCancelIndicator)
+        public Exception GetErrorException()
+        {
+            UpdateStatus();
+            return exErrorException;
+        }
+        public string GetCustomMessage()
+        {
+            UpdateStatus();
+            return sCustomMessage;
+        }
+        //// Setters ////
+        public void SetCustomMessage(string sCustomMessage)
+        {
+            this.sCustomMessage = sCustomMessage;
+            SaveStatus();
+        }
+        public void SetErrorException(Exception ex)
+        {
+            this.exErrorException = ex;
+            SaveStatus();
+        }
+        public void SetTimerCancelIndicator(bool bTimerCancelIndicator)
 		{
 			this.bTimerCancelIndicator = bTimerCancelIndicator;
 			SaveStatus();
 		}
-		public void SetTimerErrorIndicator(bool bTimerErrorIndicator)
+		public void SetTimerErrorIndicator(bool bTimerErrorIndicator, Exception ex = null, string sCustomMessage = null)
 		{
 			this.bTimerErrorIndicator = bTimerErrorIndicator;
+            this.exErrorException = ex;
+            this.sCustomMessage = sCustomMessage;
 			SaveStatus();
 		}
+        public void SetMessages(string sMessages)
+        {
+            this.sMessages = sMessages;
+            SaveStatus();
+        }
 		public void SetTimerThreadActive(bool bKeepActive)
 		{
 			this.bTimerThreadActive = bKeepActive;
@@ -139,6 +171,8 @@ namespace QuickStart
 				this.bTimerErrorIndicator = false;
 				this.bTimerCancelIndicator = false;
 				this.bPauseTimerIndicator = false;
+                this.exErrorException = null;
+                this.sCustomMessage = null;
 			}
 			SaveStatus();
 		}
@@ -196,6 +230,9 @@ namespace QuickStart
 			this.bTimerStopIconEnable = A.bTimerStopIconEnable;
 			this.sTimerStatusText = A.sTimerStatusText;
 			this.sTimerText = A.sTimerText;
+
+            this.exErrorException = A.exErrorException;
+            this.sCustomMessage = A.sCustomMessage;
 
 			SaveStatus();
 		}

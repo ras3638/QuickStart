@@ -7,3 +7,13 @@ C:\Users\robert_salinas\Documents\Visual Studio 2012\Projects\QuickStart\QuickSt
 C:\Users\robert_salinas\Documents\Visual Studio 2012\Projects\QuickStart\QuickStart\obj\Debug\QuickStart.exe
 C:\Users\robert_salinas\Documents\Visual Studio 2012\Projects\QuickStart\QuickStart\obj\Debug\QuickStart.pdb
 C:\Users\robert_salinas\Documents\Visual Studio 2012\Projects\QuickStart\QuickStart\obj\Debug\QuickStart.csprojResolveAssemblyReference.cache
+C:\Users\robesali\Documents\Visual Studio 2017\Projects\QuickStart\QuickStart\bin\Debug\QuickStart.exe.config
+C:\Users\robesali\Documents\Visual Studio 2017\Projects\QuickStart\QuickStart\bin\Debug\QuickStart.exe
+C:\Users\robesali\Documents\Visual Studio 2017\Projects\QuickStart\QuickStart\bin\Debug\QuickStart.pdb
+C:\Users\robesali\Documents\Visual Studio 2017\Projects\QuickStart\QuickStart\obj\Debug\QuickStart.csprojResolveAssemblyReference.cache
+C:\Users\robesali\Documents\Visual Studio 2017\Projects\QuickStart\QuickStart\obj\Debug\QuickStart.frmQuickStart.resources
+C:\Users\robesali\Documents\Visual Studio 2017\Projects\QuickStart\QuickStart\obj\Debug\QuickStart.Properties.Resources.resources
+C:\Users\robesali\Documents\Visual Studio 2017\Projects\QuickStart\QuickStart\obj\Debug\QuickStart.csproj.GenerateResource.Cache
+C:\Users\robesali\Documents\Visual Studio 2017\Projects\QuickStart\QuickStart\obj\Debug\QuickStart.csproj.CoreCompileInputs.cache
+C:\Users\robesali\Documents\Visual Studio 2017\Projects\QuickStart\QuickStart\obj\Debug\QuickStart.exe
+C:\Users\robesali\Documents\Visual Studio 2017\Projects\QuickStart\QuickStart\obj\Debug\QuickStart.pdb

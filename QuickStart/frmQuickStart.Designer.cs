@@ -94,11 +94,13 @@
             this.cmbLoadEnv = new System.Windows.Forms.ComboBox();
             this.rttInput = new System.Windows.Forms.RichTextBox();
             this.tabPage3 = new System.Windows.Forms.TabPage();
-            this.tsQFC = new System.Windows.Forms.ToolStrip();
+            this.txtSearchPath = new System.Windows.Forms.TextBox();
+            this.btnOpenFileDialog = new System.Windows.Forms.Button();
+            this.tsSearchString = new System.Windows.Forms.ToolStrip();
             this.tsSearch = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
             this.tsStopSearch = new System.Windows.Forms.ToolStripButton();
-            this.tsSettingsQFC = new System.Windows.Forms.ToolStripButton();
+            this.tsSettingsSearchString = new System.Windows.Forms.ToolStripButton();
             this.label19 = new System.Windows.Forms.Label();
             this.label9 = new System.Windows.Forms.Label();
             this.txtSearchString = new System.Windows.Forms.TextBox();
@@ -106,7 +108,6 @@
             this.label5 = new System.Windows.Forms.Label();
             this.cmbFilePattern = new System.Windows.Forms.ComboBox();
             this.label3 = new System.Windows.Forms.Label();
-            this.cmbVersion = new System.Windows.Forms.ComboBox();
             this.errorProvider1 = new System.Windows.Forms.ErrorProvider(this.components);
             this.errorProvider2 = new System.Windows.Forms.ErrorProvider(this.components);
             this.errorProvider3 = new System.Windows.Forms.ErrorProvider(this.components);
@@ -114,6 +115,14 @@
             this.TSlblStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.tsSuccessIcon = new System.Windows.Forms.ToolStripStatusLabel();
             this.tsErrorIcon = new System.Windows.Forms.ToolStripStatusLabel();
+            this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.tsMessages = new System.Windows.Forms.ToolStripDropDownButton();
+            this.tsErrorLog1 = new System.Windows.Forms.ToolStripTextBox();
+            this.tsErrorLog2 = new System.Windows.Forms.ToolStripTextBox();
+            this.tsErrorLog3 = new System.Windows.Forms.ToolStripTextBox();
+            this.tsErrorLog4 = new System.Windows.Forms.ToolStripTextBox();
+            this.tsErrorLog5 = new System.Windows.Forms.ToolStripTextBox();
+            this.tsErrorLog6 = new System.Windows.Forms.ToolStripTextBox();
             this.tsSpace = new System.Windows.Forms.ToolStripStatusLabel();
             this.TSlblTime = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
@@ -121,7 +130,7 @@
             this.gridSettingsLoadSchema = new System.Windows.Forms.DataGridView();
             this.dataGridViewTextBoxColumn3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.dataGridViewTextBoxColumn4 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.gridSettingsQFC = new System.Windows.Forms.DataGridView();
+            this.gridSettingsSearchString = new System.Windows.Forms.DataGridView();
             this.dataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.dataGridViewTextBoxColumn2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
@@ -135,6 +144,11 @@
             this.Setting = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Value = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.panelMainTab = new System.Windows.Forms.Panel();
+            this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
+            this.errorProvider4 = new System.Windows.Forms.ErrorProvider(this.components);
+            this.errorProvider5 = new System.Windows.Forms.ErrorProvider(this.components);
+            this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
+            this.textBox1 = new System.Windows.Forms.TextBox();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tsDevl.SuspendLayout();
@@ -148,18 +162,20 @@
             this.tabPage6.SuspendLayout();
             this.tsLoadSchema.SuspendLayout();
             this.tabPage3.SuspendLayout();
-            this.tsQFC.SuspendLayout();
+            this.tsSearchString.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.errorProvider1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.errorProvider2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.errorProvider3)).BeginInit();
             this.statusStrip1.SuspendLayout();
             this.panelSettings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridSettingsLoadSchema)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.gridSettingsQFC)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gridSettingsSearchString)).BeginInit();
             this.toolStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridSettingsCascadeDel)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridSettingsInsGen)).BeginInit();
             this.panelMainTab.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.errorProvider4)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.errorProvider5)).BeginInit();
             this.SuspendLayout();
             // 
             // tabControl1
@@ -356,7 +372,7 @@
             // label7
             // 
             this.label7.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.label7.Location = new System.Drawing.Point(3, 24);
+            this.label7.Location = new System.Drawing.Point(3, 27);
             this.label7.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(458, 2);
@@ -482,7 +498,7 @@
             // label16
             // 
             this.label16.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.label16.Location = new System.Drawing.Point(3, 24);
+            this.label16.Location = new System.Drawing.Point(3, 27);
             this.label16.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label16.Name = "label16";
             this.label16.Size = new System.Drawing.Size(458, 2);
@@ -655,7 +671,7 @@
             // label17
             // 
             this.label17.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.label17.Location = new System.Drawing.Point(3, 24);
+            this.label17.Location = new System.Drawing.Point(3, 27);
             this.label17.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label17.Name = "label17";
             this.label17.Size = new System.Drawing.Size(458, 2);
@@ -775,7 +791,9 @@
             // 
             this.tabPage3.BackColor = System.Drawing.SystemColors.Control;
             this.tabPage3.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.tabPage3.Controls.Add(this.tsQFC);
+            this.tabPage3.Controls.Add(this.txtSearchPath);
+            this.tabPage3.Controls.Add(this.btnOpenFileDialog);
+            this.tabPage3.Controls.Add(this.tsSearchString);
             this.tabPage3.Controls.Add(this.label19);
             this.tabPage3.Controls.Add(this.label9);
             this.tabPage3.Controls.Add(this.txtSearchString);
@@ -783,29 +801,47 @@
             this.tabPage3.Controls.Add(this.label5);
             this.tabPage3.Controls.Add(this.cmbFilePattern);
             this.tabPage3.Controls.Add(this.label3);
-            this.tabPage3.Controls.Add(this.cmbVersion);
             this.tabPage3.Location = new System.Drawing.Point(4, 22);
             this.tabPage3.Margin = new System.Windows.Forms.Padding(2);
             this.tabPage3.Name = "tabPage3";
             this.tabPage3.Size = new System.Drawing.Size(485, 366);
             this.tabPage3.TabIndex = 2;
-            this.tabPage3.Tag = "QFC";
-            this.tabPage3.Text = "QFC";
+            this.tabPage3.Tag = "Search String";
+            this.tabPage3.Text = "Search String";
             // 
-            // tsQFC
+            // txtSearchPath
             // 
-            this.tsQFC.BackColor = System.Drawing.SystemColors.Control;
-            this.tsQFC.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.txtSearchPath.Location = new System.Drawing.Point(158, 39);
+            this.txtSearchPath.Margin = new System.Windows.Forms.Padding(2);
+            this.txtSearchPath.Name = "txtSearchPath";
+            this.txtSearchPath.Size = new System.Drawing.Size(170, 20);
+            this.txtSearchPath.TabIndex = 29;
+            this.txtSearchPath.TextChanged += new System.EventHandler(this.txtSearchPath_TextChanged);
+            // 
+            // btnOpenFileDialog
+            // 
+            this.btnOpenFileDialog.Location = new System.Drawing.Point(333, 37);
+            this.btnOpenFileDialog.Name = "btnOpenFileDialog";
+            this.btnOpenFileDialog.Size = new System.Drawing.Size(25, 23);
+            this.btnOpenFileDialog.TabIndex = 28;
+            this.btnOpenFileDialog.Text = "...";
+            this.btnOpenFileDialog.UseVisualStyleBackColor = true;
+            this.btnOpenFileDialog.Click += new System.EventHandler(this.btnOpenFileDialog_Click);
+            // 
+            // tsSearchString
+            // 
+            this.tsSearchString.BackColor = System.Drawing.SystemColors.Control;
+            this.tsSearchString.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.tsSearch,
             this.toolStripSeparator6,
             this.tsStopSearch,
-            this.tsSettingsQFC});
-            this.tsQFC.Location = new System.Drawing.Point(0, 0);
-            this.tsQFC.Name = "tsQFC";
-            this.tsQFC.Size = new System.Drawing.Size(481, 25);
-            this.tsQFC.TabIndex = 27;
-            this.tsQFC.Tag = "QFC";
-            this.tsQFC.Text = "toolStrip1";
+            this.tsSettingsSearchString});
+            this.tsSearchString.Location = new System.Drawing.Point(0, 0);
+            this.tsSearchString.Name = "tsSearchString";
+            this.tsSearchString.Size = new System.Drawing.Size(481, 25);
+            this.tsSearchString.TabIndex = 27;
+            this.tsSearchString.Tag = "Search String";
+            this.tsSearchString.Text = "toolStrip1";
             // 
             // tsSearch
             // 
@@ -831,17 +867,17 @@
             this.tsStopSearch.Text = "Stop";
             this.tsStopSearch.Click += new System.EventHandler(this.tsStopSearch_Click);
             // 
-            // tsSettingsQFC
+            // tsSettingsSearchString
             // 
-            this.tsSettingsQFC.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
-            this.tsSettingsQFC.Image = ((System.Drawing.Image)(resources.GetObject("tsSettingsQFC.Image")));
-            this.tsSettingsQFC.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.tsSettingsQFC.Name = "tsSettingsQFC";
-            this.tsSettingsQFC.Padding = new System.Windows.Forms.Padding(0, 0, 10, 0);
-            this.tsSettingsQFC.Size = new System.Drawing.Size(79, 22);
-            this.tsSettingsQFC.Tag = "QFC";
-            this.tsSettingsQFC.Text = "Settings";
-            this.tsSettingsQFC.Click += new System.EventHandler(this.tsSettingsQFC_Click);
+            this.tsSettingsSearchString.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
+            this.tsSettingsSearchString.Image = ((System.Drawing.Image)(resources.GetObject("tsSettingsSearchString.Image")));
+            this.tsSettingsSearchString.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsSettingsSearchString.Name = "tsSettingsSearchString";
+            this.tsSettingsSearchString.Padding = new System.Windows.Forms.Padding(0, 0, 10, 0);
+            this.tsSettingsSearchString.Size = new System.Drawing.Size(79, 22);
+            this.tsSettingsSearchString.Tag = "Search String";
+            this.tsSettingsSearchString.Text = "Settings";
+            this.tsSettingsSearchString.Click += new System.EventHandler(this.tsSettingsSearchString_Click);
             // 
             // label19
             // 
@@ -917,36 +953,25 @@
             this.label3.Location = new System.Drawing.Point(22, 37);
             this.label3.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(58, 18);
+            this.label3.Size = new System.Drawing.Size(89, 18);
             this.label3.TabIndex = 13;
-            this.label3.Text = "Version";
-            // 
-            // cmbVersion
-            // 
-            this.cmbVersion.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cmbVersion.FormattingEnabled = true;
-            this.cmbVersion.Items.AddRange(new object[] {
-            "5.0",
-            "8.0",
-            "16.0"});
-            this.cmbVersion.Location = new System.Drawing.Point(158, 37);
-            this.cmbVersion.Margin = new System.Windows.Forms.Padding(2);
-            this.cmbVersion.Name = "cmbVersion";
-            this.cmbVersion.Size = new System.Drawing.Size(170, 21);
-            this.cmbVersion.TabIndex = 12;
+            this.label3.Text = "Search Path";
             // 
             // errorProvider1
             // 
+            this.errorProvider1.BlinkRate = 500;
             this.errorProvider1.BlinkStyle = System.Windows.Forms.ErrorBlinkStyle.AlwaysBlink;
             this.errorProvider1.ContainerControl = this;
             // 
             // errorProvider2
             // 
+            this.errorProvider2.BlinkRate = 500;
             this.errorProvider2.BlinkStyle = System.Windows.Forms.ErrorBlinkStyle.AlwaysBlink;
             this.errorProvider2.ContainerControl = this;
             // 
             // errorProvider3
             // 
+            this.errorProvider3.BlinkRate = 500;
             this.errorProvider3.BlinkStyle = System.Windows.Forms.ErrorBlinkStyle.AlwaysBlink;
             this.errorProvider3.ContainerControl = this;
             // 
@@ -956,6 +981,8 @@
             this.TSlblStatus,
             this.tsSuccessIcon,
             this.tsErrorIcon,
+            this.toolStripStatusLabel1,
+            this.tsMessages,
             this.tsSpace,
             this.TSlblTime});
             this.statusStrip1.Location = new System.Drawing.Point(0, 394);
@@ -970,8 +997,8 @@
             // 
             this.TSlblStatus.BorderStyle = System.Windows.Forms.Border3DStyle.Sunken;
             this.TSlblStatus.Name = "TSlblStatus";
-            this.TSlblStatus.Size = new System.Drawing.Size(42, 17);
-            this.TSlblStatus.Text = "Status:";
+            this.TSlblStatus.Size = new System.Drawing.Size(67, 17);
+            this.TSlblStatus.Text = "Status: N/A";
             // 
             // tsSuccessIcon
             // 
@@ -986,11 +1013,100 @@
             this.tsErrorIcon.Name = "tsErrorIcon";
             this.tsErrorIcon.Size = new System.Drawing.Size(16, 17);
             this.tsErrorIcon.Visible = false;
+            this.tsErrorIcon.MouseMove += new System.Windows.Forms.MouseEventHandler(this.tsErrorIcon_MouseMove);
+            // 
+            // toolStripStatusLabel1
+            // 
+            this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
+            this.toolStripStatusLabel1.Size = new System.Drawing.Size(10, 17);
+            this.toolStripStatusLabel1.Text = "|";
+            // 
+            // tsMessages
+            // 
+            this.tsMessages.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.tsMessages.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.tsErrorLog1,
+            this.tsErrorLog2,
+            this.tsErrorLog3,
+            this.tsErrorLog4,
+            this.tsErrorLog5,
+            this.tsErrorLog6});
+            this.tsMessages.Image = ((System.Drawing.Image)(resources.GetObject("tsMessages.Image")));
+            this.tsMessages.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsMessages.Name = "tsMessages";
+            this.tsMessages.Size = new System.Drawing.Size(85, 20);
+            this.tsMessages.Text = "Messages(0)";
+            this.tsMessages.Click += new System.EventHandler(this.toolStripDropDownButton1_Click);
+            // 
+            // tsErrorLog1
+            // 
+            this.tsErrorLog1.BackColor = System.Drawing.SystemColors.Menu;
+            this.tsErrorLog1.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.tsErrorLog1.Font = new System.Drawing.Font("Segoe UI", 8F);
+            this.tsErrorLog1.Margin = new System.Windows.Forms.Padding(-28, 0, 0, 0);
+            this.tsErrorLog1.Name = "tsErrorLog1";
+            this.tsErrorLog1.ReadOnly = true;
+            this.tsErrorLog1.Size = new System.Drawing.Size(318, 15);
+            // 
+            // tsErrorLog2
+            // 
+            this.tsErrorLog2.BackColor = System.Drawing.SystemColors.Menu;
+            this.tsErrorLog2.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.tsErrorLog2.Font = new System.Drawing.Font("Segoe UI", 8F);
+            this.tsErrorLog2.Margin = new System.Windows.Forms.Padding(-28, 0, 0, 0);
+            this.tsErrorLog2.Name = "tsErrorLog2";
+            this.tsErrorLog2.ReadOnly = true;
+            this.tsErrorLog2.Size = new System.Drawing.Size(318, 15);
+            this.tsErrorLog2.Visible = false;
+            // 
+            // tsErrorLog3
+            // 
+            this.tsErrorLog3.BackColor = System.Drawing.SystemColors.Menu;
+            this.tsErrorLog3.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.tsErrorLog3.Font = new System.Drawing.Font("Segoe UI", 8F);
+            this.tsErrorLog3.Margin = new System.Windows.Forms.Padding(-28, 0, 0, 0);
+            this.tsErrorLog3.Name = "tsErrorLog3";
+            this.tsErrorLog3.ReadOnly = true;
+            this.tsErrorLog3.Size = new System.Drawing.Size(318, 15);
+            this.tsErrorLog3.Visible = false;
+            // 
+            // tsErrorLog4
+            // 
+            this.tsErrorLog4.BackColor = System.Drawing.SystemColors.Menu;
+            this.tsErrorLog4.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.tsErrorLog4.Font = new System.Drawing.Font("Segoe UI", 8F);
+            this.tsErrorLog4.Margin = new System.Windows.Forms.Padding(-28, 0, 0, 0);
+            this.tsErrorLog4.Name = "tsErrorLog4";
+            this.tsErrorLog4.ReadOnly = true;
+            this.tsErrorLog4.Size = new System.Drawing.Size(318, 15);
+            this.tsErrorLog4.Visible = false;
+            // 
+            // tsErrorLog5
+            // 
+            this.tsErrorLog5.BackColor = System.Drawing.SystemColors.Menu;
+            this.tsErrorLog5.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.tsErrorLog5.Font = new System.Drawing.Font("Segoe UI", 8F);
+            this.tsErrorLog5.Margin = new System.Windows.Forms.Padding(-28, 0, 0, 0);
+            this.tsErrorLog5.Name = "tsErrorLog5";
+            this.tsErrorLog5.ReadOnly = true;
+            this.tsErrorLog5.Size = new System.Drawing.Size(318, 15);
+            this.tsErrorLog5.Visible = false;
+            // 
+            // tsErrorLog6
+            // 
+            this.tsErrorLog6.BackColor = System.Drawing.SystemColors.Menu;
+            this.tsErrorLog6.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.tsErrorLog6.Font = new System.Drawing.Font("Segoe UI", 8F);
+            this.tsErrorLog6.Margin = new System.Windows.Forms.Padding(-28, 0, 0, 0);
+            this.tsErrorLog6.Name = "tsErrorLog6";
+            this.tsErrorLog6.ReadOnly = true;
+            this.tsErrorLog6.Size = new System.Drawing.Size(318, 15);
+            this.tsErrorLog6.Visible = false;
             // 
             // tsSpace
             // 
             this.tsSpace.Name = "tsSpace";
-            this.tsSpace.Size = new System.Drawing.Size(400, 17);
+            this.tsSpace.Size = new System.Drawing.Size(280, 17);
             this.tsSpace.Spring = true;
             // 
             // TSlblTime
@@ -1003,7 +1119,7 @@
             // panelSettings
             // 
             this.panelSettings.Controls.Add(this.gridSettingsLoadSchema);
-            this.panelSettings.Controls.Add(this.gridSettingsQFC);
+            this.panelSettings.Controls.Add(this.gridSettingsSearchString);
             this.panelSettings.Controls.Add(this.toolStrip1);
             this.panelSettings.Controls.Add(this.gridSettingsCascadeDel);
             this.panelSettings.Controls.Add(this.gridSettingsInsGen);
@@ -1071,14 +1187,14 @@
             this.dataGridViewTextBoxColumn4.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             this.dataGridViewTextBoxColumn4.Width = 254;
             // 
-            // gridSettingsQFC
+            // gridSettingsSearchString
             // 
-            this.gridSettingsQFC.AllowUserToAddRows = false;
-            this.gridSettingsQFC.AllowUserToDeleteRows = false;
-            this.gridSettingsQFC.AllowUserToResizeColumns = false;
-            this.gridSettingsQFC.AllowUserToResizeRows = false;
-            this.gridSettingsQFC.BackgroundColor = System.Drawing.SystemColors.Control;
-            this.gridSettingsQFC.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.gridSettingsSearchString.AllowUserToAddRows = false;
+            this.gridSettingsSearchString.AllowUserToDeleteRows = false;
+            this.gridSettingsSearchString.AllowUserToResizeColumns = false;
+            this.gridSettingsSearchString.AllowUserToResizeRows = false;
+            this.gridSettingsSearchString.BackgroundColor = System.Drawing.SystemColors.Control;
+            this.gridSettingsSearchString.BorderStyle = System.Windows.Forms.BorderStyle.None;
             dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.ControlDark;
             dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -1086,25 +1202,25 @@
             dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
             dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
             dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.gridSettingsQFC.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle3;
-            this.gridSettingsQFC.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.gridSettingsQFC.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.gridSettingsSearchString.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle3;
+            this.gridSettingsSearchString.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.gridSettingsSearchString.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.dataGridViewTextBoxColumn1,
             this.dataGridViewTextBoxColumn2});
-            this.gridSettingsQFC.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
-            this.gridSettingsQFC.EnableHeadersVisualStyles = false;
-            this.gridSettingsQFC.Location = new System.Drawing.Point(0, 170);
-            this.gridSettingsQFC.Margin = new System.Windows.Forms.Padding(2);
-            this.gridSettingsQFC.MultiSelect = false;
-            this.gridSettingsQFC.Name = "gridSettingsQFC";
-            this.gridSettingsQFC.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
-            this.gridSettingsQFC.RowTemplate.Height = 24;
-            this.gridSettingsQFC.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.gridSettingsQFC.Size = new System.Drawing.Size(470, 78);
-            this.gridSettingsQFC.TabIndex = 24;
-            this.gridSettingsQFC.Tag = "QFC";
-            this.gridSettingsQFC.SelectionChanged += new System.EventHandler(this.gridSettingsQFC_SelectionChanged);
-            this.gridSettingsQFC.Click += new System.EventHandler(this.gridSettingsQFC_Click);
+            this.gridSettingsSearchString.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
+            this.gridSettingsSearchString.EnableHeadersVisualStyles = false;
+            this.gridSettingsSearchString.Location = new System.Drawing.Point(0, 170);
+            this.gridSettingsSearchString.Margin = new System.Windows.Forms.Padding(2);
+            this.gridSettingsSearchString.MultiSelect = false;
+            this.gridSettingsSearchString.Name = "gridSettingsSearchString";
+            this.gridSettingsSearchString.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
+            this.gridSettingsSearchString.RowTemplate.Height = 24;
+            this.gridSettingsSearchString.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.gridSettingsSearchString.Size = new System.Drawing.Size(470, 78);
+            this.gridSettingsSearchString.TabIndex = 24;
+            this.gridSettingsSearchString.Tag = "Search String";
+            this.gridSettingsSearchString.SelectionChanged += new System.EventHandler(this.gridSettingsSearchString_SelectionChanged);
+            this.gridSettingsSearchString.Click += new System.EventHandler(this.gridSettingsSearchString_Click);
             // 
             // dataGridViewTextBoxColumn1
             // 
@@ -1114,7 +1230,7 @@
             dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Control;
             dataGridViewCellStyle4.SelectionForeColor = System.Drawing.Color.Black;
             this.dataGridViewTextBoxColumn1.DefaultCellStyle = dataGridViewCellStyle4;
-            this.dataGridViewTextBoxColumn1.HeaderText = "QFC";
+            this.dataGridViewTextBoxColumn1.HeaderText = "Search String";
             this.dataGridViewTextBoxColumn1.Name = "dataGridViewTextBoxColumn1";
             this.dataGridViewTextBoxColumn1.ReadOnly = true;
             this.dataGridViewTextBoxColumn1.Resizable = System.Windows.Forms.DataGridViewTriState.False;
@@ -1297,11 +1413,36 @@
             this.panelMainTab.Size = new System.Drawing.Size(483, 393);
             this.panelMainTab.TabIndex = 3;
             // 
+            // errorProvider4
+            // 
+            this.errorProvider4.BlinkRate = 500;
+            this.errorProvider4.BlinkStyle = System.Windows.Forms.ErrorBlinkStyle.AlwaysBlink;
+            this.errorProvider4.ContainerControl = this;
+            // 
+            // errorProvider5
+            // 
+            this.errorProvider5.BlinkRate = 500;
+            this.errorProvider5.BlinkStyle = System.Windows.Forms.ErrorBlinkStyle.AlwaysBlink;
+            this.errorProvider5.ContainerControl = this;
+            // 
+            // notifyIcon1
+            // 
+            this.notifyIcon1.Text = "notifyIcon1";
+            this.notifyIcon1.Visible = true;
+            // 
+            // textBox1
+            // 
+            this.textBox1.Location = new System.Drawing.Point(476, 416);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(100, 20);
+            this.textBox1.TabIndex = 4;
+            // 
             // frmQuickStart
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(492, 416);
+            this.Controls.Add(this.textBox1);
             this.Controls.Add(this.panelMainTab);
             this.Controls.Add(this.panelSettings);
             this.Controls.Add(this.statusStrip1);
@@ -1333,8 +1474,8 @@
             this.tsLoadSchema.PerformLayout();
             this.tabPage3.ResumeLayout(false);
             this.tabPage3.PerformLayout();
-            this.tsQFC.ResumeLayout(false);
-            this.tsQFC.PerformLayout();
+            this.tsSearchString.ResumeLayout(false);
+            this.tsSearchString.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.errorProvider1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.errorProvider2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.errorProvider3)).EndInit();
@@ -1343,12 +1484,14 @@
             this.panelSettings.ResumeLayout(false);
             this.panelSettings.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridSettingsLoadSchema)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.gridSettingsQFC)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gridSettingsSearchString)).EndInit();
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridSettingsCascadeDel)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridSettingsInsGen)).EndInit();
             this.panelMainTab.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.errorProvider4)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.errorProvider5)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1371,7 +1514,6 @@
 		private System.Windows.Forms.Label label5;
 		private System.Windows.Forms.ComboBox cmbFilePattern;
 		private System.Windows.Forms.Label label3;
-		private System.Windows.Forms.ComboBox cmbVersion;
 		private System.Windows.Forms.RichTextBox rttInput;
 		private System.Windows.Forms.TabControl tabControl2;
 		private System.Windows.Forms.TabPage tabPage4;
@@ -1422,7 +1564,7 @@
 		private System.Windows.Forms.ToolStrip tsDevl;
 		private System.Windows.Forms.ToolStripButton tsSetup;
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
-		private System.Windows.Forms.ToolStrip tsQFC;
+		private System.Windows.Forms.ToolStrip tsSearchString;
 		private System.Windows.Forms.ToolStripButton tsSearch;
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
 		private System.Windows.Forms.ToolStripButton tsStopGenerate_Insert;
@@ -1439,8 +1581,8 @@
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
 		private System.Windows.Forms.ToolStripButton tsSettingsBack;
 		private System.Windows.Forms.ToolStripButton tsSettingsCascade_Delete;
-		private System.Windows.Forms.DataGridView gridSettingsQFC;
-		private System.Windows.Forms.ToolStripButton tsSettingsQFC;
+		private System.Windows.Forms.DataGridView gridSettingsSearchString;
+		private System.Windows.Forms.ToolStripButton tsSettingsSearchString;
 		private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn1;
 		private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn2;
 		private System.Windows.Forms.DataGridViewTextBoxColumn Setting2;
@@ -1452,7 +1594,21 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn3;
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn4;
         private System.Windows.Forms.ToolStripButton tsSettingsLoad_Schema;
-
-	}
+        private System.Windows.Forms.Button btnOpenFileDialog;
+        private System.Windows.Forms.TextBox txtSearchPath;
+        private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
+        private System.Windows.Forms.ErrorProvider errorProvider4;
+        private System.Windows.Forms.ErrorProvider errorProvider5;
+        private System.Windows.Forms.NotifyIcon notifyIcon1;
+        private System.Windows.Forms.ToolStripDropDownButton tsMessages;
+        private System.Windows.Forms.ToolStripTextBox tsErrorLog1;
+        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.ToolStripTextBox tsErrorLog2;
+        private System.Windows.Forms.ToolStripTextBox tsErrorLog3;
+        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
+        private System.Windows.Forms.ToolStripTextBox tsErrorLog5;
+        private System.Windows.Forms.ToolStripTextBox tsErrorLog6;
+        private System.Windows.Forms.ToolStripTextBox tsErrorLog4;
+    }
 }
 

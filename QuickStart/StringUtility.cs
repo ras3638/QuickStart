@@ -142,6 +142,7 @@ namespace QuickStart
 			}
 			return list;
 		}		
+
 		public static int NthIndexOf(string sSource, char cFinder, int iNth)
 		{
 			//This works with char finder

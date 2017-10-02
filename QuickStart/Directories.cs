@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,7 +10,9 @@ namespace QuickStart
 
 	class BaseDirectories
 	{
-		public static string QuickStartBase = "C:\\Program Files\\QuickStart";
+
+
+        public static string QuickStartBase = Directory.GetCurrentDirectory() + "\\SettingFiles";
 		public static string Base5 = "C:\\Devl\\Products\\Upstream\\5.0.00";
 		public static string Base8 = "C:\\Devl\\Products\\Upstream\\8.0.00";
 		public static string Base16 = "C:\\Devl\\Products\\Upstream\\Main";

@@ -37,25 +37,25 @@ namespace QuickStart
 			row2.CreateCells(gridSettingsCascadeDel, "Multiline support for None cascade option", false);
 			gridSettingsCascadeDel.Rows.Add(row2);
 
-			DataGridViewRow row3 = (DataGridViewRow)gridSettingsQFC.RowTemplate.Clone();
-			SettingManager.AddSetting(gridSettingsQFC.Tag.ToString(), "QFC 5.0 Zip Path", "C:\\Devl\\Products\\Upstream\\5.0.00\\Dependencies\\Zip Files");
-			row3.CreateCells(gridSettingsQFC, "QFC 5.0 Zip Path", "C:\\Devl\\Products\\Upstream\\5.0.00\\Dependencies\\Zip Files");
-			gridSettingsQFC.Rows.Add(row3);
+            DataGridViewRow row3 = (DataGridViewRow)gridSettingsSearchString.RowTemplate.Clone();
+            SettingManager.AddSetting(gridSettingsSearchString.Tag.ToString(), "Number of top lines to remove from SearchResults.txt", (int)6);
+            row3.CreateCells(gridSettingsSearchString, "Number of top lines to remove from SearchResults.txt", 6);
+            gridSettingsSearchString.Rows.Add(row3);
 
-			DataGridViewRow row4 = (DataGridViewRow)gridSettingsQFC.RowTemplate.Clone();
-			SettingManager.AddSetting(gridSettingsQFC.Tag.ToString(), "QFC 8.0 Zip Path", "C:\\Devl\\Products\\Upstream\\8.0.00\\Dependencies\\Zip Files");
-			row4.CreateCells(gridSettingsQFC, "QFC 8.0 Zip Path", "C:\\Devl\\Products\\Upstream\\8.0.00\\Dependencies\\Zip Files");
-			gridSettingsQFC.Rows.Add(row4);
+            DataGridViewRow row4 = (DataGridViewRow)gridSettingsSearchString.RowTemplate.Clone();
+            SettingManager.AddSetting(gridSettingsSearchString.Tag.ToString(), "Number of bottom lines to remove from SearchResults.txt", (int)2);
+            row4.CreateCells(gridSettingsSearchString, "Number of bottom lines to remove from SearchResults.txt", 2);
+            gridSettingsSearchString.Rows.Add(row4);
 
-			DataGridViewRow row5 = (DataGridViewRow)gridSettingsQFC.RowTemplate.Clone();
-			SettingManager.AddSetting(gridSettingsQFC.Tag.ToString(), "QFC 16.0 Zip Path", "C:\\Devl\\Products\\Upstream\\Main\\Dependencies\\Zip Files");
-			row5.CreateCells(gridSettingsQFC, "QFC 16.0 Zip Path", "C:\\Devl\\Products\\Upstream\\Main\\Dependencies\\Zip Files");
-			gridSettingsQFC.Rows.Add(row5);
+            //DataGridViewRow row5 = (DataGridViewRow)gridSettingsQFC.RowTemplate.Clone();
+            //SettingManager.AddSetting(gridSettingsQFC.Tag.ToString(), "QFC 16.0 Zip Path", "C:\\Devl\\Products\\Upstream\\Main\\Dependencies\\Zip Files");
+            //row5.CreateCells(gridSettingsQFC, "QFC 16.0 Zip Path", "C:\\Devl\\Products\\Upstream\\Main\\Dependencies\\Zip Files");
+            //gridSettingsQFC.Rows.Add(row5);
 
-			DataGridViewRow row6 = (DataGridViewRow)gridSettingsQFC.RowTemplate.Clone();
-			SettingManager.AddSetting(gridSettingsQFC.Tag.ToString(), "Enable Zip Functionality", true);
-			row6.CreateCells(gridSettingsQFC, "Enable Zip Functionality", true);
-			gridSettingsQFC.Rows.Add(row6);
+            DataGridViewRow row6 = (DataGridViewRow)gridSettingsSearchString.RowTemplate.Clone();
+			SettingManager.AddSetting(gridSettingsSearchString.Tag.ToString(), "Enable Zip Functionality", true);
+			row6.CreateCells(gridSettingsSearchString, "Enable Zip Functionality", true);
+			gridSettingsSearchString.Rows.Add(row6);
 
             DataGridViewRow row9 = (DataGridViewRow)gridSettingsLoadSchema.RowTemplate.Clone();
             SettingManager.AddSetting(gridSettingsLoadSchema.Tag.ToString(), "Allow Custom Env", false);
@@ -64,7 +64,7 @@ namespace QuickStart
 
 			gridSettingsInsGen.TopLeftHeaderCell.Value = "v";
 			gridSettingsCascadeDel.TopLeftHeaderCell.Value = "v";
-			gridSettingsQFC.TopLeftHeaderCell.Value = "v";
+			gridSettingsSearchString.TopLeftHeaderCell.Value = "v";
             gridSettingsLoadSchema.TopLeftHeaderCell.Value = "v";
 
 			//Fills the row headers
@@ -74,8 +74,8 @@ namespace QuickStart
 			gridSettingsCascadeDel.DefaultCellStyle.SelectionBackColor = gridSettingsCascadeDel.DefaultCellStyle.BackColor;
 			gridSettingsCascadeDel.DefaultCellStyle.SelectionForeColor = gridSettingsCascadeDel.DefaultCellStyle.ForeColor;
 
-			gridSettingsQFC.DefaultCellStyle.SelectionBackColor = gridSettingsQFC.DefaultCellStyle.BackColor;
-			gridSettingsQFC.DefaultCellStyle.SelectionForeColor = gridSettingsQFC.DefaultCellStyle.ForeColor;
+			gridSettingsSearchString.DefaultCellStyle.SelectionBackColor = gridSettingsSearchString.DefaultCellStyle.BackColor;
+			gridSettingsSearchString.DefaultCellStyle.SelectionForeColor = gridSettingsSearchString.DefaultCellStyle.ForeColor;
 
             gridSettingsLoadSchema.DefaultCellStyle.SelectionBackColor = gridSettingsLoadSchema.DefaultCellStyle.BackColor;
             gridSettingsLoadSchema.DefaultCellStyle.SelectionForeColor = gridSettingsLoadSchema.DefaultCellStyle.ForeColor;
@@ -83,7 +83,7 @@ namespace QuickStart
 			//Removes the grid selection arrows
 			gridSettingsInsGen.RowHeadersDefaultCellStyle.Padding = new Padding(this.gridSettingsInsGen.RowHeadersWidth);
 			gridSettingsCascadeDel.RowHeadersDefaultCellStyle.Padding = new Padding(this.gridSettingsCascadeDel.RowHeadersWidth);
-			gridSettingsQFC.RowHeadersDefaultCellStyle.Padding = new Padding(this.gridSettingsQFC.RowHeadersWidth);
+			gridSettingsSearchString.RowHeadersDefaultCellStyle.Padding = new Padding(this.gridSettingsSearchString.RowHeadersWidth);
             gridSettingsLoadSchema.RowHeadersDefaultCellStyle.Padding = new Padding(this.gridSettingsLoadSchema.RowHeadersWidth);
 			//gridSettingsCascadeDel.EnableHeadersVisualStyles = false;
 
@@ -114,25 +114,25 @@ namespace QuickStart
 				{
 					iGridHeight += gridSettingsCascadeDel.Rows[iVisibleRows - 1].Height;
 				}
-				gridSettingsQFC.Location = new Point(gridSettingsCascadeDel.Location.X, gridSettingsCascadeDel.Location.Y + iGridHeight);
+				gridSettingsSearchString.Location = new Point(gridSettingsCascadeDel.Location.X, gridSettingsCascadeDel.Location.Y + iGridHeight);
 			}
 
             iVisibleRows = 0;
-            iGridHeight = gridSettingsQFC.ColumnHeadersHeight;
-            foreach (DataGridViewRow row in gridSettingsQFC.Rows)
+            iGridHeight = gridSettingsSearchString.ColumnHeadersHeight;
+            foreach (DataGridViewRow row in gridSettingsSearchString.Rows)
             {
                 if (row.Visible) iVisibleRows++;
 
                 if (iVisibleRows > 0)
                 {
-                    iGridHeight += gridSettingsQFC.Rows[iVisibleRows - 1].Height;
+                    iGridHeight += gridSettingsSearchString.Rows[iVisibleRows - 1].Height;
                 }
-                gridSettingsLoadSchema.Location = new Point(gridSettingsQFC.Location.X, gridSettingsQFC.Location.Y + iGridHeight);
+                gridSettingsLoadSchema.Location = new Point(gridSettingsSearchString.Location.X, gridSettingsSearchString.Location.Y + iGridHeight);
             }
 
             //Add extra height to grid to avoid vertical scrollbar from appearing
             AddExtraDataGridHeight(gridSettingsInsGen);
-            AddExtraDataGridHeight(gridSettingsQFC);
+            AddExtraDataGridHeight(gridSettingsSearchString);
             AddExtraDataGridHeight(gridSettingsCascadeDel);
             AddExtraDataGridHeight(gridSettingsLoadSchema);
 
@@ -166,13 +166,13 @@ namespace QuickStart
 				}
 				gridSettingsCascadeDel.TopLeftHeaderCell.Value = ">";
 			}
-			if (sFromTab != gridSettingsQFC.Tag.ToString())
+			if (sFromTab != gridSettingsSearchString.Tag.ToString())
 			{
-				for (int i = 0; i < gridSettingsQFC.Rows.Count; i++)
+				for (int i = 0; i < gridSettingsSearchString.Rows.Count; i++)
 				{
-					gridSettingsQFC.Rows[i].Visible = false;
+					gridSettingsSearchString.Rows[i].Visible = false;
 				}
-				gridSettingsQFC.TopLeftHeaderCell.Value = ">";
+				gridSettingsSearchString.TopLeftHeaderCell.Value = ">";
 			}
             if (sFromTab != gridSettingsLoadSchema.Tag.ToString())
             {
@@ -201,13 +201,13 @@ namespace QuickStart
 				gridSettingsInsGen.TopLeftHeaderCell.Value = "v";
 			}
 			//Populate QFC Section
-			if (sFromTab == gridSettingsQFC.Tag.ToString())
+			if (sFromTab == gridSettingsSearchString.Tag.ToString())
 			{
-				for (int i = 0; i < gridSettingsQFC.Rows.Count; i++)
+				for (int i = 0; i < gridSettingsSearchString.Rows.Count; i++)
 				{
-					gridSettingsQFC.Rows[i].Visible = true;
+					gridSettingsSearchString.Rows[i].Visible = true;
 				}
-				gridSettingsQFC.TopLeftHeaderCell.Value = "v";
+				gridSettingsSearchString.TopLeftHeaderCell.Value = "v";
 			}
             //Populate Load Schema Section
             if (sFromTab == gridSettingsLoadSchema.Tag.ToString())
@@ -226,7 +226,7 @@ namespace QuickStart
 			this.Validate();
 			gridSettingsInsGen.EndEdit();
 			gridSettingsCascadeDel.EndEdit();
-			gridSettingsQFC.EndEdit();
+			gridSettingsSearchString.EndEdit();
             gridSettingsLoadSchema.EndEdit();
 
 			foreach (DataGridViewRow row in gridSettingsInsGen.Rows)
@@ -237,9 +237,9 @@ namespace QuickStart
 			{
 				SettingManager.UpdateSetting(gridSettingsCascadeDel.Tag.ToString(), row.Cells[0].Value.ToString(), row.Cells[1].Value);
 			}
-			foreach (DataGridViewRow row in gridSettingsQFC.Rows)
+			foreach (DataGridViewRow row in gridSettingsSearchString.Rows)
 			{
-				SettingManager.UpdateSetting(gridSettingsQFC.Tag.ToString(), row.Cells[0].Value.ToString(), row.Cells[1].Value);
+				SettingManager.UpdateSetting(gridSettingsSearchString.Tag.ToString(), row.Cells[0].Value.ToString(), row.Cells[1].Value);
 			}
             foreach (DataGridViewRow row in gridSettingsLoadSchema.Rows)
             {
@@ -292,20 +292,20 @@ namespace QuickStart
 				string sValue = SettingManager.GetSettingDefaultValue(gridSettingsInsGen.Tag.ToString(), row.Cells[0].Value.ToString()).ToString();
 				row.Cells[1].Value = sValue;
 			}
-			foreach (DataGridViewRow row in gridSettingsQFC.Rows)
+			foreach (DataGridViewRow row in gridSettingsSearchString.Rows)
 			{
-				string sValue = SettingManager.GetSettingDefaultValue(gridSettingsQFC.Tag.ToString(), row.Cells[0].Value.ToString()).ToString();
+				string sValue = SettingManager.GetSettingDefaultValue(gridSettingsSearchString.Tag.ToString(), row.Cells[0].Value.ToString()).ToString();
 				row.Cells[1].Value = sValue;
 			}
 		}
 		private void tsSettingsQFC_Click(object sender, EventArgs e)
 		{
-			ShowSettings(tsSettingsQFC.Tag.ToString());
+			ShowSettings(tsSettingsSearchString.Tag.ToString());
 		}
 
-		private void gridSettingsQFC_SelectionChanged(object sender, EventArgs e)
+		private void gridSettingsSearchString_SelectionChanged(object sender, EventArgs e)
 		{
-			gridSettingsQFC.ClearSelection();
+			gridSettingsSearchString.ClearSelection();
 		}
 		private void tsSettingsGenerate_Insert_Click(object sender, EventArgs e)
 		{
@@ -367,19 +367,19 @@ namespace QuickStart
 			panelSettings.Show();
 		}
 
-		private void gridSettingsQFC_Click(object sender, EventArgs e)
+		private void gridSettingsSearchString_Click(object sender, EventArgs e)
 		{
 			MouseEventArgs args = (MouseEventArgs)e;
 			DataGridView dgv = (DataGridView)sender;
 			DataGridView.HitTestInfo hit = dgv.HitTest(args.X, args.Y);
 			if (hit.Type == DataGridViewHitTestType.TopLeftHeader)
 			{
-				for (int i = 0; i < gridSettingsQFC.Rows.Count; i++)
+				for (int i = 0; i < gridSettingsSearchString.Rows.Count; i++)
 				{
-					gridSettingsQFC.Rows[i].Visible = (gridSettingsQFC.Rows[i].Visible == true) ? false : true;
+					gridSettingsSearchString.Rows[i].Visible = (gridSettingsSearchString.Rows[i].Visible == true) ? false : true;
 				}
 
-				gridSettingsQFC.TopLeftHeaderCell.Value = (gridSettingsQFC.Rows[0].Visible == true) ? "v" : ">";
+				gridSettingsSearchString.TopLeftHeaderCell.Value = (gridSettingsSearchString.Rows[0].Visible == true) ? "v" : ">";
 				GridAutoSize();
 			}
 		}
@@ -399,5 +399,9 @@ namespace QuickStart
                 GridAutoSize();
             }
         }
-	}
+        private void tsSettingsSearchString_Click(object sender, EventArgs e)
+        {
+            ShowSettings(tsSettingsSearchString.Tag.ToString());
+        }
+    }
 }
