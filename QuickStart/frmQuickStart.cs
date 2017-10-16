@@ -99,7 +99,13 @@ namespace QuickStart
 			//Commit
 			UpdateExecuteAndStopIcons(A);
 
-			bool bTrack = true;
+            //Reset error/custom messages
+            A.SetErrorException(null);
+            A.SetCustomMessage(null);
+            //Commit
+            UpdateErrorMessages(A);
+
+            bool bTrack = true;
 			string elapsedTime = String.Empty;
 			string sLaunchingTabName = A.GetName();
 
@@ -240,8 +246,8 @@ namespace QuickStart
 			}
             else if (A.GetName() == tsUpdateGen.Tag.ToString())
             {
-                ThreadHelperUtility.SetEnable(this, tsUpdateGen, tsGenerate_UpdateGen, A.GetTimerExecuteIconEnable());
-                ThreadHelperUtility.SetEnable(this, tsUpdateGen, tsGenerate_UpdateGen, A.GetTimerExecuteIconEnable());
+                ThreadHelperUtility.SetEnable(this, tsUpdateGen, tsGenerate_Update, A.GetTimerExecuteIconEnable());
+                ThreadHelperUtility.SetEnable(this, tsUpdateGen, tsStopGenerate_Update, A.GetTimerStopIconEnable());
             }
         }
         private void ThrottleThreadProcSafe(int processId, double limit)
@@ -497,8 +503,11 @@ namespace QuickStart
 			}
 		}
 
-        private void GenUpdateThreadProcSafe(string sInput, string sTableName, string sSchema, TimerObjectState A)
+        private void GenUpdateThreadProcSafe(string sInput, string sTableName, string sSchema, string sGenFile, TimerObjectState A)
         {
+            //Only want one GenUpdateThread thread running at any time
+            BlockParallelThreads(Thread.CurrentThread);
+
             try
             {
                 StreamReader streamReader = new StreamReader(BaseDirectories.GeneratedSchemas + "\\" + GetSchemaFileName(sSchema));
@@ -515,7 +524,7 @@ namespace QuickStart
                 }
 
                 sb = SqlGenEngine.UpdateGenEngine(dtDatabaseSchema, sTableName, sInput);
-                CreateGeneratedScriptFile(sb, "GeneratedScript.txt");
+                CreateGeneratedScriptFile(sb, sGenFile);
 
                 if (sb.ToString().Contains("@@Warning:"))
                 {
@@ -537,7 +546,16 @@ namespace QuickStart
             }
             finally
             {
-                A.SetTimerThreadActive(false);
+                if (ManagedThreadList.Contains(Thread.CurrentThread))
+                {
+                    ManagedThreadList.Remove(Thread.CurrentThread);
+                }
+
+                if (ManagedThreadList.Find(item => item.Name == UPDATE_GEN) == null)
+                {
+                    //There are no more active GenUpdateThread. Stop the timer
+                    A.SetTimerThreadActive(false);
+                }
             }
         }
         #endregion
@@ -551,6 +569,7 @@ namespace QuickStart
 			tsLoadSchema.Renderer = new ToolStripOverride();
 			tsDevl.Renderer = new ToolStripOverride();
 			tsSearchString.Renderer = new ToolStripOverride();
+            tsUpdateGen.Renderer = new ToolStripOverride();
 
             statusStrip1.Renderer = new ToolStripDropDownOverride();
 			cmbCascadeOption.SelectedIndex = 0;
@@ -1262,7 +1281,7 @@ namespace QuickStart
 			}
 
 			
-			if (chkSplit.Checked)
+			if (chkSplit_InsertGen.Checked)
 			{
 				if (StringUtility.IsStringOverMemory(sInputString))
 				{
@@ -1271,7 +1290,7 @@ namespace QuickStart
 
 					foreach (string sInput in ListToProcess)
 					{
-						string sGenFile = "GeneratedScript" + iFileNumber.ToString() + ".txt";	
+						string sGenFile = "GeneratedInsertScript" + iFileNumber.ToString() + ".txt";	
 						GenInsertThread = new Thread(() => GenInsertThreadProcSafe(sInput, sIDInsert, sTableName, sGenFile, A));
 						GenInsertThread.Start();
 						GenInsertThread.Name = INSERT_GEN;
@@ -1297,7 +1316,7 @@ namespace QuickStart
 			if (!bProcessed)
 			{
 				
-				GenInsertThread = new Thread(() => GenInsertThreadProcSafe(sInputString, sIDInsert, sTableName, "GeneratedScript1.txt", A));
+				GenInsertThread = new Thread(() => GenInsertThreadProcSafe(sInputString, sIDInsert, sTableName, "GeneratedInsertScript1.txt", A));
 				GenInsertThread.Start();
 				GenInsertThread.Name = INSERT_GEN;
 				ManagedThreadList.Add(GenInsertThread);				
@@ -1646,10 +1665,12 @@ namespace QuickStart
         private void tsGenerate_UpdateGen_Click(object sender, EventArgs e)
         {
             bool bSuccess = true;
-            string sInput = rttInput.Text;
+            string sInputString = rttInput.Text;
             string sSchema = cmbSchema_Update.Text;
             string sTableName = txtTableName_Update.Text;
             string sTabName = tabControl2.SelectedTab.Tag.ToString();
+            bool bProcessed = false;
+            TimerObjectState A = TimerObjectManager.Retrieve(sTabName);
 
             //Error handling
             if (string.IsNullOrWhiteSpace(sTableName))
@@ -1670,16 +1691,52 @@ namespace QuickStart
             {
                 errorProvider9.SetError(cmbSchema_Update, "");
             }
-            if (!bSuccess) return;
 
-            TimerObjectState A = TimerObjectManager.Retrieve(sTabName);
+            if (!bSuccess) return;
+           
+            if (chkSplit_UpdateGen.Checked)
+            {
+                if (StringUtility.IsStringOverMemory(sInputString))
+                {
+                    List<string> ListToProcess = StringUtility.SplitLargeString(sInputString);
+                    int iFileNumber = 1;
+
+                    foreach (string sInput in ListToProcess)
+                    {
+                        string sGenFile = "GeneratedUpdateScript" + iFileNumber.ToString() + ".txt";
+                        GenUpdateThread = new Thread(() => GenUpdateThreadProcSafe(sInput, sTableName, sSchema, sGenFile, A));
+                        GenUpdateThread.Start();
+                        GenUpdateThread.Name = UPDATE_GEN;
+                        ManagedThreadList.Add(GenUpdateThread);
+
+                        bProcessed = true;
+                        iFileNumber++;
+                    }
+                }
+            }
+            else
+            {
+                if (StringUtility.IsStringOverMemory(sInputString))
+                {
+                    if (MessageBoxEx.Show("Dataset is large and may cause memory issues.\n Recommendation is to check: Split To multiple files\n" + StringUtility.StringOverCapacity(sInputString).ToString() + "% over recommended capacity.\nContinue?",
+                            "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
+                    {
+                        return;
+                    }
+                }
+            }
+
+            if (!bProcessed)
+            {
+                GenUpdateThread = new Thread(() => GenUpdateThreadProcSafe(sInputString, sTableName, sSchema, "GeneratedUpdateScript1.txt", A));
+                GenUpdateThread.Start();
+                GenUpdateThread.Name = UPDATE_GEN;
+                ManagedThreadList.Add(GenUpdateThread);
+            }
+
             A.SetTimerThreadActive(true);
             TimerThread = new Thread(() => TimerThreadProcSafe(A));
             TimerThread.Start();
-
-            GenUpdateThread = new Thread(() => GenUpdateThreadProcSafe(sInput,sTableName, sSchema, A));
-            GenUpdateThread.Start();
-            ManagedThreadList.Add(GenUpdateThread);
         }
 
         private void tsStopGenerate_UpdateGen_Click(object sender, EventArgs e)

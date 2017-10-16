@@ -30,15 +30,15 @@
 		{
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmQuickStart));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle9 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle10 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle11 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle12 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle13 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle14 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle15 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle16 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle18 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle17 = new System.Windows.Forms.DataGridViewCellStyle();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.label18 = new System.Windows.Forms.Label();
@@ -54,7 +54,7 @@
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.tabControl2 = new System.Windows.Forms.TabControl();
             this.tabPage4 = new System.Windows.Forms.TabPage();
-            this.chkSplit = new System.Windows.Forms.CheckBox();
+            this.chkSplit_InsertGen = new System.Windows.Forms.CheckBox();
             this.label7 = new System.Windows.Forms.Label();
             this.tsInsertGen = new System.Windows.Forms.ToolStrip();
             this.tsGenerate_Insert = new System.Windows.Forms.ToolStripButton();
@@ -82,16 +82,17 @@
             this.cmbCascadeOption = new System.Windows.Forms.ComboBox();
             this.label11 = new System.Windows.Forms.Label();
             this.tabPage7 = new System.Windows.Forms.TabPage();
+            this.chkSplit_UpdateGen = new System.Windows.Forms.CheckBox();
             this.cmbSchema_Update = new System.Windows.Forms.ComboBox();
             this.label21 = new System.Windows.Forms.Label();
             this.txtTableName_Update = new System.Windows.Forms.TextBox();
             this.label22 = new System.Windows.Forms.Label();
             this.label20 = new System.Windows.Forms.Label();
             this.tsUpdateGen = new System.Windows.Forms.ToolStrip();
-            this.tsGenerate_UpdateGen = new System.Windows.Forms.ToolStripButton();
+            this.tsGenerate_Update = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
-            this.tsStopGenerate_UpdateGen = new System.Windows.Forms.ToolStripButton();
-            this.tsSettingsUpdate_Gen = new System.Windows.Forms.ToolStripButton();
+            this.tsStopGenerate_Update = new System.Windows.Forms.ToolStripButton();
+            this.tsSettingsGenerate_Update = new System.Windows.Forms.ToolStripButton();
             this.tabPage6 = new System.Windows.Forms.TabPage();
             this.label17 = new System.Windows.Forms.Label();
             this.tsLoadSchema = new System.Windows.Forms.ToolStrip();
@@ -366,7 +367,7 @@
             // 
             this.tabPage4.BackColor = System.Drawing.SystemColors.Control;
             this.tabPage4.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.tabPage4.Controls.Add(this.chkSplit);
+            this.tabPage4.Controls.Add(this.chkSplit_InsertGen);
             this.tabPage4.Controls.Add(this.label7);
             this.tabPage4.Controls.Add(this.tsInsertGen);
             this.tabPage4.Controls.Add(this.cmbIDInsert);
@@ -382,16 +383,16 @@
             this.tabPage4.Tag = "Insert Gen";
             this.tabPage4.Text = "Insert Gen";
             // 
-            // chkSplit
+            // chkSplit_InsertGen
             // 
-            this.chkSplit.AutoSize = true;
-            this.chkSplit.Location = new System.Drawing.Point(27, 95);
-            this.chkSplit.Margin = new System.Windows.Forms.Padding(2);
-            this.chkSplit.Name = "chkSplit";
-            this.chkSplit.Size = new System.Drawing.Size(123, 17);
-            this.chkSplit.TabIndex = 29;
-            this.chkSplit.Text = "Split to multiple files?";
-            this.chkSplit.UseVisualStyleBackColor = true;
+            this.chkSplit_InsertGen.AutoSize = true;
+            this.chkSplit_InsertGen.Location = new System.Drawing.Point(27, 95);
+            this.chkSplit_InsertGen.Margin = new System.Windows.Forms.Padding(2);
+            this.chkSplit_InsertGen.Name = "chkSplit_InsertGen";
+            this.chkSplit_InsertGen.Size = new System.Drawing.Size(123, 17);
+            this.chkSplit_InsertGen.TabIndex = 29;
+            this.chkSplit_InsertGen.Text = "Split to multiple files?";
+            this.chkSplit_InsertGen.UseVisualStyleBackColor = true;
             // 
             // label7
             // 
@@ -678,6 +679,7 @@
             // 
             this.tabPage7.BackColor = System.Drawing.SystemColors.Control;
             this.tabPage7.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.tabPage7.Controls.Add(this.chkSplit_UpdateGen);
             this.tabPage7.Controls.Add(this.cmbSchema_Update);
             this.tabPage7.Controls.Add(this.label21);
             this.tabPage7.Controls.Add(this.txtTableName_Update);
@@ -693,12 +695,23 @@
             this.tabPage7.Tag = "Update Gen";
             this.tabPage7.Text = "Update Gen";
             // 
+            // chkSplit_UpdateGen
+            // 
+            this.chkSplit_UpdateGen.AutoSize = true;
+            this.chkSplit_UpdateGen.Location = new System.Drawing.Point(27, 95);
+            this.chkSplit_UpdateGen.Margin = new System.Windows.Forms.Padding(2);
+            this.chkSplit_UpdateGen.Name = "chkSplit_UpdateGen";
+            this.chkSplit_UpdateGen.Size = new System.Drawing.Size(123, 17);
+            this.chkSplit_UpdateGen.TabIndex = 38;
+            this.chkSplit_UpdateGen.Text = "Split to multiple files?";
+            this.chkSplit_UpdateGen.UseVisualStyleBackColor = true;
+            // 
             // cmbSchema_Update
             // 
             this.cmbSchema_Update.ContextMenuStrip = this.rightClickMenuStrip;
             this.cmbSchema_Update.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbSchema_Update.FormattingEnabled = true;
-            this.cmbSchema_Update.Location = new System.Drawing.Point(159, 66);
+            this.cmbSchema_Update.Location = new System.Drawing.Point(159, 64);
             this.cmbSchema_Update.Margin = new System.Windows.Forms.Padding(2);
             this.cmbSchema_Update.Name = "cmbSchema_Update";
             this.cmbSchema_Update.Size = new System.Drawing.Size(170, 21);
@@ -708,7 +721,7 @@
             // 
             this.label21.AutoSize = true;
             this.label21.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label21.Location = new System.Drawing.Point(24, 64);
+            this.label21.Location = new System.Drawing.Point(24, 63);
             this.label21.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label21.Name = "label21";
             this.label21.Size = new System.Drawing.Size(63, 18);
@@ -717,7 +730,7 @@
             // 
             // txtTableName_Update
             // 
-            this.txtTableName_Update.Location = new System.Drawing.Point(159, 38);
+            this.txtTableName_Update.Location = new System.Drawing.Point(159, 37);
             this.txtTableName_Update.Margin = new System.Windows.Forms.Padding(2);
             this.txtTableName_Update.Name = "txtTableName_Update";
             this.txtTableName_Update.Size = new System.Drawing.Size(170, 20);
@@ -749,50 +762,50 @@
             // 
             this.tsUpdateGen.BackColor = System.Drawing.SystemColors.Control;
             this.tsUpdateGen.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.tsGenerate_UpdateGen,
+            this.tsGenerate_Update,
             this.toolStripSeparator7,
-            this.tsStopGenerate_UpdateGen,
-            this.tsSettingsUpdate_Gen});
+            this.tsStopGenerate_Update,
+            this.tsSettingsGenerate_Update});
             this.tsUpdateGen.Location = new System.Drawing.Point(2, 2);
             this.tsUpdateGen.Name = "tsUpdateGen";
             this.tsUpdateGen.Size = new System.Drawing.Size(452, 25);
             this.tsUpdateGen.TabIndex = 30;
-            this.tsUpdateGen.Tag = "Cascade Delete Gen";
+            this.tsUpdateGen.Tag = "Update Gen";
             this.tsUpdateGen.Text = "toolStrip1";
             // 
-            // tsGenerate_UpdateGen
+            // tsGenerate_Update
             // 
-            this.tsGenerate_UpdateGen.Image = ((System.Drawing.Image)(resources.GetObject("tsGenerate_UpdateGen.Image")));
-            this.tsGenerate_UpdateGen.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.tsGenerate_UpdateGen.Name = "tsGenerate_UpdateGen";
-            this.tsGenerate_UpdateGen.Size = new System.Drawing.Size(67, 22);
-            this.tsGenerate_UpdateGen.Text = "Execute";
-            this.tsGenerate_UpdateGen.Click += new System.EventHandler(this.tsGenerate_UpdateGen_Click);
+            this.tsGenerate_Update.Image = ((System.Drawing.Image)(resources.GetObject("tsGenerate_Update.Image")));
+            this.tsGenerate_Update.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsGenerate_Update.Name = "tsGenerate_Update";
+            this.tsGenerate_Update.Size = new System.Drawing.Size(67, 22);
+            this.tsGenerate_Update.Text = "Execute";
+            this.tsGenerate_Update.Click += new System.EventHandler(this.tsGenerate_UpdateGen_Click);
             // 
             // toolStripSeparator7
             // 
             this.toolStripSeparator7.Name = "toolStripSeparator7";
             this.toolStripSeparator7.Size = new System.Drawing.Size(6, 25);
             // 
-            // tsStopGenerate_UpdateGen
+            // tsStopGenerate_Update
             // 
-            this.tsStopGenerate_UpdateGen.Enabled = false;
-            this.tsStopGenerate_UpdateGen.Image = ((System.Drawing.Image)(resources.GetObject("tsStopGenerate_UpdateGen.Image")));
-            this.tsStopGenerate_UpdateGen.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.tsStopGenerate_UpdateGen.Name = "tsStopGenerate_UpdateGen";
-            this.tsStopGenerate_UpdateGen.Size = new System.Drawing.Size(51, 22);
-            this.tsStopGenerate_UpdateGen.Text = "Stop";
-            this.tsStopGenerate_UpdateGen.Click += new System.EventHandler(this.tsStopGenerate_UpdateGen_Click);
+            this.tsStopGenerate_Update.Enabled = false;
+            this.tsStopGenerate_Update.Image = ((System.Drawing.Image)(resources.GetObject("tsStopGenerate_Update.Image")));
+            this.tsStopGenerate_Update.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsStopGenerate_Update.Name = "tsStopGenerate_Update";
+            this.tsStopGenerate_Update.Size = new System.Drawing.Size(51, 22);
+            this.tsStopGenerate_Update.Text = "Stop";
+            this.tsStopGenerate_Update.Click += new System.EventHandler(this.tsStopGenerate_UpdateGen_Click);
             // 
-            // tsSettingsUpdate_Gen
+            // tsSettingsGenerate_Update
             // 
-            this.tsSettingsUpdate_Gen.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
-            this.tsSettingsUpdate_Gen.Image = ((System.Drawing.Image)(resources.GetObject("tsSettingsUpdate_Gen.Image")));
-            this.tsSettingsUpdate_Gen.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.tsSettingsUpdate_Gen.Name = "tsSettingsUpdate_Gen";
-            this.tsSettingsUpdate_Gen.Size = new System.Drawing.Size(69, 22);
-            this.tsSettingsUpdate_Gen.Tag = "Cascade Delete Gen";
-            this.tsSettingsUpdate_Gen.Text = "Settings";
+            this.tsSettingsGenerate_Update.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
+            this.tsSettingsGenerate_Update.Image = ((System.Drawing.Image)(resources.GetObject("tsSettingsGenerate_Update.Image")));
+            this.tsSettingsGenerate_Update.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsSettingsGenerate_Update.Name = "tsSettingsGenerate_Update";
+            this.tsSettingsGenerate_Update.Size = new System.Drawing.Size(69, 22);
+            this.tsSettingsGenerate_Update.Tag = "Cascade Delete Gen";
+            this.tsSettingsGenerate_Update.Text = "Settings";
             // 
             // tabPage6
             // 
@@ -1306,14 +1319,14 @@
             this.gridSettingsLoadSchema.AllowUserToResizeRows = false;
             this.gridSettingsLoadSchema.BackgroundColor = System.Drawing.SystemColors.Control;
             this.gridSettingsLoadSchema.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.ControlDark;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.gridSettingsLoadSchema.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle10.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle10.BackColor = System.Drawing.SystemColors.ControlDark;
+            dataGridViewCellStyle10.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle10.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle10.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle10.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle10.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.gridSettingsLoadSchema.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle10;
             this.gridSettingsLoadSchema.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.gridSettingsLoadSchema.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.dataGridViewTextBoxColumn3,
@@ -1336,11 +1349,11 @@
             // dataGridViewTextBoxColumn3
             // 
             this.dataGridViewTextBoxColumn3.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.Color.Black;
-            this.dataGridViewTextBoxColumn3.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle11.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle11.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle11.SelectionBackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle11.SelectionForeColor = System.Drawing.Color.Black;
+            this.dataGridViewTextBoxColumn3.DefaultCellStyle = dataGridViewCellStyle11;
             this.dataGridViewTextBoxColumn3.HeaderText = "Load Schema";
             this.dataGridViewTextBoxColumn3.Name = "dataGridViewTextBoxColumn3";
             this.dataGridViewTextBoxColumn3.ReadOnly = true;
@@ -1364,14 +1377,14 @@
             this.gridSettingsSearchString.AllowUserToResizeRows = false;
             this.gridSettingsSearchString.BackgroundColor = System.Drawing.SystemColors.Control;
             this.gridSettingsSearchString.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.ControlDark;
-            dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.gridSettingsSearchString.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle12.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle12.BackColor = System.Drawing.SystemColors.ControlDark;
+            dataGridViewCellStyle12.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle12.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle12.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle12.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle12.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.gridSettingsSearchString.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle12;
             this.gridSettingsSearchString.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.gridSettingsSearchString.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.dataGridViewTextBoxColumn1,
@@ -1394,11 +1407,11 @@
             // dataGridViewTextBoxColumn1
             // 
             this.dataGridViewTextBoxColumn1.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle4.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.Color.Black;
-            this.dataGridViewTextBoxColumn1.DefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle13.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle13.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle13.SelectionBackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle13.SelectionForeColor = System.Drawing.Color.Black;
+            this.dataGridViewTextBoxColumn1.DefaultCellStyle = dataGridViewCellStyle13;
             this.dataGridViewTextBoxColumn1.HeaderText = "Search String";
             this.dataGridViewTextBoxColumn1.Name = "dataGridViewTextBoxColumn1";
             this.dataGridViewTextBoxColumn1.ReadOnly = true;
@@ -1457,14 +1470,14 @@
             this.gridSettingsCascadeDel.AllowUserToResizeRows = false;
             this.gridSettingsCascadeDel.BackgroundColor = System.Drawing.SystemColors.Control;
             this.gridSettingsCascadeDel.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.ControlDark;
-            dataGridViewCellStyle5.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.gridSettingsCascadeDel.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle14.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle14.BackColor = System.Drawing.SystemColors.ControlDark;
+            dataGridViewCellStyle14.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle14.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle14.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle14.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle14.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.gridSettingsCascadeDel.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle14;
             this.gridSettingsCascadeDel.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.gridSettingsCascadeDel.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.Setting2,
@@ -1487,11 +1500,11 @@
             // Setting2
             // 
             this.Setting2.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            dataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle6.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle6.SelectionForeColor = System.Drawing.Color.Black;
-            this.Setting2.DefaultCellStyle = dataGridViewCellStyle6;
+            dataGridViewCellStyle15.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle15.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle15.SelectionBackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle15.SelectionForeColor = System.Drawing.Color.Black;
+            this.Setting2.DefaultCellStyle = dataGridViewCellStyle15;
             this.Setting2.HeaderText = "Cascade Delete";
             this.Setting2.Name = "Setting2";
             this.Setting2.ReadOnly = true;
@@ -1515,14 +1528,14 @@
             this.gridSettingsInsGen.AllowUserToResizeRows = false;
             this.gridSettingsInsGen.BackgroundColor = System.Drawing.SystemColors.Control;
             this.gridSettingsInsGen.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle7.BackColor = System.Drawing.SystemColors.ControlDark;
-            dataGridViewCellStyle7.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle7.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle7.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle7.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle7.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.gridSettingsInsGen.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle7;
+            dataGridViewCellStyle16.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle16.BackColor = System.Drawing.SystemColors.ControlDark;
+            dataGridViewCellStyle16.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle16.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle16.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle16.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle16.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.gridSettingsInsGen.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle16;
             this.gridSettingsInsGen.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.gridSettingsInsGen.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.Setting,
@@ -1533,14 +1546,14 @@
             this.gridSettingsInsGen.Margin = new System.Windows.Forms.Padding(2);
             this.gridSettingsInsGen.MultiSelect = false;
             this.gridSettingsInsGen.Name = "gridSettingsInsGen";
-            dataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle9.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle9.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle9.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle9.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle9.SelectionForeColor = System.Drawing.SystemColors.ControlDark;
-            dataGridViewCellStyle9.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.gridSettingsInsGen.RowHeadersDefaultCellStyle = dataGridViewCellStyle9;
+            dataGridViewCellStyle18.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle18.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle18.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle18.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle18.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle18.SelectionForeColor = System.Drawing.SystemColors.ControlDark;
+            dataGridViewCellStyle18.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.gridSettingsInsGen.RowHeadersDefaultCellStyle = dataGridViewCellStyle18;
             this.gridSettingsInsGen.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
             this.gridSettingsInsGen.RowTemplate.Height = 24;
             this.gridSettingsInsGen.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
@@ -1553,11 +1566,11 @@
             // Setting
             // 
             this.Setting.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            dataGridViewCellStyle8.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle8.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle8.SelectionBackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle8.SelectionForeColor = System.Drawing.Color.Black;
-            this.Setting.DefaultCellStyle = dataGridViewCellStyle8;
+            dataGridViewCellStyle17.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle17.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle17.SelectionBackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle17.SelectionForeColor = System.Drawing.Color.Black;
+            this.Setting.DefaultCellStyle = dataGridViewCellStyle17;
             this.Setting.HeaderText = "Insert Gen";
             this.Setting.Name = "Setting";
             this.Setting.ReadOnly = true;
@@ -1769,7 +1782,7 @@
 		private System.Windows.Forms.ToolStripButton tsSearch;
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
 		private System.Windows.Forms.ToolStripButton tsStopGenerate_Insert;
-		private System.Windows.Forms.CheckBox chkSplit;
+		private System.Windows.Forms.CheckBox chkSplit_InsertGen;
 		private System.Windows.Forms.ToolStripButton tsStopGenerate_CascadeDelete;
 		private System.Windows.Forms.ToolStripButton tsStopSearch;
 		private System.Windows.Forms.ToolStripButton tsStopSetup;
@@ -1821,12 +1834,13 @@
         private System.Windows.Forms.Label label22;
         private System.Windows.Forms.Label label20;
         private System.Windows.Forms.ToolStrip tsUpdateGen;
-        private System.Windows.Forms.ToolStripButton tsGenerate_UpdateGen;
+        private System.Windows.Forms.ToolStripButton tsGenerate_Update;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator7;
-        private System.Windows.Forms.ToolStripButton tsStopGenerate_UpdateGen;
-        private System.Windows.Forms.ToolStripButton tsSettingsUpdate_Gen;
+        private System.Windows.Forms.ToolStripButton tsStopGenerate_Update;
+        private System.Windows.Forms.ToolStripButton tsSettingsGenerate_Update;
         private System.Windows.Forms.ErrorProvider errorProvider8;
         private System.Windows.Forms.ErrorProvider errorProvider9;
+        private System.Windows.Forms.CheckBox chkSplit_UpdateGen;
     }
 }
 
