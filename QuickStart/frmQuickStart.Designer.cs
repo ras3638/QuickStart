@@ -26,7 +26,7 @@
 		/// Required method for Designer support - do not modify
 		/// the contents of this method with the code editor.
 		/// </summary>
-		private void InitializeComponent()
+		public void InitializeComponent()
 		{
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmQuickStart));
@@ -73,7 +73,7 @@
             this.tsStopGenerate_CascadeDelete = new System.Windows.Forms.ToolStripButton();
             this.tsSettingsCascade_Delete = new System.Windows.Forms.ToolStripButton();
             this.chkUseIncrements = new System.Windows.Forms.CheckBox();
-            this.cmbSchema = new System.Windows.Forms.ComboBox();
+            this.cmbSchema_CascadeDel = new System.Windows.Forms.ComboBox();
             this.rightClickMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.tsRightClickRemove = new System.Windows.Forms.ToolStripMenuItem();
             this.label13 = new System.Windows.Forms.Label();
@@ -81,6 +81,17 @@
             this.label12 = new System.Windows.Forms.Label();
             this.cmbCascadeOption = new System.Windows.Forms.ComboBox();
             this.label11 = new System.Windows.Forms.Label();
+            this.tabPage7 = new System.Windows.Forms.TabPage();
+            this.cmbSchema_Update = new System.Windows.Forms.ComboBox();
+            this.label21 = new System.Windows.Forms.Label();
+            this.txtTableName_Update = new System.Windows.Forms.TextBox();
+            this.label22 = new System.Windows.Forms.Label();
+            this.label20 = new System.Windows.Forms.Label();
+            this.tsUpdateGen = new System.Windows.Forms.ToolStrip();
+            this.tsGenerate_UpdateGen = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
+            this.tsStopGenerate_UpdateGen = new System.Windows.Forms.ToolStripButton();
+            this.tsSettingsUpdate_Gen = new System.Windows.Forms.ToolStripButton();
             this.tabPage6 = new System.Windows.Forms.TabPage();
             this.label17 = new System.Windows.Forms.Label();
             this.tsLoadSchema = new System.Windows.Forms.ToolStrip();
@@ -123,6 +134,8 @@
             this.tsErrorLog4 = new System.Windows.Forms.ToolStripTextBox();
             this.tsErrorLog5 = new System.Windows.Forms.ToolStripTextBox();
             this.tsErrorLog6 = new System.Windows.Forms.ToolStripTextBox();
+            this.tsErrorLog7 = new System.Windows.Forms.ToolStripTextBox();
+            this.tsErrorLog8 = new System.Windows.Forms.ToolStripTextBox();
             this.tsSpace = new System.Windows.Forms.ToolStripStatusLabel();
             this.TSlblTime = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
@@ -149,6 +162,10 @@
             this.errorProvider5 = new System.Windows.Forms.ErrorProvider(this.components);
             this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
             this.textBox1 = new System.Windows.Forms.TextBox();
+            this.errorProvider6 = new System.Windows.Forms.ErrorProvider(this.components);
+            this.errorProvider7 = new System.Windows.Forms.ErrorProvider(this.components);
+            this.errorProvider8 = new System.Windows.Forms.ErrorProvider(this.components);
+            this.errorProvider9 = new System.Windows.Forms.ErrorProvider(this.components);
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tsDevl.SuspendLayout();
@@ -159,6 +176,8 @@
             this.tabPage5.SuspendLayout();
             this.tsCascadeDelete.SuspendLayout();
             this.rightClickMenuStrip.SuspendLayout();
+            this.tabPage7.SuspendLayout();
+            this.tsUpdateGen.SuspendLayout();
             this.tabPage6.SuspendLayout();
             this.tsLoadSchema.SuspendLayout();
             this.tabPage3.SuspendLayout();
@@ -176,6 +195,10 @@
             this.panelMainTab.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.errorProvider4)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.errorProvider5)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.errorProvider6)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.errorProvider7)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.errorProvider8)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.errorProvider9)).BeginInit();
             this.SuspendLayout();
             // 
             // tabControl1
@@ -329,6 +352,7 @@
             // 
             this.tabControl2.Controls.Add(this.tabPage4);
             this.tabControl2.Controls.Add(this.tabPage5);
+            this.tabControl2.Controls.Add(this.tabPage7);
             this.tabControl2.Controls.Add(this.tabPage6);
             this.tabControl2.Location = new System.Drawing.Point(5, 5);
             this.tabControl2.Margin = new System.Windows.Forms.Padding(2);
@@ -480,7 +504,7 @@
             this.tabPage5.Controls.Add(this.label16);
             this.tabPage5.Controls.Add(this.tsCascadeDelete);
             this.tabPage5.Controls.Add(this.chkUseIncrements);
-            this.tabPage5.Controls.Add(this.cmbSchema);
+            this.tabPage5.Controls.Add(this.cmbSchema_CascadeDel);
             this.tabPage5.Controls.Add(this.label13);
             this.tabPage5.Controls.Add(this.txtFKName);
             this.tabPage5.Controls.Add(this.label12);
@@ -566,18 +590,18 @@
             this.chkUseIncrements.Text = "Delete in Increments?";
             this.chkUseIncrements.UseVisualStyleBackColor = true;
             // 
-            // cmbSchema
+            // cmbSchema_CascadeDel
             // 
-            this.cmbSchema.ContextMenuStrip = this.rightClickMenuStrip;
-            this.cmbSchema.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cmbSchema.FormattingEnabled = true;
-            this.cmbSchema.Location = new System.Drawing.Point(159, 93);
-            this.cmbSchema.Margin = new System.Windows.Forms.Padding(2);
-            this.cmbSchema.Name = "cmbSchema";
-            this.cmbSchema.Size = new System.Drawing.Size(170, 21);
-            this.cmbSchema.TabIndex = 27;
-            this.cmbSchema.SelectedIndexChanged += new System.EventHandler(this.cmbSchema_SelectedIndexChanged);
-            this.cmbSchema.KeyDown += new System.Windows.Forms.KeyEventHandler(this.cmbSchema_KeyDown);
+            this.cmbSchema_CascadeDel.ContextMenuStrip = this.rightClickMenuStrip;
+            this.cmbSchema_CascadeDel.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbSchema_CascadeDel.FormattingEnabled = true;
+            this.cmbSchema_CascadeDel.Location = new System.Drawing.Point(159, 93);
+            this.cmbSchema_CascadeDel.Margin = new System.Windows.Forms.Padding(2);
+            this.cmbSchema_CascadeDel.Name = "cmbSchema_CascadeDel";
+            this.cmbSchema_CascadeDel.Size = new System.Drawing.Size(170, 21);
+            this.cmbSchema_CascadeDel.TabIndex = 27;
+            this.cmbSchema_CascadeDel.SelectedIndexChanged += new System.EventHandler(this.cmbSchema_SelectedIndexChanged);
+            this.cmbSchema_CascadeDel.KeyDown += new System.Windows.Forms.KeyEventHandler(this.cmbSchema_KeyDown);
             // 
             // rightClickMenuStrip
             // 
@@ -637,6 +661,7 @@
             this.cmbCascadeOption.Name = "cmbCascadeOption";
             this.cmbCascadeOption.Size = new System.Drawing.Size(170, 21);
             this.cmbCascadeOption.TabIndex = 23;
+            this.cmbCascadeOption.SelectedIndexChanged += new System.EventHandler(this.cmbCascadeOption_SelectedIndexChanged);
             // 
             // label11
             // 
@@ -648,6 +673,126 @@
             this.label11.Size = new System.Drawing.Size(115, 18);
             this.label11.TabIndex = 20;
             this.label11.Text = "Cascade Option";
+            // 
+            // tabPage7
+            // 
+            this.tabPage7.BackColor = System.Drawing.SystemColors.Control;
+            this.tabPage7.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.tabPage7.Controls.Add(this.cmbSchema_Update);
+            this.tabPage7.Controls.Add(this.label21);
+            this.tabPage7.Controls.Add(this.txtTableName_Update);
+            this.tabPage7.Controls.Add(this.label22);
+            this.tabPage7.Controls.Add(this.label20);
+            this.tabPage7.Controls.Add(this.tsUpdateGen);
+            this.tabPage7.Location = new System.Drawing.Point(4, 22);
+            this.tabPage7.Margin = new System.Windows.Forms.Padding(2);
+            this.tabPage7.Name = "tabPage7";
+            this.tabPage7.Padding = new System.Windows.Forms.Padding(2);
+            this.tabPage7.Size = new System.Drawing.Size(460, 155);
+            this.tabPage7.TabIndex = 3;
+            this.tabPage7.Tag = "Update Gen";
+            this.tabPage7.Text = "Update Gen";
+            // 
+            // cmbSchema_Update
+            // 
+            this.cmbSchema_Update.ContextMenuStrip = this.rightClickMenuStrip;
+            this.cmbSchema_Update.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbSchema_Update.FormattingEnabled = true;
+            this.cmbSchema_Update.Location = new System.Drawing.Point(159, 66);
+            this.cmbSchema_Update.Margin = new System.Windows.Forms.Padding(2);
+            this.cmbSchema_Update.Name = "cmbSchema_Update";
+            this.cmbSchema_Update.Size = new System.Drawing.Size(170, 21);
+            this.cmbSchema_Update.TabIndex = 37;
+            // 
+            // label21
+            // 
+            this.label21.AutoSize = true;
+            this.label21.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label21.Location = new System.Drawing.Point(24, 64);
+            this.label21.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label21.Name = "label21";
+            this.label21.Size = new System.Drawing.Size(63, 18);
+            this.label21.TabIndex = 36;
+            this.label21.Text = "Schema";
+            // 
+            // txtTableName_Update
+            // 
+            this.txtTableName_Update.Location = new System.Drawing.Point(159, 38);
+            this.txtTableName_Update.Margin = new System.Windows.Forms.Padding(2);
+            this.txtTableName_Update.Name = "txtTableName_Update";
+            this.txtTableName_Update.Size = new System.Drawing.Size(170, 20);
+            this.txtTableName_Update.TabIndex = 35;
+            this.txtTableName_Update.TextChanged += new System.EventHandler(this.txtTableName_Update_TextChanged);
+            // 
+            // label22
+            // 
+            this.label22.AutoSize = true;
+            this.label22.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label22.Location = new System.Drawing.Point(24, 36);
+            this.label22.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label22.Name = "label22";
+            this.label22.Size = new System.Drawing.Size(88, 18);
+            this.label22.TabIndex = 34;
+            this.label22.Text = "Table Name";
+            // 
+            // label20
+            // 
+            this.label20.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.label20.Location = new System.Drawing.Point(-1, 27);
+            this.label20.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label20.Name = "label20";
+            this.label20.Size = new System.Drawing.Size(458, 2);
+            this.label20.TabIndex = 31;
+            this.label20.Text = "label20";
+            // 
+            // tsUpdateGen
+            // 
+            this.tsUpdateGen.BackColor = System.Drawing.SystemColors.Control;
+            this.tsUpdateGen.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.tsGenerate_UpdateGen,
+            this.toolStripSeparator7,
+            this.tsStopGenerate_UpdateGen,
+            this.tsSettingsUpdate_Gen});
+            this.tsUpdateGen.Location = new System.Drawing.Point(2, 2);
+            this.tsUpdateGen.Name = "tsUpdateGen";
+            this.tsUpdateGen.Size = new System.Drawing.Size(452, 25);
+            this.tsUpdateGen.TabIndex = 30;
+            this.tsUpdateGen.Tag = "Cascade Delete Gen";
+            this.tsUpdateGen.Text = "toolStrip1";
+            // 
+            // tsGenerate_UpdateGen
+            // 
+            this.tsGenerate_UpdateGen.Image = ((System.Drawing.Image)(resources.GetObject("tsGenerate_UpdateGen.Image")));
+            this.tsGenerate_UpdateGen.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsGenerate_UpdateGen.Name = "tsGenerate_UpdateGen";
+            this.tsGenerate_UpdateGen.Size = new System.Drawing.Size(67, 22);
+            this.tsGenerate_UpdateGen.Text = "Execute";
+            this.tsGenerate_UpdateGen.Click += new System.EventHandler(this.tsGenerate_UpdateGen_Click);
+            // 
+            // toolStripSeparator7
+            // 
+            this.toolStripSeparator7.Name = "toolStripSeparator7";
+            this.toolStripSeparator7.Size = new System.Drawing.Size(6, 25);
+            // 
+            // tsStopGenerate_UpdateGen
+            // 
+            this.tsStopGenerate_UpdateGen.Enabled = false;
+            this.tsStopGenerate_UpdateGen.Image = ((System.Drawing.Image)(resources.GetObject("tsStopGenerate_UpdateGen.Image")));
+            this.tsStopGenerate_UpdateGen.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsStopGenerate_UpdateGen.Name = "tsStopGenerate_UpdateGen";
+            this.tsStopGenerate_UpdateGen.Size = new System.Drawing.Size(51, 22);
+            this.tsStopGenerate_UpdateGen.Text = "Stop";
+            this.tsStopGenerate_UpdateGen.Click += new System.EventHandler(this.tsStopGenerate_UpdateGen_Click);
+            // 
+            // tsSettingsUpdate_Gen
+            // 
+            this.tsSettingsUpdate_Gen.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
+            this.tsSettingsUpdate_Gen.Image = ((System.Drawing.Image)(resources.GetObject("tsSettingsUpdate_Gen.Image")));
+            this.tsSettingsUpdate_Gen.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsSettingsUpdate_Gen.Name = "tsSettingsUpdate_Gen";
+            this.tsSettingsUpdate_Gen.Size = new System.Drawing.Size(69, 22);
+            this.tsSettingsUpdate_Gen.Tag = "Cascade Delete Gen";
+            this.tsSettingsUpdate_Gen.Text = "Settings";
             // 
             // tabPage6
             // 
@@ -744,6 +889,7 @@
             this.cmbLoadDB.Name = "cmbLoadDB";
             this.cmbLoadDB.Size = new System.Drawing.Size(170, 21);
             this.cmbLoadDB.TabIndex = 26;
+            this.cmbLoadDB.TextUpdate += new System.EventHandler(this.cmbLoadDB_TextUpdate);
             // 
             // label15
             // 
@@ -777,6 +923,7 @@
             this.cmbLoadEnv.Name = "cmbLoadEnv";
             this.cmbLoadEnv.Size = new System.Drawing.Size(170, 21);
             this.cmbLoadEnv.TabIndex = 5;
+            this.cmbLoadEnv.TextUpdate += new System.EventHandler(this.cmbLoadEnv_TextUpdate);
             // 
             // rttInput
             // 
@@ -1013,7 +1160,6 @@
             this.tsErrorIcon.Name = "tsErrorIcon";
             this.tsErrorIcon.Size = new System.Drawing.Size(16, 17);
             this.tsErrorIcon.Visible = false;
-            this.tsErrorIcon.MouseMove += new System.Windows.Forms.MouseEventHandler(this.tsErrorIcon_MouseMove);
             // 
             // toolStripStatusLabel1
             // 
@@ -1030,13 +1176,14 @@
             this.tsErrorLog3,
             this.tsErrorLog4,
             this.tsErrorLog5,
-            this.tsErrorLog6});
+            this.tsErrorLog6,
+            this.tsErrorLog7,
+            this.tsErrorLog8});
             this.tsMessages.Image = ((System.Drawing.Image)(resources.GetObject("tsMessages.Image")));
             this.tsMessages.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsMessages.Name = "tsMessages";
             this.tsMessages.Size = new System.Drawing.Size(85, 20);
             this.tsMessages.Text = "Messages(0)";
-            this.tsMessages.Click += new System.EventHandler(this.toolStripDropDownButton1_Click);
             // 
             // tsErrorLog1
             // 
@@ -1102,6 +1249,28 @@
             this.tsErrorLog6.ReadOnly = true;
             this.tsErrorLog6.Size = new System.Drawing.Size(318, 15);
             this.tsErrorLog6.Visible = false;
+            // 
+            // tsErrorLog7
+            // 
+            this.tsErrorLog7.BackColor = System.Drawing.SystemColors.Menu;
+            this.tsErrorLog7.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.tsErrorLog7.Font = new System.Drawing.Font("Segoe UI", 8F);
+            this.tsErrorLog7.Margin = new System.Windows.Forms.Padding(-28, 0, 0, 0);
+            this.tsErrorLog7.Name = "tsErrorLog7";
+            this.tsErrorLog7.ReadOnly = true;
+            this.tsErrorLog7.Size = new System.Drawing.Size(318, 15);
+            this.tsErrorLog7.Visible = false;
+            // 
+            // tsErrorLog8
+            // 
+            this.tsErrorLog8.BackColor = System.Drawing.SystemColors.Menu;
+            this.tsErrorLog8.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.tsErrorLog8.Font = new System.Drawing.Font("Segoe UI", 8F);
+            this.tsErrorLog8.Margin = new System.Windows.Forms.Padding(-28, 0, 0, 0);
+            this.tsErrorLog8.Name = "tsErrorLog8";
+            this.tsErrorLog8.ReadOnly = true;
+            this.tsErrorLog8.Size = new System.Drawing.Size(318, 15);
+            this.tsErrorLog8.Visible = false;
             // 
             // tsSpace
             // 
@@ -1437,6 +1606,30 @@
             this.textBox1.Size = new System.Drawing.Size(100, 20);
             this.textBox1.TabIndex = 4;
             // 
+            // errorProvider6
+            // 
+            this.errorProvider6.BlinkRate = 500;
+            this.errorProvider6.BlinkStyle = System.Windows.Forms.ErrorBlinkStyle.AlwaysBlink;
+            this.errorProvider6.ContainerControl = this;
+            // 
+            // errorProvider7
+            // 
+            this.errorProvider7.BlinkRate = 500;
+            this.errorProvider7.BlinkStyle = System.Windows.Forms.ErrorBlinkStyle.AlwaysBlink;
+            this.errorProvider7.ContainerControl = this;
+            // 
+            // errorProvider8
+            // 
+            this.errorProvider8.BlinkRate = 500;
+            this.errorProvider8.BlinkStyle = System.Windows.Forms.ErrorBlinkStyle.AlwaysBlink;
+            this.errorProvider8.ContainerControl = this;
+            // 
+            // errorProvider9
+            // 
+            this.errorProvider9.BlinkRate = 500;
+            this.errorProvider9.BlinkStyle = System.Windows.Forms.ErrorBlinkStyle.AlwaysBlink;
+            this.errorProvider9.ContainerControl = this;
+            // 
             // frmQuickStart
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1468,6 +1661,10 @@
             this.tsCascadeDelete.ResumeLayout(false);
             this.tsCascadeDelete.PerformLayout();
             this.rightClickMenuStrip.ResumeLayout(false);
+            this.tabPage7.ResumeLayout(false);
+            this.tabPage7.PerformLayout();
+            this.tsUpdateGen.ResumeLayout(false);
+            this.tsUpdateGen.PerformLayout();
             this.tabPage6.ResumeLayout(false);
             this.tabPage6.PerformLayout();
             this.tsLoadSchema.ResumeLayout(false);
@@ -1492,6 +1689,10 @@
             this.panelMainTab.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.errorProvider4)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.errorProvider5)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.errorProvider6)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.errorProvider7)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.errorProvider8)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.errorProvider9)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1534,7 +1735,7 @@
 		private System.Windows.Forms.ComboBox cmbLoadEnv;
 		private System.Windows.Forms.ComboBox cmbLoadDB;
 		private System.Windows.Forms.Label label15;
-		private System.Windows.Forms.ComboBox cmbSchema;
+		private System.Windows.Forms.ComboBox cmbSchema_CascadeDel;
 		private System.Windows.Forms.ErrorProvider errorProvider3;
 		private System.Windows.Forms.CheckBox chkUseIncrements;
 		private System.Windows.Forms.StatusStrip statusStrip1;
@@ -1609,6 +1810,23 @@
         private System.Windows.Forms.ToolStripTextBox tsErrorLog5;
         private System.Windows.Forms.ToolStripTextBox tsErrorLog6;
         private System.Windows.Forms.ToolStripTextBox tsErrorLog4;
+        private System.Windows.Forms.ToolStripTextBox tsErrorLog7;
+        private System.Windows.Forms.ToolStripTextBox tsErrorLog8;
+        private System.Windows.Forms.ErrorProvider errorProvider6;
+        private System.Windows.Forms.ErrorProvider errorProvider7;
+        private System.Windows.Forms.TabPage tabPage7;
+        private System.Windows.Forms.ComboBox cmbSchema_Update;
+        private System.Windows.Forms.Label label21;
+        private System.Windows.Forms.TextBox txtTableName_Update;
+        private System.Windows.Forms.Label label22;
+        private System.Windows.Forms.Label label20;
+        private System.Windows.Forms.ToolStrip tsUpdateGen;
+        private System.Windows.Forms.ToolStripButton tsGenerate_UpdateGen;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator7;
+        private System.Windows.Forms.ToolStripButton tsStopGenerate_UpdateGen;
+        private System.Windows.Forms.ToolStripButton tsSettingsUpdate_Gen;
+        private System.Windows.Forms.ErrorProvider errorProvider8;
+        private System.Windows.Forms.ErrorProvider errorProvider9;
     }
 }
 

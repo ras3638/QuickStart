@@ -8,15 +8,15 @@ using System.Windows.Forms;
 
 namespace QuickStart
 {
-	public static class TimerObjectState
-	{
-		private static Dictionary<string,TimerObjectManager> ThreadObjectManagerDictionary = new  Dictionary<string,TimerObjectManager>();
+	public static class TimerObjectManager
+    {
+		private static Dictionary<string,TimerObjectState> ThreadObjectManagerDictionary = new  Dictionary<string,TimerObjectState>();
 	
-		public static TimerObjectManager Retrieve(string sSourceName)
+		public static TimerObjectState Retrieve(string sSourceName)
 		{
 			return ThreadObjectManagerDictionary[sSourceName];
 		}
-		public static void SaveStatus(TimerObjectManager x)
+		public static void SaveStatus(TimerObjectState x)
 		{
 			if (ThreadObjectManagerDictionary.ContainsKey(x.GetName()))
 			{
@@ -28,13 +28,12 @@ namespace QuickStart
 			}
 		}
 	}
-	public class TimerObjectManager
+	public class TimerObjectState
 	{
 		bool bTimerCancelIndicator { get; set; }
 		bool bTimerErrorIndicator { get; set; }
 		bool bTimerThreadActive { get; set; }
 		bool bPauseTimerIndicator { get; set; }
-
 		bool bTimerErrorIconVisible { get; set; }
 		bool bTimerSuccessIconVisible { get; set; }
 		bool bTimerExecuteIconEnable { get; set; }
@@ -45,9 +44,7 @@ namespace QuickStart
 
         Exception exErrorException { get; set; }
         string sCustomMessage { get; set; }
-
-        string sMessages { get; set; }
-        public TimerObjectManager(string sSourceName)
+        public TimerObjectState(string sSourceName)
 		{
 			this.sSourceName = sSourceName;
 			bTimerCancelIndicator = false;
@@ -134,7 +131,10 @@ namespace QuickStart
             UpdateStatus();
             return sCustomMessage;
         }
+
+
         //// Setters ////
+
         public void SetCustomMessage(string sCustomMessage)
         {
             this.sCustomMessage = sCustomMessage;
@@ -157,11 +157,7 @@ namespace QuickStart
             this.sCustomMessage = sCustomMessage;
 			SaveStatus();
 		}
-        public void SetMessages(string sMessages)
-        {
-            this.sMessages = sMessages;
-            SaveStatus();
-        }
+
 		public void SetTimerThreadActive(bool bKeepActive)
 		{
 			this.bTimerThreadActive = bKeepActive;
@@ -213,11 +209,11 @@ namespace QuickStart
 		}
 		private void SaveStatus()
 		{
-			TimerObjectState.SaveStatus(this);
+            TimerObjectManager.SaveStatus(this);
 		}
 		private void UpdateStatus()
 		{
-			TimerObjectManager A = TimerObjectState.Retrieve(this.GetName());
+			TimerObjectState A = TimerObjectManager.Retrieve(this.GetName());
 
 			this.bTimerCancelIndicator = A.bTimerCancelIndicator;
 			this.bTimerErrorIndicator = A.bTimerErrorIndicator;

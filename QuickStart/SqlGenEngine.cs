@@ -15,13 +15,15 @@ namespace QuickStart
 			HashSet<string> TableResultsHashSet = new HashSet<string>();
 			HashSet<string> RefTableResultsHashSet = new HashSet<string>();
 			//SQL:
-			//SELECT [table] FROM SchemaDataset WHERE [fk_name] = sFKName
+			//SELECT [table] FROM SchemaDataset WHERE [fk_name] = sFKName and [constraint_type] = "fk"
 			//put results in TableResultsHashSet
 
 			var Query1 = dtDatabaseSchema.Rows.Cast<DataRow>().Where
-				(p => p.Field<string>("fk_name") == sFK.Trim().ToUpper());
+                //(p => (p.Field<string>("constraint_type") == "fk");
+            (p => (p.Field<string>("constraint_name") == sFK.Trim().ToUpper())
+            && (p.Field<string>("constraint_type") == "fk"));
 
-			foreach (DataRow row in Query1)
+            foreach (DataRow row in Query1)
 			{
 				string sTable = row["table"].ToString();
 				TableResultsHashSet.Add(sTable.Trim());
@@ -48,13 +50,54 @@ namespace QuickStart
 
 			foreach (DataRow row in Query2)
 			{
-				string sFKName2 = row["fk_name"].ToString();
+				string sFKName2 = row["constraint_name"].ToString();
 				FKResultsHashSet.Add(sFKName2.Trim());				
 			}
 
 			return FKResultsHashSet;
 		}
-		public static StringBuilder GenerateInsertStatement(List<string> ColumnList, string sTableName)
+        public static StringBuilder GenerateUpdateStatement(List<string> ColumnList, string sTableName, List<string> PKList)
+        {
+            StringBuilder sb = new StringBuilder();
+            StringBuilder sbWhereClause = new StringBuilder();
+
+            bool bWhereClauseFirstIter = true;
+            bool bSetClauseFirstIter = true;
+
+            for (int i = 0; i < ColumnList.Count; i++)
+            {
+                if (PKList.Contains(ColumnList[i]) && bWhereClauseFirstIter)
+                {
+                    sbWhereClause.Append(" WHERE " + ColumnList[i] + " = '{" + i + "}'");
+                    bWhereClauseFirstIter = false;
+                }
+                else if (PKList.Contains(ColumnList[i]) && !bWhereClauseFirstIter)
+                {
+                    sbWhereClause.Append(" AND " + ColumnList[i] + " = '{" + i + "}'");
+                }
+                else
+                {
+                    if (bSetClauseFirstIter)
+                    {
+                        sb.Append("UPDATE " + sTableName + " SET " + ColumnList[i] + " = '{" + i + "}'");
+                        bSetClauseFirstIter = false;
+                    }
+                    else
+                    {
+                        //last statement
+                        sb.Append(", " + ColumnList[i] + " = '{" + i + "}'");
+                    }
+                }
+
+            }
+            return sb.Append(sbWhereClause);
+        }
+        public static bool IsUpdateColumnPK(string sColumn, string sTableName)
+        {
+            return true;
+        }
+
+        public static StringBuilder GenerateInsertStatement(List<string> ColumnList, string sTableName)
 		{
 			StringBuilder sb = new StringBuilder();
 	
@@ -274,9 +317,11 @@ namespace QuickStart
 				RefTableHashSet.Add(sReferencedTable);
 			}
 			var Query1 = dtDatabaseSchema.Rows.Cast<DataRow>().Where
-					(p => p.Field<string>("fk_name") == sFKName.Trim());
+					//(p => p.Field<string>("fk_name") == sFKName.Trim());
+                    (p => (p.Field<string>("constraint_name") == sFKName.Trim().ToUpper())
+                    && (p.Field<string>("constraint_type") == "fk"));
 
-			foreach (DataRow row in Query1)
+            foreach (DataRow row in Query1)
 			{
 				string sReferenced_Table = row["referenced_table"].ToString();
 				RefTableHashSet.Add(sReferenced_Table);
@@ -293,7 +338,8 @@ namespace QuickStart
 
 			foreach (DataRow row in Query2)
 			{
-				string sFK_Name = row["fk_name"].ToString();
+                //string sFK_Name = row["fk_name"].ToString();
+                string sFK_Name = row["constraint_name"].ToString();
 				FKNameHashSet.Add(sFK_Name);
 			}
 
@@ -360,9 +406,11 @@ namespace QuickStart
 			IncrementAlphabet A = new IncrementAlphabet(sAlias);
 
 			var Query1 = dtDatabaseSchema.Rows.Cast<DataRow>().Where
-				(p => p.Field<string>("fk_name") == sFKName.Trim());
+				//(p => p.Field<string>("fk_name") == sFKName.Trim());
+                (p => (p.Field<string>("constraint_name") == sFKName.Trim().ToUpper())
+                && (p.Field<string>("constraint_type") == "fk"));
 
-			foreach (DataRow row in Query1)
+            foreach (DataRow row in Query1)
 			{
 				string sColumn = row["column"].ToString();
 				string sReferenced_Column = row["referenced_column"].ToString();
@@ -427,6 +475,71 @@ namespace QuickStart
 
 			return sb;
 		}
+
+        public static StringBuilder UpdateGenEngine(DataTable dtDatabaseSchema, string sTableName, string sSource)
+        {
+            StringBuilder sb = new StringBuilder();
+            string sRecordSet = sSource;
+
+            //Remove the first line. These are columns
+            int iFirstNewLineIndex = sRecordSet.IndexOf("\n");
+            sRecordSet = sRecordSet.Substring(iFirstNewLineIndex);
+
+            //Handles Apostrophes
+            sRecordSet = new StringBuilder(sRecordSet).Replace("'", "''").ToString();
+
+            //Get PK columns
+            List<string> PKList = new List<string>();
+            var Query1 = dtDatabaseSchema.Rows.Cast<DataRow>().Where
+                (p => (p.Field<string>("table") == sTableName.Trim())
+                && (p.Field<string>("constraint_type") == "pk"));
+
+            foreach (DataRow row in Query1)
+            {
+                string sColumn = row["column"].ToString();
+                PKList.Add(sColumn);
+
+            }
+
+            string sFirstLine = sSource.Substring(0, iFirstNewLineIndex);
+            List<string> ColumnList = StringUtility.LowMemSplit(sFirstLine, "\t");
+            string sUpdateStatement = SqlGenEngine.GenerateUpdateStatement(ColumnList, sTableName, PKList).ToString();
+            sRecordSet = new StringBuilder(sRecordSet).Replace("\n", "\r\n" + sUpdateStatement).ToString();
+
+
+            //Handle ending and beginning
+            sRecordSet = sRecordSet.Remove(0, 2);
+            List<string> Splitter = StringUtility.LowMemSplit(sRecordSet, "\r\n");
+            foreach(string s in Splitter)
+            {
+                int iLast = s.LastIndexOf("}'");
+                string sLast = s.Substring(iLast + 2);
+
+                string sFirst = s.Substring(0, iLast + 2);
+
+                List<string> InnerSplitter = StringUtility.LowMemSplit(sLast, "\t");
+                for (int i = 0; i < InnerSplitter.Count(); i++)
+                {
+                    sFirst = sFirst.Replace("{" + i + "}", InnerSplitter[i]);
+                }
+                sb.Append(sFirst + "\r\n");
+                
+            }
+            sb.Replace("'NULL'", "NULL");
+
+            if(PKList.Count == 0)
+            {
+                sb.Insert(0, "--@@Warning: Schema did not contain any primary keys for table " + sTableName + ". Where clause could not be generated \r\n");
+                return sb;
+            }
+            if (!StringUtility.ContainsAllItems(ColumnList, PKList))
+            {
+                sb.Insert(0,"--@@Warning: Not all primary keys found for table " + sTableName + ". Verify your where clause \r\n");
+                return sb;
+            }
+
+            return sb;
+        }
 		public static StringBuilder InsertEngine(string sSource, string sIdentityInsert, string sTableName)
 		{
 			StringBuilder sb = new StringBuilder();

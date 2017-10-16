@@ -20,7 +20,6 @@ namespace QuickStart
 		#region Class Variables
 
 		List<string> Log = new List<string>();
-		//List<string> RTTLog = new List<string>();
 
 		//Constants
 		public const string SEARCH_STRING = "Search String";
@@ -29,6 +28,7 @@ namespace QuickStart
 		public const string SCRIPT_GEN = "Script Gen";
 		public const string INSERT_GEN = "Insert Gen";
 		public const string CASCADE_DELETE_GEN = "Cascade Delete Gen";
+        public const string UPDATE_GEN = "Update Gen";
 
         List<Client> dataSource = new List<Client>();
         List<Client> dataSource2 = new List<Client>();
@@ -42,12 +42,13 @@ namespace QuickStart
 		Thread SearchStringThread;
 		Thread GenInsertThread;
 		Thread GenCascadeDeleteThread;
-		
-		#endregion
+        Thread GenUpdateThread;
 
-		#region Worker Thread Methods
+        #endregion
 
-		private void BlockParallelThreads(Thread CurrentThread)
+        #region Worker Thread Methods
+
+        private void BlockParallelThreads(Thread CurrentThread)
 		{
 			//Blocks the calling thread from running if other parallel threads are ahead of queue.
 			while (true)
@@ -78,7 +79,7 @@ namespace QuickStart
 				}
 			}
 		}
-		private void TimerThreadProcSafe(TimerObjectManager A)
+		private void TimerThreadProcSafe(TimerObjectState A)
 		{			
 			A.SetTimerStatusText("Status: Executing...");
 			ThreadHelperUtility.SetText(this, statusStrip1, TSlblStatus, "Status: Executing...");
@@ -123,7 +124,7 @@ namespace QuickStart
 					if (bTrack)
 					{
 						//Limit the number of objects created by using bTrack
-						TimerObjectManager B = TimerObjectState.Retrieve(sCurrentTab);
+						TimerObjectState B = TimerObjectManager.Retrieve(sCurrentTab);
 						ThreadHelperUtility.SetText(this, statusStrip1, TSlblTime, B.GetTimerText());
 						bTrack = false;
 					}			
@@ -176,9 +177,8 @@ namespace QuickStart
             //Update error messages (if any)
             UpdateErrorMessages(A);
         }
-        private void UpdateErrorMessages(TimerObjectManager A)
+        private void UpdateErrorMessages(TimerObjectState A)
         {
-
             if (A.GetErrorException() == null && A.GetCustomMessage() == null)
             {
                 //No error messages. Clear it
@@ -207,16 +207,16 @@ namespace QuickStart
 
             List<string> Splitter = StringUtility.HighMemSplit(sMessage, "\r\n");
 
-            for (int i = 0; i < Splitter.Count; i++)
+            for (int i = 0; i < Splitter.Count && i < tsMessages.DropDownItems.Count; i++)
             {
-                if (i > tsMessages.DropDownItems.Count) break;
+                //if (i > tsMessages.DropDownItems.Count) break;
                 ThreadHelperUtility.SetText(this, statusStrip1, tsMessages, tsMessages.DropDownItems[i], Splitter[i]);
                 ThreadHelperUtility.SetText(this, statusStrip1, tsMessages, "Messages(1)");
                 ThreadHelperUtility.SetVisible(this, statusStrip1, tsMessages, tsMessages.DropDownItems[i], true);
             }
 
         }
-		private void UpdateExecuteAndStopIcons(TimerObjectManager A)
+		private void UpdateExecuteAndStopIcons(TimerObjectState A)
 		{
 			if (A.GetName() == tsInsertGen.Tag.ToString())
 			{
@@ -238,8 +238,17 @@ namespace QuickStart
 				ThreadHelperUtility.SetEnable(this, tsLoadSchema, tsGenerate_SchemaScript, A.GetTimerExecuteIconEnable());
 				ThreadHelperUtility.SetEnable(this, tsLoadSchema, tsSubmit_Schema, A.GetTimerExecuteIconEnable());
 			}
-		}
-		private void SearchStringThreadProcSafe(string sSearchPath, string sSearchString, string sFilePattern, TimerObjectManager A)
+            else if (A.GetName() == tsUpdateGen.Tag.ToString())
+            {
+                ThreadHelperUtility.SetEnable(this, tsUpdateGen, tsGenerate_UpdateGen, A.GetTimerExecuteIconEnable());
+                ThreadHelperUtility.SetEnable(this, tsUpdateGen, tsGenerate_UpdateGen, A.GetTimerExecuteIconEnable());
+            }
+        }
+        private void ThrottleThreadProcSafe(int processId, double limit)
+        {
+            ProcessManager.ThrottleProcess(processId, limit);
+        }
+        private void SearchStringThreadProcSafe(string sSearchPath, string sSearchString, string sFilePattern, TimerObjectState A)
 		{
 			ProcessStartInfo cmdStartInfo = new ProcessStartInfo();
 			cmdStartInfo.FileName = @"C:\Windows\System32\cmd.exe";
@@ -254,11 +263,19 @@ namespace QuickStart
 			cmdProcess.ErrorDataReceived += cmd_Error;
 			cmdProcess.OutputDataReceived += cmd_DataReceived;
 			cmdProcess.EnableRaisingEvents = true;
-			cmdProcess.Start();
+            
+
+            cmdProcess.Start();
+            cmdProcess.PriorityClass = ProcessPriorityClass.BelowNormal;
             //cmdProcess.BeginOutputReadLine();
             //cmdProcess.BeginErrorReadLine();
             cmdProcess.StartInfo.RedirectStandardOutput = true;
 
+            //test
+            //ThrottleThread = new Thread(() => ThrottleThreadProcSafe(cmdProcess.Id, 10));
+            //ThrottleThread.Start();
+
+            
             int iTopRowsToRemove = (int)SettingManager.GetSettingValue(SEARCH_STRING, "Number of top lines to remove from SearchResults.txt");
             int iBottomRowsToRemove = (int)SettingManager.GetSettingValue(SEARCH_STRING, "Number of bottom lines to remove from SearchResults.txt");
 
@@ -332,8 +349,8 @@ namespace QuickStart
                 //string OutputFile = ">> \\SearchResults.txt";
                 //string sFull = string.Format("{0}\"{1}\" {2} {3}", SearchCommand, sSearchString, sFilePattern, OutputFile);
                 string sFull = string.Format("{0}\"{1}\" {2}", SearchCommand, sSearchString, sFilePattern);
-                cmdProcess.StandardInput.WriteLine(sFull);
 
+                cmdProcess.StandardInput.WriteLine(sFull);
                 //cmdProcess.WaitForExit();
                 cmdProcess.StandardInput.WriteLine("exit");
 
@@ -362,7 +379,7 @@ namespace QuickStart
 			}
             
         }
-		private void GenInsertThreadProcSafe(string sInputString, string sIDInsert, string sTableName, string sGenFile, TimerObjectManager A)
+		private void GenInsertThreadProcSafe(string sInputString, string sIDInsert, string sTableName, string sGenFile, TimerObjectState A)
 		{
 			//Only want one GenInsertThread thread running at any time
 			BlockParallelThreads(Thread.CurrentThread);
@@ -373,7 +390,7 @@ namespace QuickStart
 
 				if (!sInputString.Contains("\n"))
 				{
-					sb.Append("@@Error:Improper input");
+					sb.Append("@@Error:Improper input - No new lines found");
 				}
 				else
 				{
@@ -393,7 +410,6 @@ namespace QuickStart
 				{
 					//We got an unrequested Abort
 					A.SetTimerErrorIndicator(true, ex);
-                    //MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
 			}
 			catch (Exception ex)
@@ -415,7 +431,7 @@ namespace QuickStart
 				}
 			}		
 		}
-		private void GenCascadeDeleteThreadProcSafe(string sFKName, bool bUseIncrements, string sInput, string sCascadeOption, string sSchema, TimerObjectManager A)
+		private void GenCascadeDeleteThreadProcSafe(string sFKName, bool bUseIncrements, string sInput, string sCascadeOption, string sSchema, TimerObjectState A)
 		{
 			try
 			{
@@ -463,9 +479,16 @@ namespace QuickStart
 
 				CreateGeneratedScriptFile(sb, "GeneratedScript.txt");
 			}
+            catch(ThreadAbortException ex)
+            {
+                if (!A.GetTimerCancelIndicator())
+                {
+                    //We got an unrequested Abort
+                    A.SetTimerErrorIndicator(true, ex);
+                }
+            }
 			catch (Exception ex)
 			{
-                //MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 A.SetTimerErrorIndicator(true,ex);
 			}
 			finally
@@ -473,10 +496,54 @@ namespace QuickStart
 				A.SetTimerThreadActive(false);
 			}
 		}
-		#endregion
-	
-		#region Constructor
-		public frmQuickStart()
+
+        private void GenUpdateThreadProcSafe(string sInput, string sTableName, string sSchema, TimerObjectState A)
+        {
+            try
+            {
+                StreamReader streamReader = new StreamReader(BaseDirectories.GeneratedSchemas + "\\" + GetSchemaFileName(sSchema));
+                string sReadLine;
+                DataTable dtDatabaseSchema = new DataTable("Database Schema");
+                bool bFirstIteration = true;
+                StringBuilder sb = new StringBuilder();
+
+                while ((sReadLine = streamReader.ReadLine()) != null)
+                {
+                    if (bFirstIteration) dtDatabaseSchema = DataTableHelperUtility.AddColumns(dtDatabaseSchema, sReadLine);
+                    if (!bFirstIteration) dtDatabaseSchema = DataTableHelperUtility.AddRows(dtDatabaseSchema, sReadLine);
+                    bFirstIteration = false;
+                }
+
+                sb = SqlGenEngine.UpdateGenEngine(dtDatabaseSchema, sTableName, sInput);
+                CreateGeneratedScriptFile(sb, "GeneratedScript.txt");
+
+                if (sb.ToString().Contains("@@Warning:"))
+                {
+                    //Don't log a warning as error
+                    A.SetTimerErrorIndicator(false, null, "See generated file for warning details");
+                }
+            }
+            catch(ThreadAbortException ex)
+            {
+                if (!A.GetTimerCancelIndicator())
+                {
+                    //We got an unrequested Abort
+                    A.SetTimerErrorIndicator(true, ex);
+                }
+            }
+            catch(Exception ex)
+            {
+                A.SetTimerErrorIndicator(true, ex);
+            }
+            finally
+            {
+                A.SetTimerThreadActive(false);
+            }
+        }
+        #endregion
+
+        #region Constructor
+        public frmQuickStart()
 		{
 			InitializeComponent();
 			tsInsertGen.Renderer = new ToolStripOverride();
@@ -484,6 +551,8 @@ namespace QuickStart
 			tsLoadSchema.Renderer = new ToolStripOverride();
 			tsDevl.Renderer = new ToolStripOverride();
 			tsSearchString.Renderer = new ToolStripOverride();
+
+            statusStrip1.Renderer = new ToolStripDropDownOverride();
 			cmbCascadeOption.SelectedIndex = 0;
 			cmbFilePattern.SelectedIndex = 0;
 			cmbLoadDB.SelectedIndex = 0;
@@ -491,13 +560,14 @@ namespace QuickStart
 			LoadSchemas();
 			LoadSettings();
 
-            new TimerObjectManager(CASCADE_DELETE_GEN);
-			new TimerObjectManager(INSERT_GEN);
-			new TimerObjectManager(LOAD_SCHEMA);
-			new TimerObjectManager(DEVL);
-			new TimerObjectManager(SEARCH_STRING);
+            new TimerObjectState(CASCADE_DELETE_GEN);
+			new TimerObjectState(INSERT_GEN);
+			new TimerObjectState(LOAD_SCHEMA);
+			new TimerObjectState(DEVL);
+			new TimerObjectState(SEARCH_STRING);
+            new TimerObjectState(UPDATE_GEN);
 
-			IDictionary<string, string> ClientDictionary = new Dictionary<string, string>();
+            IDictionary<string, string> ClientDictionary = new Dictionary<string, string>();
 			ClientDictionary.Add("", "");
 
 			try
@@ -524,6 +594,7 @@ namespace QuickStart
 				{
 					StreamReader streamReader = new StreamReader(BaseDirectories.CacheClientBase);
 					string sReadLine;
+
 					while ((sReadLine = streamReader.ReadLine()) != null)
 					{
 						List<string> Split = StringUtility.HighMemSplit(sReadLine, " - ");
@@ -534,20 +605,24 @@ namespace QuickStart
 					}
 					streamReader.Dispose();
 				}
-				using (var writer = new StreamWriter(BaseDirectories.CacheClientBase))
+                //CachedClient is empty
+                if (ClientDictionary.Count == 1) throw new IOException();
+                using (var writer = new StreamWriter(BaseDirectories.CacheClientBase))
 				{
 					foreach (var pair in ClientDictionary)
 					{
 						
 						dataSource.Add(new Client() { CmbName = pair.Key + " - " + pair.Value, Name = pair.Key, Code = pair.Value });
 						dataSource2.Add(new Client() { CmbName = pair.Key + " - " + pair.Value, Name = pair.Key, Code = pair.Value });
-						if (pair.Key != "")
+                        
+                        if (pair.Key != "")
 						{
 							writer.WriteLine(pair.Key + " - " + pair.Value);
 							dataSource3.Add(new Client() { CmbName = pair.Key + " - " + pair.Value, Name = pair.Key, Code = pair.Value });
 						}
 					}			
 				}
+              
 				//Setup data binding
 				this.cmbProcess.DataSource = dataSource;
 				this.cmbGUI.DataSource = dataSource2;
@@ -574,9 +649,9 @@ namespace QuickStart
 			catch (IOException)
 			{
 				tsSetup.Enabled = false;
-				tsSubmit_Schema.Enabled = false;
-				dataSource.Add(new Client() { CmbName = "Could not connect to R drive", Name = "", Code = "" });
-				this.cmbProcess.DataSource = dataSource;
+				dataSource.Add(new Client() { CmbName = "-", Name = "", Code = "" });
+                dataSource3.Add(new Client() { CmbName = "-", Name = "", Code = "" });
+                this.cmbProcess.DataSource = dataSource;
 				this.cmbGUI.DataSource = dataSource;
 				this.cmbLoadEnv.DataSource = dataSource;
 			}
@@ -626,8 +701,6 @@ namespace QuickStart
 		}
 		private void LoadBaseDirectories()
 		{
-            
-
             if (!Directory.Exists(BaseDirectories.QuickStartBase)) Directory.CreateDirectory(BaseDirectories.QuickStartBase);
 			if (!Directory.Exists(BaseDirectories.Core5QPECBase)) Directory.CreateDirectory(BaseDirectories.Core5QPECBase);
 			if (!Directory.Exists(BaseDirectories.Core8QPECBase)) Directory.CreateDirectory(BaseDirectories.Core8QPECBase);
@@ -641,6 +714,7 @@ namespace QuickStart
 			if (!Directory.Exists(BaseDirectories.Core16UpstreamMainAppBase)) Directory.CreateDirectory(BaseDirectories.Core16UpstreamMainAppBase);
 			if (!Directory.Exists(BaseDirectories.GeneratedSchemas)) Directory.CreateDirectory(BaseDirectories.GeneratedSchemas);		
 		}
+
 		private void LoadSchemas()
 		{
 			var dataSource4 = new List<Client>();
@@ -661,11 +735,14 @@ namespace QuickStart
 				dataSource4.Add(new Client() { CmbName = SchemaFileName });
 			}
 
-			this.cmbSchema.DataSource = dataSource4;
-			this.cmbSchema.DisplayMember = "CmbName";
-			this.cmbSchema.ValueMember = null;//"Value";
+			this.cmbSchema_CascadeDel.DataSource = dataSource4;
+			this.cmbSchema_CascadeDel.DisplayMember = "CmbName";
+			this.cmbSchema_CascadeDel.ValueMember = null;//"Value";
 
-		}
+            this.cmbSchema_Update.DataSource = dataSource4;
+            this.cmbSchema_Update.DisplayMember = "CmbName";
+            this.cmbSchema_Update.ValueMember = null;//"Value";
+        }
 		private string GetSchemaFileName(string Schema)
 		{
 			string[] files = Directory.GetFiles(BaseDirectories.GeneratedSchemas,
@@ -1052,8 +1129,7 @@ namespace QuickStart
 			cmdProcess.WaitForExit(50);
 			cmdProcess.Kill();
 
-			using (FileStream stream = File.Open(BaseDirectories.QuickStartBase + "\\" + GenFile, FileMode.Create))
-			{}
+			using (FileStream stream = File.Open(BaseDirectories.QuickStartBase + "\\" + GenFile, FileMode.Create)){}
 			using (var writer = new StreamWriter(BaseDirectories.QuickStartBase + "\\" + GenFile))
             {
                 string s = sb.ToString();
@@ -1086,13 +1162,11 @@ namespace QuickStart
                         {
                             s = s.Substring(s.IndexOf(Environment.NewLine) + 1);
                         }
-
                         //Remove bottom rows
                         for (int i = 1; i <= iBottomRowsToRemove; i++)
                         {
                             s = s.Remove(s.LastIndexOf(Environment.NewLine));
                         }
-
                     }
                     catch(Exception)
                     {
@@ -1131,10 +1205,10 @@ namespace QuickStart
 		{
             try
             {
-                string sSchema = cmbSchema.Text;
+                string sSchema = cmbSchema_CascadeDel.Text;
                 File.Delete(BaseDirectories.GeneratedSchemas + "\\" + GetSchemaFileName(sSchema));
                 LoadSchemas();
-                cmbSchema.SelectedIndex = -1;
+                cmbSchema_CascadeDel.SelectedIndex = -1;
             }
             catch (Exception ex)
             {
@@ -1145,19 +1219,19 @@ namespace QuickStart
 		{
             try
             {
-                if (e.KeyCode == Keys.Delete && cmbSchema.DroppedDown)
+                if (e.KeyCode == Keys.Delete && cmbSchema_CascadeDel.DroppedDown)
                 {
-                    string sSchema = cmbSchema.Text;
+                    string sSchema = cmbSchema_CascadeDel.Text;
                     File.Delete(BaseDirectories.GeneratedSchemas + "\\" + GetSchemaFileName(sSchema));
                     LoadSchemas();
-                    cmbSchema.SelectedIndex = -1;
+                    cmbSchema_CascadeDel.SelectedIndex = -1;
 
                     //Make sure no other processing happens
                     e.Handled = true;
                 }
-                else if (e.KeyCode == Keys.Down && !cmbSchema.DroppedDown)
+                else if (e.KeyCode == Keys.Down && !cmbSchema_CascadeDel.DroppedDown)
                 {
-                    cmbSchema.DroppedDown = true;
+                    cmbSchema_CascadeDel.DroppedDown = true;
                 }
             }
             catch (Exception ex)
@@ -1175,7 +1249,7 @@ namespace QuickStart
 			string sTableName = txtTableName_Insert.Text;
 			bool bProcessed = false;
 			string sTabName = tabControl2.SelectedTab.Tag.ToString();
-			TimerObjectManager A = new TimerObjectManager(sTabName);
+			TimerObjectState A = new TimerObjectState(sTabName);
 
 			if (string.IsNullOrWhiteSpace(sTableName))
 			{
@@ -1212,7 +1286,7 @@ namespace QuickStart
 			{
 				if (StringUtility.IsStringOverMemory(sInputString))
 				{
-					if (MessageBoxEx.Show("Dataset is large and may cause memory issues.\n" + StringUtility.StringOverCapacity(sInputString).ToString() + "% over recommended capacity.\nContinue?",
+					if (MessageBoxEx.Show("Dataset is large and may cause memory issues.\n Recommendation is to check: Split To multiple files\n" + StringUtility.StringOverCapacity(sInputString).ToString() + "% over recommended capacity.\nContinue?",
 							"Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
 					{
 						return;
@@ -1243,7 +1317,7 @@ namespace QuickStart
 			string sFKName = txtFKName.Text;
 			bool bUseIncrements = chkUseIncrements.Checked;
 			string sInput = rttInput.Text;
-			string sSchema = cmbSchema.Text;
+			string sSchema = cmbSchema_CascadeDel.Text;
 			string sTabName = tabControl2.SelectedTab.Tag.ToString();
 
 			if (sCascadeOption == "Single" || sCascadeOption == "Full" || sCascadeOption == "All")
@@ -1260,20 +1334,20 @@ namespace QuickStart
 				{
 					errorProvider3.SetError(txtFKName, "");
 				}
-				if (cmbSchema.SelectedIndex == -1)
+				if (cmbSchema_CascadeDel.SelectedIndex == -1)
 				{
-					errorProvider2.SetError(cmbSchema, "Please Enter Schema");
+					errorProvider2.SetError(cmbSchema_CascadeDel, "Please Enter Schema. If no options are available, then submit a schema in Load Schema tab");
 					bSuccess = false;
 				}
 				else
 				{
-					errorProvider2.SetError(cmbSchema, "");
+					errorProvider2.SetError(cmbSchema_CascadeDel, "");
 				}
 				if (!bSuccess) return;
 			}
 
 			//TimerThread = new Thread(new ThreadStart(this.TimerThreadProcSafe));
-			TimerObjectManager A = TimerObjectState.Retrieve(sTabName);
+			TimerObjectState A = TimerObjectManager.Retrieve(sTabName);
 			A.SetTimerThreadActive(true);
 			TimerThread = new Thread(() => TimerThreadProcSafe(A));	
 			TimerThread.Start();
@@ -1293,8 +1367,21 @@ namespace QuickStart
 
 		private void tsSubmit_Schema_Click(object sender, EventArgs e)
 		{
-			string sTabName = tabControl2.SelectedTab.Tag.ToString();
-			TimerObjectManager A = TimerObjectState.Retrieve(sTabName);
+            //Error handling
+            bool bSuccess = true;
+            if (cmbLoadEnv.Text == "-" || string.IsNullOrWhiteSpace(cmbLoadEnv.Text))
+            {
+                 errorProvider6.SetError(cmbLoadEnv, "Please Enter Environment. If no options are available, then allow custom environment in Settings");
+                bSuccess = false;
+             }
+            if(string.IsNullOrWhiteSpace(cmbLoadDB.Text))
+            {
+                errorProvider7.SetError(cmbLoadDB, "Please Enter Database");
+                bSuccess = false;
+            }
+            if (!bSuccess) return;
+            string sTabName = tabControl2.SelectedTab.Tag.ToString();
+			TimerObjectState A = TimerObjectManager.Retrieve(sTabName);
 
 			try
 			{
@@ -1303,6 +1390,12 @@ namespace QuickStart
 				
 				TimerThread.Start();
 
+                if(string.IsNullOrWhiteSpace(rttInput.Text))
+                {
+                    A.SetTimerErrorIndicator(true, null, "Please submit schema information by following these steps: \r\n 1) Click Generate \r\n 2) Copy/paste sql into SQL Server (Oracle not supported) \r\n 3) Copy results with headers into QuickStart \r\n 4) Click Submit");
+                    A.SetTimerThreadActive(false);
+                    return;
+                }
                 bool bUseCustomEnv = (bool)SettingManager.GetSettingValue(LOAD_SCHEMA, "Allow Custom Env");
                 string sSchemaFileName = String.Empty;
 
@@ -1359,8 +1452,8 @@ namespace QuickStart
 		{
             //Error handling
             bool bSuccess = true;
-
-			if (txtSearchString.Text == string.Empty)
+            
+			if (string.IsNullOrWhiteSpace(txtSearchString.Text))
 			{
 				errorProvider4.SetError(txtSearchString, "Please Enter Search String");
                 bSuccess = false;
@@ -1391,7 +1484,7 @@ namespace QuickStart
             if (!bSuccess) return;
             string sTabName = tabControl1.SelectedTab.Tag.ToString();
 
-			TimerObjectManager A = TimerObjectState.Retrieve(sTabName);
+			TimerObjectState A = TimerObjectManager.Retrieve(sTabName);
 			A.SetTimerThreadActive(true);
 
 			TimerThread = new Thread(() => TimerThreadProcSafe(A));	
@@ -1407,21 +1500,37 @@ namespace QuickStart
 		}
 		private void StopCurrentThread(string sLaunchingTab)
 		{
-			TimerObjectManager A = TimerObjectState.Retrieve(sLaunchingTab);
+			TimerObjectState A = TimerObjectManager.Retrieve(sLaunchingTab);
 			A.SetTimerCancelIndicator(true);
 
-			lock (ManagedThreadList)
-			{
-				foreach (Thread t in ManagedThreadList.ToList())
-				{
-					if(t.Name == sLaunchingTab)
-					{
-						t.Abort();
-						t.Join();
-						ManagedThreadList.Remove(t);
-					}
-				}
-			}
+            //the problem is that this forcefully kills all findstr procs regardless of whether launched from QuickStart or elsewhere
+            //a better design would be to setup a session id/proc id dictionary and stop all pqids for a given a session id
+            if (sLaunchingTab == SEARCH_STRING)
+            {
+                foreach (Process proc in Process.GetProcessesByName("findstr"))
+                {
+                    proc.Kill();
+                }
+            }
+            //if (A.GetOverrideCmdCancel())
+            //{
+            //    //do nothing. we are managing the thread externally
+            //}
+            //else
+            //{
+                lock (ManagedThreadList)
+                {
+                    foreach (Thread t in ManagedThreadList.ToList())
+                    {
+                        if (t.Name == sLaunchingTab)
+                        {
+                            t.Abort();
+                            t.Join();
+                            ManagedThreadList.Remove(t);
+                        }
+                    }
+                }
+            //}
 			
 			A.SetTimerThreadActive(false);
 		}
@@ -1454,7 +1563,7 @@ namespace QuickStart
 		{
 			string sNewTabName = tabControl2.SelectedTab.Tag.ToString();
 			
-			TimerObjectManager A = TimerObjectState.Retrieve(sNewTabName);
+			TimerObjectState A = TimerObjectManager.Retrieve(sNewTabName);
 
 			TSlblStatus.Text = A.GetTimerStatusText();
 			tsSuccessIcon.Visible = A.GetTimerSuccessIconVisible();
@@ -1471,7 +1580,7 @@ namespace QuickStart
 
 			if (sNewTabName1 == SCRIPT_GEN)
 			{
-				TimerObjectManager B = TimerObjectState.Retrieve(sNewTabName2);
+				TimerObjectState B = TimerObjectManager.Retrieve(sNewTabName2);
 				TSlblStatus.Text = B.GetTimerStatusText();
 				tsSuccessIcon.Visible = B.GetTimerSuccessIconVisible();
 				tsErrorIcon.Visible = B.GetTimerErrorIconVisible();
@@ -1481,7 +1590,7 @@ namespace QuickStart
 			}
 			else
 			{
-				TimerObjectManager A = TimerObjectState.Retrieve(sNewTabName1);
+				TimerObjectState A = TimerObjectManager.Retrieve(sNewTabName1);
 				TSlblStatus.Text = A.GetTimerStatusText();
 				tsSuccessIcon.Visible = A.GetTimerSuccessIconVisible();
 				tsErrorIcon.Visible = A.GetTimerErrorIconVisible();
@@ -1505,15 +1614,78 @@ namespace QuickStart
             errorProvider5.Clear();
         }
 
-        private void tsErrorIcon_MouseMove(object sender, MouseEventArgs e)
+        private void cmbCascadeOption_SelectedIndexChanged(object sender, EventArgs e)
         {
-            //tsErrorIcon.ToolTipText = "hello";
-
+            int i = cmbCascadeOption.SelectedIndex;
+            if (cmbCascadeOption.Text == "None")
+            {
+                txtFKName.ReadOnly = true;
+                txtFKName.Text = String.Empty;
+            }
+            else
+            {
+                txtFKName.ReadOnly = false;
+            }
         }
 
-        private void toolStripDropDownButton1_Click(object sender, EventArgs e)
+        private void cmbLoadEnv_TextUpdate(object sender, EventArgs e)
         {
+            errorProvider6.Clear();
+        }
 
+        private void cmbLoadDB_TextUpdate(object sender, EventArgs e)
+        {
+            errorProvider7.Clear();
+        }
+
+        private void txtTableName_Update_TextChanged(object sender, EventArgs e)
+        {
+            errorProvider8.Clear();
+        }
+
+        private void tsGenerate_UpdateGen_Click(object sender, EventArgs e)
+        {
+            bool bSuccess = true;
+            string sInput = rttInput.Text;
+            string sSchema = cmbSchema_Update.Text;
+            string sTableName = txtTableName_Update.Text;
+            string sTabName = tabControl2.SelectedTab.Tag.ToString();
+
+            //Error handling
+            if (string.IsNullOrWhiteSpace(sTableName))
+            {
+                errorProvider8.SetError(txtTableName_Update, "Please Enter Table Name");
+                bSuccess = false;
+            }
+            else
+            {
+                errorProvider8.SetError(txtTableName_Update, "");
+            }
+            if (cmbSchema_Update.SelectedIndex == -1)
+            {
+                errorProvider9.SetError(cmbSchema_Update, "Please Enter Schema. If no options are available, then submit a schema in Load Schema tab");
+                bSuccess = false;
+            }
+            else
+            {
+                errorProvider9.SetError(cmbSchema_Update, "");
+            }
+            if (!bSuccess) return;
+
+            TimerObjectState A = TimerObjectManager.Retrieve(sTabName);
+            A.SetTimerThreadActive(true);
+            TimerThread = new Thread(() => TimerThreadProcSafe(A));
+            TimerThread.Start();
+
+            GenUpdateThread = new Thread(() => GenUpdateThreadProcSafe(sInput,sTableName, sSchema, A));
+            GenUpdateThread.Start();
+            ManagedThreadList.Add(GenUpdateThread);
+        }
+
+        private void tsStopGenerate_UpdateGen_Click(object sender, EventArgs e)
+        {
+            string sTabName = tabControl2.SelectedTab.Tag.ToString();
+            StopCurrentThread(sTabName);
         }
     }	 
 }

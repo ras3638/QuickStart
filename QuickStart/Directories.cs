@@ -10,9 +10,7 @@ namespace QuickStart
 
 	class BaseDirectories
 	{
-
-
-        public static string QuickStartBase = Directory.GetCurrentDirectory() + "\\SettingFiles";
+        public static string QuickStartBase = Directory.GetCurrentDirectory() + "\\QuickStart Setting Files";
 		public static string Base5 = "C:\\Devl\\Products\\Upstream\\5.0.00";
 		public static string Base8 = "C:\\Devl\\Products\\Upstream\\8.0.00";
 		public static string Base16 = "C:\\Devl\\Products\\Upstream\\Main";

@@ -9,19 +9,15 @@ namespace QuickStart
 {
 	public static class ThreadHelperUtility
 	{
-        //This class helps update form objects across threads
+        //This utility class helps update form objects across threads
 
 		delegate void SetEnableCallbackToolStrip(Form Form, ToolStrip ToolStrip, ToolStripButton ToolStripStatusButton, bool bEnable);
 		delegate void SetTextCallback(Form Form, Control Control, string sText);
 		delegate void SetEnableCallback(Form Form, Control Control, bool bEnable);
-
-		delegate void SetVisibleCallback(Form Form, StatusStrip StatusStrip, ToolStripStatusLabel ToolStripStatusLabel, bool bVisible);
+        delegate void SetVisibleCallback(Form Form, StatusStrip StatusStrip, ToolStripStatusLabel ToolStripStatusLabel, bool bVisible);
         delegate void SetVisibleCallbackStatusStripDropDownItem(Form Form, StatusStrip StatusStrip, ToolStripDropDownButton ToolStripStatusDropDownButton, ToolStripItem ToolStripStatusItem, bool bVisible);
-
-
         delegate void SetTextCallbackStatusStripLabel(Form Form, StatusStrip StatusStrip, ToolStripStatusLabel ToolStripStatusLabel, string sText);
         delegate void SetTextCallbackStatusStripDropDown(Form Form, StatusStrip StatusStrip, ToolStripDropDownButton ToolStripStatusDropDownButton, string sText);
-
         delegate void SetTextCallbackStatusStripDropDownItem(Form Form, StatusStrip StatusStrip, ToolStripDropDownButton ToolStripStatusDropDownButton, ToolStripItem ToolStripStatusItem, string sText);
 
         public static void SetEnable(Form Form, Control Control, bool bEnable)

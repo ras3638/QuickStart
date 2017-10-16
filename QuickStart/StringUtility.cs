@@ -97,7 +97,12 @@ namespace QuickStart
 			}
 			return list;
 		}
-		public static List<string> LowMemSplit(this string s, string sDelimiter)
+        public static bool ContainsAllItems(List<string> a, List<string> b)
+        {
+            return !b.Except(a).Any();
+        }
+
+        public static List<string> LowMemSplit(this string s, string sDelimiter)
 		{
 			//Returns a list of delimited strings. 
 			//More effecient when working with large strings
