@@ -45,7 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Client.cs" />
+    <Compile Include="CustomObjects.cs" />
     <Compile Include="DataTableHelperUtility.cs" />
     <Compile Include="Directories.cs" />
     <Compile Include="frmQuickStart.cs">

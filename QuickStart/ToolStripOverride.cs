@@ -22,14 +22,14 @@ namespace QuickStart
             {
                 //Change arrow direction
                 Rectangle r = e.ArrowRectangle;
-                List<Point> points = new List<Point>();
+                List<Point> TrianglePoints = new List<Point>();
 
-                points.Add(new Point(r.Left - 3, r.Height - 8));
-                points.Add(new Point(r.Right - 2, r.Height - 8));
-                points.Add(new Point(r.Left + (r.Width / 2) - 2, (r.Height / 2) - 3));
+                TrianglePoints.Add(new Point(r.Left - 3, r.Height - 8));
+                TrianglePoints.Add(new Point(r.Right - 2, r.Height - 8));
+                TrianglePoints.Add(new Point(r.Left + (r.Width / 2) - 2, (r.Height / 2) - 3));
 
                 e.Graphics.SmoothingMode = SmoothingMode.HighQuality;
-                e.Graphics.FillPolygon(Brushes.Black, points.ToArray());
+                e.Graphics.FillPolygon(Brushes.Black, TrianglePoints.ToArray());
             }
             else
             {

@@ -1,0 +1,8 @@
+Microsoft Windows [Version 10.0.15063]
+(c) 2017 Microsoft Corporation. All rights reserved.
+
+C:\Users\robesali\Documents\Visual Studio 2017\Projects\QuickStart\QuickStart\bin\Debug>cd C:\Users\robesali\Desktop\Custom Devl
+
+C:\Users\robesali\Desktop\Custom Devl>findstr /s /n /i /p /c:"hello" *
+
+C:\Users\robesali\Desktop\Custom Devl>exit

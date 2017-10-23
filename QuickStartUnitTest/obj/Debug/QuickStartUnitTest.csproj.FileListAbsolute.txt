@@ -1,0 +1,12 @@
+C:\Users\robesali\Documents\Visual Studio 2017\Projects\QuickStart\QuickStartUnitTest\bin\Debug\QuickStartUnitTest.exe.config
+C:\Users\robesali\Documents\Visual Studio 2017\Projects\QuickStart\QuickStartUnitTest\bin\Debug\QuickStartUnitTest.exe
+C:\Users\robesali\Documents\Visual Studio 2017\Projects\QuickStart\QuickStartUnitTest\bin\Debug\QuickStartUnitTest.pdb
+C:\Users\robesali\Documents\Visual Studio 2017\Projects\QuickStart\QuickStartUnitTest\bin\Debug\QuickStartUnitTest.exe.CodeAnalysisLog.xml
+C:\Users\robesali\Documents\Visual Studio 2017\Projects\QuickStart\QuickStartUnitTest\bin\Debug\QuickStartUnitTest.exe.lastcodeanalysissucceeded
+C:\Users\robesali\Documents\Visual Studio 2017\Projects\QuickStart\QuickStartUnitTest\bin\Debug\QuickStart.exe
+C:\Users\robesali\Documents\Visual Studio 2017\Projects\QuickStart\QuickStartUnitTest\bin\Debug\QuickStart.pdb
+C:\Users\robesali\Documents\Visual Studio 2017\Projects\QuickStart\QuickStartUnitTest\bin\Debug\QuickStart.exe.config
+C:\Users\robesali\Documents\Visual Studio 2017\Projects\QuickStart\QuickStartUnitTest\obj\Debug\QuickStartUnitTest.csprojResolveAssemblyReference.cache
+C:\Users\robesali\Documents\Visual Studio 2017\Projects\QuickStart\QuickStartUnitTest\obj\Debug\QuickStartUnitTest.csproj.CoreCompileInputs.cache
+C:\Users\robesali\Documents\Visual Studio 2017\Projects\QuickStart\QuickStartUnitTest\obj\Debug\QuickStartUnitTest.exe
+C:\Users\robesali\Documents\Visual Studio 2017\Projects\QuickStart\QuickStartUnitTest\obj\Debug\QuickStartUnitTest.pdb

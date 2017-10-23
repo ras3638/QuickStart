@@ -13,6 +13,8 @@ using System.Diagnostics;
 using System.Threading;
 using System.Text.RegularExpressions;
 using System.IO.Compression;
+using System.Drawing.Drawing2D;
+
 namespace QuickStart
 {
 	public partial class frmQuickStart : Form
@@ -45,9 +47,7 @@ namespace QuickStart
         Thread GenUpdateThread;
 
         #endregion
-
         #region Worker Thread Methods
-
         private void BlockParallelThreads(Thread CurrentThread)
 		{
 			//Blocks the calling thread from running if other parallel threads are ahead of queue.
@@ -502,7 +502,6 @@ namespace QuickStart
 				A.SetTimerThreadActive(false);
 			}
 		}
-
         private void GenUpdateThreadProcSafe(string sInput, string sTableName, string sSchema, string sGenFile, TimerObjectState A)
         {
             //Only want one GenUpdateThread thread running at any time
@@ -559,7 +558,6 @@ namespace QuickStart
             }
         }
         #endregion
-
         #region Constructor
         public frmQuickStart()
 		{
@@ -733,7 +731,6 @@ namespace QuickStart
 			if (!Directory.Exists(BaseDirectories.Core16UpstreamMainAppBase)) Directory.CreateDirectory(BaseDirectories.Core16UpstreamMainAppBase);
 			if (!Directory.Exists(BaseDirectories.GeneratedSchemas)) Directory.CreateDirectory(BaseDirectories.GeneratedSchemas);		
 		}
-
 		private void LoadSchemas()
 		{
 			var dataSource4 = new List<Client>();
@@ -1105,29 +1102,6 @@ namespace QuickStart
 			}
 			return ClientDirectory;
 		}
-		private void cmd_DataReceived(object sender, DataReceivedEventArgs e)
-		{
-			Console.WriteLine("Output from other process");
-			Console.WriteLine(e.Data);
-			//if(!String.IsNullOrWhiteSpace(e.Data))
-			//{
-			//	RTTLog.Add(e.Data);
-			//}		
-		}
-		static void cmd_Error(object sender, DataReceivedEventArgs e)
-		{
-			Console.WriteLine("Error from other process");
-			Console.WriteLine(e.Data);
-			
-		}
-		private void txtTableName_TextChanged(object sender, EventArgs e)
-		{
-			errorProvider1.Clear();
-		}
-		private void txtSearchString_TextChanged(object sender, EventArgs e)
-		{
-			errorProvider4.Clear();
-		}
 		private void CreateGeneratedScriptFile(StringBuilder sb, string GenFile, int iTopRowsToRemove = 0, int iBottomRowsToRemove = 0)
 		{
 			ProcessStartInfo cmdStartInfo = new ProcessStartInfo();
@@ -1202,321 +1176,6 @@ namespace QuickStart
 			cmdProcess.StandardInput.WriteLine("exit");
 			cmdProcess.WaitForExit();
 		}
-		private void frmQuickStart_Load(object sender, EventArgs e)
-		{
-			Application.ApplicationExit += new EventHandler(this.OnApplicationExit);
-			panelSettings.Hide();
-		}
-		
-		private void OnApplicationExit(object sender, EventArgs e)
-		{
-			Environment.Exit(Environment.ExitCode);
-		}
-		private void cmbSchema_SelectedIndexChanged(object sender, EventArgs e)
-		{
-			errorProvider3.Clear();
-		}
-		private void txtFKName_TextChanged(object sender, EventArgs e)
-		{
-			errorProvider2.Clear();
-		}
-		private void tsRightClickRemove_Click(object sender, EventArgs e)
-		{
-            try
-            {
-                string sSchema = cmbSchema_CascadeDel.Text;
-                File.Delete(BaseDirectories.GeneratedSchemas + "\\" + GetSchemaFileName(sSchema));
-                LoadSchemas();
-                cmbSchema_CascadeDel.SelectedIndex = -1;
-            }
-            catch (Exception ex)
-            {
-                MessageBoxEx.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-		}
-		private void cmbSchema_KeyDown(object sender, KeyEventArgs e)
-		{
-            try
-            {
-                if (e.KeyCode == Keys.Delete && cmbSchema_CascadeDel.DroppedDown)
-                {
-                    string sSchema = cmbSchema_CascadeDel.Text;
-                    File.Delete(BaseDirectories.GeneratedSchemas + "\\" + GetSchemaFileName(sSchema));
-                    LoadSchemas();
-                    cmbSchema_CascadeDel.SelectedIndex = -1;
-
-                    //Make sure no other processing happens
-                    e.Handled = true;
-                }
-                else if (e.KeyCode == Keys.Down && !cmbSchema_CascadeDel.DroppedDown)
-                {
-                    cmbSchema_CascadeDel.DroppedDown = true;
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBoxEx.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-		}
-
-		private void tsGenerate_Insert_Click(object sender, EventArgs e)
-		{
-			//string sInputString = rttInput.Text.Trim();
-			string sInputString = rttInput.Text; //Trim causes an issue if last columns are empty strings. Really we should be trimming new lines only.
-
-			string sIDInsert = cmbIDInsert.Text;
-			string sTableName = txtTableName_Insert.Text;
-			bool bProcessed = false;
-			string sTabName = tabControl2.SelectedTab.Tag.ToString();
-			TimerObjectState A = new TimerObjectState(sTabName);
-
-			if (string.IsNullOrWhiteSpace(sTableName))
-			{
-				errorProvider1.SetError(txtTableName_Insert, "Please Enter Table Name");
-				return;
-			}
-			else
-			{
-				errorProvider1.SetError(txtTableName_Insert, "");
-			}
-
-			
-			if (chkSplit_InsertGen.Checked)
-			{
-				if (StringUtility.IsStringOverMemory(sInputString))
-				{
-					List<string> ListToProcess = StringUtility.SplitLargeString(sInputString);
-					int iFileNumber = 1;
-
-					foreach (string sInput in ListToProcess)
-					{
-						string sGenFile = "GeneratedInsertScript" + iFileNumber.ToString() + ".txt";	
-						GenInsertThread = new Thread(() => GenInsertThreadProcSafe(sInput, sIDInsert, sTableName, sGenFile, A));
-						GenInsertThread.Start();
-						GenInsertThread.Name = INSERT_GEN;
-						ManagedThreadList.Add(GenInsertThread);
-						
-						bProcessed = true;
-						iFileNumber++;
-					}
-				}
-			}
-			else
-			{
-				if (StringUtility.IsStringOverMemory(sInputString))
-				{
-					if (MessageBoxEx.Show("Dataset is large and may cause memory issues.\n Recommendation is to check: Split To multiple files\n" + StringUtility.StringOverCapacity(sInputString).ToString() + "% over recommended capacity.\nContinue?",
-							"Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
-					{
-						return;
-					}
-				}
-			}
-
-			if (!bProcessed)
-			{
-				
-				GenInsertThread = new Thread(() => GenInsertThreadProcSafe(sInputString, sIDInsert, sTableName, "GeneratedInsertScript1.txt", A));
-				GenInsertThread.Start();
-				GenInsertThread.Name = INSERT_GEN;
-				ManagedThreadList.Add(GenInsertThread);				
-			}
-
-			//TimerThread = new Thread(new ThreadStart(this.TimerThreadProcSafe));
-			A.SetTimerThreadActive(true);
-
-			TimerThread = new Thread(() => TimerThreadProcSafe(A));	
-			TimerThread.Start();
-		}
-		
-
-		private void tsGenerateCascadeDelete_Click(object sender, EventArgs e)
-		{
-			string sCascadeOption = cmbCascadeOption.Text;
-			string sFKName = txtFKName.Text;
-			bool bUseIncrements = chkUseIncrements.Checked;
-			string sInput = rttInput.Text;
-			string sSchema = cmbSchema_CascadeDel.Text;
-			string sTabName = tabControl2.SelectedTab.Tag.ToString();
-
-			if (sCascadeOption == "Single" || sCascadeOption == "Full" || sCascadeOption == "All")
-			{
-				//Error Handling
-				bool bSuccess = true;
-
-				if (string.IsNullOrWhiteSpace(sFKName) && sCascadeOption != "All")
-				{
-					errorProvider3.SetError(txtFKName, "Please Enter FK Name");
-					bSuccess = false;
-				}
-				else
-				{
-					errorProvider3.SetError(txtFKName, "");
-				}
-				if (cmbSchema_CascadeDel.SelectedIndex == -1)
-				{
-					errorProvider2.SetError(cmbSchema_CascadeDel, "Please Enter Schema. If no options are available, then submit a schema in Load Schema tab");
-					bSuccess = false;
-				}
-				else
-				{
-					errorProvider2.SetError(cmbSchema_CascadeDel, "");
-				}
-				if (!bSuccess) return;
-			}
-
-			//TimerThread = new Thread(new ThreadStart(this.TimerThreadProcSafe));
-			TimerObjectState A = TimerObjectManager.Retrieve(sTabName);
-			A.SetTimerThreadActive(true);
-			TimerThread = new Thread(() => TimerThreadProcSafe(A));	
-			TimerThread.Start();
-
-			GenCascadeDeleteThread = new Thread(() => GenCascadeDeleteThreadProcSafe(sFKName, bUseIncrements, sInput, sCascadeOption, sSchema, A));
-			GenCascadeDeleteThread.Start();
-			ManagedThreadList.Add(GenCascadeDeleteThread);
-		}
-
-		private void tsGenerate_SchemaScript_Click(object sender, EventArgs e)
-		{
-			StringBuilder sb = new StringBuilder();
-			string GenFile = "GeneratedScript.txt";
-			sb.Append(Sql.sLoadSchema);
-			CreateGeneratedScriptFile(sb,GenFile);
-		}
-
-		private void tsSubmit_Schema_Click(object sender, EventArgs e)
-		{
-            //Error handling
-            bool bSuccess = true;
-            if (cmbLoadEnv.Text == "-" || string.IsNullOrWhiteSpace(cmbLoadEnv.Text))
-            {
-                 errorProvider6.SetError(cmbLoadEnv, "Please Enter Environment. If no options are available, then allow custom environment in Settings");
-                bSuccess = false;
-             }
-            if(string.IsNullOrWhiteSpace(cmbLoadDB.Text))
-            {
-                errorProvider7.SetError(cmbLoadDB, "Please Enter Database");
-                bSuccess = false;
-            }
-            if (!bSuccess) return;
-            string sTabName = tabControl2.SelectedTab.Tag.ToString();
-			TimerObjectState A = TimerObjectManager.Retrieve(sTabName);
-
-			try
-			{
-				A.SetTimerThreadActive(true);
-				TimerThread = new Thread(() => TimerThreadProcSafe(A));
-				
-				TimerThread.Start();
-
-                if(string.IsNullOrWhiteSpace(rttInput.Text))
-                {
-                    A.SetTimerErrorIndicator(true, null, "Please submit schema information by following these steps: \r\n 1) Click Generate \r\n 2) Copy/paste sql into SQL Server (Oracle not supported) \r\n 3) Copy results with headers into QuickStart \r\n 4) Click Submit");
-                    A.SetTimerThreadActive(false);
-                    return;
-                }
-                bool bUseCustomEnv = (bool)SettingManager.GetSettingValue(LOAD_SCHEMA, "Allow Custom Env");
-                string sSchemaFileName = String.Empty;
-
-                if (bUseCustomEnv)
-                {
-                    sSchemaFileName = cmbLoadEnv.Text + "_" + cmbLoadDB.Text + ".txt";
-                }
-                else
-                {
-                    Client SelectedClient = (Client)cmbLoadEnv.SelectedValue;
-                    sSchemaFileName = SelectedClient.Name + "_" + SelectedClient.Code + "_" + cmbLoadDB.Text + ".txt";
-
-                }
-                using (FileStream stream = File.Open(BaseDirectories.GeneratedSchemas + "\\" + sSchemaFileName, FileMode.Create))
-                {
-                }
-                using (var writer = new StreamWriter(BaseDirectories.GeneratedSchemas + "\\" + sSchemaFileName))
-                {
-                    writer.Write(rttInput.Text);
-                }
-				LoadSchemas();
-				//MessageBox.Show("Successfully uploaded schema", "Success",MessageBoxButtons.OK, MessageBoxIcon.Information);
-                
-
-                A.SetTimerErrorIndicator(false, null, "Successfully uploaded schema");
-                errorProvider2.Clear();
-
-            }
-			catch (Exception ex)
-			{
-                //MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                A.SetTimerErrorIndicator(true, ex);
-			}
-			finally
-			{
-				A.SetTimerThreadActive(false);
-			}
-		}
-
-		private void tsSetup_Click(object sender, EventArgs e)
-		{
-			Log.Clear();
-			Log.Add("Process Summary");
-			QPECHandler((Client)cmbProcess.SelectedValue);
-			QPECConfigHandler((Client)cmbProcess.SelectedValue);
-			Log.Add(" ");
-			Log.Add("GUI Summary");
-			UpstreamMainAppHandler((Client)cmbGUI.SelectedValue);
-			QEnvironmentDefinitionsHandler((Client)cmbGUI.SelectedValue);
-			MessageBoxEx.Show(String.Join("\n", Log), "Log");
-		}
-
-		private void tsSearch_Click(object sender, EventArgs e)
-		{
-            //Error handling
-            bool bSuccess = true;
-            
-			if (string.IsNullOrWhiteSpace(txtSearchString.Text))
-			{
-				errorProvider4.SetError(txtSearchString, "Please Enter Search String");
-                bSuccess = false;
-            }
-			else
-			{
-				errorProvider4.SetError(txtSearchString, "");
-			}
-
-            try
-            {
-                if (Path.GetPathRoot(txtSearchPath.Text) == string.Empty)
-                {
-                    errorProvider5.SetError(btnOpenFileDialog, "Search Path must be a valid path");
-                    bSuccess = false;
-                }
-                else
-                {
-                    errorProvider5.SetError(btnOpenFileDialog, "");
-                }
-            }
-            catch (Exception)
-            {
-                errorProvider5.SetError(btnOpenFileDialog, "Search Path must be a valid path");
-                bSuccess = false;
-            }
-
-            if (!bSuccess) return;
-            string sTabName = tabControl1.SelectedTab.Tag.ToString();
-
-			TimerObjectState A = TimerObjectManager.Retrieve(sTabName);
-			A.SetTimerThreadActive(true);
-
-			TimerThread = new Thread(() => TimerThreadProcSafe(A));	
-			TimerThread.Start();
-
-            string SearchPath = txtSearchPath.Text; 
-            string SearchString = txtSearchString.Text;
-			string FilePattern = cmbFilePattern.Text;
-			SearchStringThread = new Thread(() => SearchStringThreadProcSafe(SearchPath, SearchString, FilePattern, A));
-			SearchStringThread.Start();
-			SearchStringThread.Name = SEARCH_STRING;
-			ManagedThreadList.Add(SearchStringThread);
-		}
 		private void StopCurrentThread(string sLaunchingTab)
 		{
 			TimerObjectState A = TimerObjectManager.Retrieve(sLaunchingTab);
@@ -1531,94 +1190,112 @@ namespace QuickStart
                     proc.Kill();
                 }
             }
-            //if (A.GetOverrideCmdCancel())
-            //{
-            //    //do nothing. we are managing the thread externally
-            //}
-            //else
-            //{
-                lock (ManagedThreadList)
-                {
-                    foreach (Thread t in ManagedThreadList.ToList())
+
+            lock (ManagedThreadList)
+            {
+                foreach (Thread t in ManagedThreadList.ToList())
+                 {
+                    if (t.Name == sLaunchingTab)
                     {
-                        if (t.Name == sLaunchingTab)
-                        {
-                            t.Abort();
-                            t.Join();
-                            ManagedThreadList.Remove(t);
-                        }
+                        t.Abort();
+                        t.Join();
+                        ManagedThreadList.Remove(t);
                     }
                 }
-            //}
-			
+            }
 			A.SetTimerThreadActive(false);
 		}
+        #region EventHandlers
+        private void frmQuickStart_Load(object sender, EventArgs e)
+        {
+            Application.ApplicationExit += new EventHandler(this.OnApplicationExit);
+            panelSettings.Hide();
+        }
+        private void OnApplicationExit(object sender, EventArgs e)
+        {
+            Environment.Exit(Environment.ExitCode);
+        }
+        private void cmd_DataReceived(object sender, DataReceivedEventArgs e)
+        {
+            Console.WriteLine("Output from other process");
+            Console.WriteLine(e.Data);
+            //if(!String.IsNullOrWhiteSpace(e.Data))
+            //{
+            //	RTTLog.Add(e.Data);
+            //}		
+        }
+        static void cmd_Error(object sender, DataReceivedEventArgs e)
+        {
+            Console.WriteLine("Error from other process");
+            Console.WriteLine(e.Data);
 
-		private void tsStopGenerate_Insert_Click(object sender, EventArgs e)
-		{
-			string sTabName = tabControl2.SelectedTab.Tag.ToString();
-			StopCurrentThread(sTabName);
-		}
+        }
+        private void txtTableName_TextChanged(object sender, EventArgs e)
+        {
+            errorProvider1.Clear();
+        }
+        private void txtSearchString_TextChanged(object sender, EventArgs e)
+        {
+            errorProvider4.Clear();
+        }
+        private void tsStopGenerate_Insert_Click(object sender, EventArgs e)
+        {
+            string sTabName = tabControl2.SelectedTab.Tag.ToString();
+            StopCurrentThread(sTabName);
+        }
+        private void tsStopGenerate_CascadeDelete_Click(object sender, EventArgs e)
+        {
+            string sTabName = tabControl2.SelectedTab.Tag.ToString();
+            StopCurrentThread(sTabName);
+        }
+        private void tsStopSearch_Click(object sender, EventArgs e)
+        {
+            string sTabName = tabControl1.SelectedTab.Tag.ToString();
+            StopCurrentThread(sTabName);
+        }
+        private void tsStopSetup_Click(object sender, EventArgs e)
+        {
+            string sTabName = tabControl2.SelectedTab.Tag.ToString();
+            StopCurrentThread(sTabName);
+        }
+        private void tabControl2_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            string sNewTabName = tabControl2.SelectedTab.Tag.ToString();
+            TimerObjectState A = TimerObjectManager.Retrieve(sNewTabName);
 
-		private void tsStopGenerate_CascadeDelete_Click(object sender, EventArgs e)
-		{
-			string sTabName = tabControl2.SelectedTab.Tag.ToString();
-			StopCurrentThread(sTabName);
-		}
-
-		private void tsStopSearch_Click(object sender, EventArgs e)
-		{
-			string sTabName = tabControl1.SelectedTab.Tag.ToString();
-			StopCurrentThread(sTabName);
-		}
-
-		private void tsStopSetup_Click(object sender, EventArgs e)
-		{
-			string sTabName = tabControl2.SelectedTab.Tag.ToString();
-			StopCurrentThread(sTabName);
-		}
-
-		private void tabControl2_SelectedIndexChanged(object sender, EventArgs e)
-		{
-			string sNewTabName = tabControl2.SelectedTab.Tag.ToString();
-			
-			TimerObjectState A = TimerObjectManager.Retrieve(sNewTabName);
-
-			TSlblStatus.Text = A.GetTimerStatusText();
-			tsSuccessIcon.Visible = A.GetTimerSuccessIconVisible();
-			tsErrorIcon.Visible = A.GetTimerErrorIconVisible();
-			TSlblTime.Text = A.GetTimerText();
+            TSlblStatus.Text = A.GetTimerStatusText();
+            tsSuccessIcon.Visible = A.GetTimerSuccessIconVisible();
+            tsErrorIcon.Visible = A.GetTimerErrorIconVisible();
+            TSlblTime.Text = A.GetTimerText();
             UpdateErrorMessages(A);
-            sCurrentTab = sNewTabName;	
-		}
+            sCurrentTab = sNewTabName;
+        }
+        private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            string sNewTabName1 = tabControl1.SelectedTab.Tag.ToString();
+            string sNewTabName2 = tabControl2.SelectedTab.Tag.ToString();
 
-		private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
-		{
-			string sNewTabName1 = tabControl1.SelectedTab.Tag.ToString();
-			string sNewTabName2 = tabControl2.SelectedTab.Tag.ToString();
-
-			if (sNewTabName1 == SCRIPT_GEN)
-			{
-				TimerObjectState B = TimerObjectManager.Retrieve(sNewTabName2);
-				TSlblStatus.Text = B.GetTimerStatusText();
-				tsSuccessIcon.Visible = B.GetTimerSuccessIconVisible();
-				tsErrorIcon.Visible = B.GetTimerErrorIconVisible();
-				TSlblTime.Text = B.GetTimerText();
+            if (sNewTabName1 == SCRIPT_GEN)
+            {
+                TimerObjectState B = TimerObjectManager.Retrieve(sNewTabName2);
+                TSlblStatus.Text = B.GetTimerStatusText();
+                tsSuccessIcon.Visible = B.GetTimerSuccessIconVisible();
+                tsErrorIcon.Visible = B.GetTimerErrorIconVisible();
+                TSlblTime.Text = B.GetTimerText();
                 UpdateErrorMessages(B);
                 sCurrentTab = sNewTabName2;
-			}
-			else
-			{
-				TimerObjectState A = TimerObjectManager.Retrieve(sNewTabName1);
-				TSlblStatus.Text = A.GetTimerStatusText();
-				tsSuccessIcon.Visible = A.GetTimerSuccessIconVisible();
-				tsErrorIcon.Visible = A.GetTimerErrorIconVisible();
-				TSlblTime.Text = A.GetTimerText();
+            }
+            else
+            {
+                TimerObjectState A = TimerObjectManager.Retrieve(sNewTabName1);
+                TSlblStatus.Text = A.GetTimerStatusText();
+                tsSuccessIcon.Visible = A.GetTimerSuccessIconVisible();
+                tsErrorIcon.Visible = A.GetTimerErrorIconVisible();
+                TSlblTime.Text = A.GetTimerText();
                 UpdateErrorMessages(A);
                 sCurrentTab = sNewTabName1;
-			}
-		}
-
+            }
+        }
         private void btnOpenFileDialog_Click(object sender, EventArgs e)
         {
             DialogResult result = folderBrowserDialog1.ShowDialog();
@@ -1627,12 +1304,10 @@ namespace QuickStart
                 txtSearchPath.Text = folderBrowserDialog1.SelectedPath;
             }
         }
-
         private void txtSearchPath_TextChanged(object sender, EventArgs e)
         {
             errorProvider5.Clear();
         }
-
         private void cmbCascadeOption_SelectedIndexChanged(object sender, EventArgs e)
         {
             int i = cmbCascadeOption.SelectedIndex;
@@ -1646,22 +1321,18 @@ namespace QuickStart
                 txtFKName.ReadOnly = false;
             }
         }
-
         private void cmbLoadEnv_TextUpdate(object sender, EventArgs e)
         {
             errorProvider6.Clear();
         }
-
         private void cmbLoadDB_TextUpdate(object sender, EventArgs e)
         {
             errorProvider7.Clear();
         }
-
         private void txtTableName_Update_TextChanged(object sender, EventArgs e)
         {
             errorProvider8.Clear();
         }
-
         private void tsGenerate_UpdateGen_Click(object sender, EventArgs e)
         {
             bool bSuccess = true;
@@ -1693,7 +1364,7 @@ namespace QuickStart
             }
 
             if (!bSuccess) return;
-           
+
             if (chkSplit_UpdateGen.Checked)
             {
                 if (StringUtility.IsStringOverMemory(sInputString))
@@ -1738,11 +1409,311 @@ namespace QuickStart
             TimerThread = new Thread(() => TimerThreadProcSafe(A));
             TimerThread.Start();
         }
-
         private void tsStopGenerate_UpdateGen_Click(object sender, EventArgs e)
         {
             string sTabName = tabControl2.SelectedTab.Tag.ToString();
             StopCurrentThread(sTabName);
         }
-    }	 
+        private void cmbSchema_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            errorProvider3.Clear();
+        }
+        private void txtFKName_TextChanged(object sender, EventArgs e)
+        {
+            errorProvider2.Clear();
+        }
+        private void tsRightClickRemove_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string sSchema = cmbSchema_CascadeDel.Text;
+                File.Delete(BaseDirectories.GeneratedSchemas + "\\" + GetSchemaFileName(sSchema));
+                LoadSchemas();
+                cmbSchema_CascadeDel.SelectedIndex = -1;
+            }
+            catch (Exception ex)
+            {
+                MessageBoxEx.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+        private void cmbSchema_KeyDown(object sender, KeyEventArgs e)
+        {
+            try
+            {
+                if (e.KeyCode == Keys.Delete && cmbSchema_CascadeDel.DroppedDown)
+                {
+                    string sSchema = cmbSchema_CascadeDel.Text;
+                    File.Delete(BaseDirectories.GeneratedSchemas + "\\" + GetSchemaFileName(sSchema));
+                    LoadSchemas();
+                    cmbSchema_CascadeDel.SelectedIndex = -1;
+
+                    //Make sure no other processing happens
+                    e.Handled = true;
+                }
+                else if (e.KeyCode == Keys.Down && !cmbSchema_CascadeDel.DroppedDown)
+                {
+                    cmbSchema_CascadeDel.DroppedDown = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBoxEx.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+        private void tsGenerate_Insert_Click(object sender, EventArgs e)
+        {
+            //string sInputString = rttInput.Text.Trim();
+            string sInputString = rttInput.Text; //Trim causes an issue if last columns are empty strings. Really we should be trimming new lines only.
+
+            string sIDInsert = cmbIDInsert.Text;
+            string sTableName = txtTableName_Insert.Text;
+            bool bProcessed = false;
+            string sTabName = tabControl2.SelectedTab.Tag.ToString();
+            TimerObjectState A = new TimerObjectState(sTabName);
+
+            if (string.IsNullOrWhiteSpace(sTableName))
+            {
+                errorProvider1.SetError(txtTableName_Insert, "Please Enter Table Name");
+                return;
+            }
+            else
+            {
+                errorProvider1.SetError(txtTableName_Insert, "");
+            }
+
+
+            if (chkSplit_InsertGen.Checked)
+            {
+                if (StringUtility.IsStringOverMemory(sInputString))
+                {
+                    List<string> ListToProcess = StringUtility.SplitLargeString(sInputString);
+                    int iFileNumber = 1;
+
+                    foreach (string sInput in ListToProcess)
+                    {
+                        string sGenFile = "GeneratedInsertScript" + iFileNumber.ToString() + ".txt";
+                        GenInsertThread = new Thread(() => GenInsertThreadProcSafe(sInput, sIDInsert, sTableName, sGenFile, A));
+                        GenInsertThread.Start();
+                        GenInsertThread.Name = INSERT_GEN;
+                        ManagedThreadList.Add(GenInsertThread);
+
+                        bProcessed = true;
+                        iFileNumber++;
+                    }
+                }
+            }
+            else
+            {
+                if (StringUtility.IsStringOverMemory(sInputString))
+                {
+                    if (MessageBoxEx.Show("Dataset is large and may cause memory issues.\n Recommendation is to check: Split To multiple files\n" + StringUtility.StringOverCapacity(sInputString).ToString() + "% over recommended capacity.\nContinue?",
+                            "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
+                    {
+                        return;
+                    }
+                }
+            }
+
+            if (!bProcessed)
+            {
+
+                GenInsertThread = new Thread(() => GenInsertThreadProcSafe(sInputString, sIDInsert, sTableName, "GeneratedInsertScript1.txt", A));
+                GenInsertThread.Start();
+                GenInsertThread.Name = INSERT_GEN;
+                ManagedThreadList.Add(GenInsertThread);
+            }
+
+            //TimerThread = new Thread(new ThreadStart(this.TimerThreadProcSafe));
+            A.SetTimerThreadActive(true);
+
+            TimerThread = new Thread(() => TimerThreadProcSafe(A));
+            TimerThread.Start();
+        }
+        private void tsGenerateCascadeDelete_Click(object sender, EventArgs e)
+        {
+            string sCascadeOption = cmbCascadeOption.Text;
+            string sFKName = txtFKName.Text;
+            bool bUseIncrements = chkUseIncrements.Checked;
+            string sInput = rttInput.Text;
+            string sSchema = cmbSchema_CascadeDel.Text;
+            string sTabName = tabControl2.SelectedTab.Tag.ToString();
+
+            if (sCascadeOption == "Single" || sCascadeOption == "Full" || sCascadeOption == "All")
+            {
+                //Error Handling
+                bool bSuccess = true;
+
+                if (string.IsNullOrWhiteSpace(sFKName) && sCascadeOption != "All")
+                {
+                    errorProvider3.SetError(txtFKName, "Please Enter FK Name");
+                    bSuccess = false;
+                }
+                else
+                {
+                    errorProvider3.SetError(txtFKName, "");
+                }
+                if (cmbSchema_CascadeDel.SelectedIndex == -1)
+                {
+                    errorProvider2.SetError(cmbSchema_CascadeDel, "Please Enter Schema. If no options are available, then submit a schema in Load Schema tab");
+                    bSuccess = false;
+                }
+                else
+                {
+                    errorProvider2.SetError(cmbSchema_CascadeDel, "");
+                }
+                if (!bSuccess) return;
+            }
+
+            //TimerThread = new Thread(new ThreadStart(this.TimerThreadProcSafe));
+            TimerObjectState A = TimerObjectManager.Retrieve(sTabName);
+            A.SetTimerThreadActive(true);
+            TimerThread = new Thread(() => TimerThreadProcSafe(A));
+            TimerThread.Start();
+
+            GenCascadeDeleteThread = new Thread(() => GenCascadeDeleteThreadProcSafe(sFKName, bUseIncrements, sInput, sCascadeOption, sSchema, A));
+            GenCascadeDeleteThread.Start();
+            ManagedThreadList.Add(GenCascadeDeleteThread);
+        }
+        private void tsGenerate_SchemaScript_Click(object sender, EventArgs e)
+        {
+            StringBuilder sb = new StringBuilder();
+            string GenFile = "GeneratedScript.txt";
+            sb.Append(Sql.sLoadSchema);
+            CreateGeneratedScriptFile(sb, GenFile);
+        }
+        private void tsSubmit_Schema_Click(object sender, EventArgs e)
+        {
+            //Error handling
+            bool bSuccess = true;
+            if (cmbLoadEnv.Text == "-" || string.IsNullOrWhiteSpace(cmbLoadEnv.Text))
+            {
+                errorProvider6.SetError(cmbLoadEnv, "Please Enter Environment. If no options are available, then allow custom environment in Settings");
+                bSuccess = false;
+            }
+            if (string.IsNullOrWhiteSpace(cmbLoadDB.Text))
+            {
+                errorProvider7.SetError(cmbLoadDB, "Please Enter Database");
+                bSuccess = false;
+            }
+            if (!bSuccess) return;
+            string sTabName = tabControl2.SelectedTab.Tag.ToString();
+            TimerObjectState A = TimerObjectManager.Retrieve(sTabName);
+
+            try
+            {
+                A.SetTimerThreadActive(true);
+                TimerThread = new Thread(() => TimerThreadProcSafe(A));
+
+                TimerThread.Start();
+
+                if (string.IsNullOrWhiteSpace(rttInput.Text))
+                {
+                    A.SetTimerErrorIndicator(true, null, "Please submit schema information by following these steps: \r\n 1) Click Generate \r\n 2) Copy/paste sql into SQL Server (Oracle not supported) \r\n 3) Copy results with headers into QuickStart \r\n 4) Click Submit");
+                    A.SetTimerThreadActive(false);
+                    return;
+                }
+                bool bUseCustomEnv = (bool)SettingManager.GetSettingValue(LOAD_SCHEMA, "Allow Custom Env");
+                string sSchemaFileName = String.Empty;
+
+                if (bUseCustomEnv)
+                {
+                    sSchemaFileName = cmbLoadEnv.Text + "_" + cmbLoadDB.Text + ".txt";
+                }
+                else
+                {
+                    Client SelectedClient = (Client)cmbLoadEnv.SelectedValue;
+                    sSchemaFileName = SelectedClient.Name + "_" + SelectedClient.Code + "_" + cmbLoadDB.Text + ".txt";
+
+                }
+                using (FileStream stream = File.Open(BaseDirectories.GeneratedSchemas + "\\" + sSchemaFileName, FileMode.Create))
+                {
+                }
+                using (var writer = new StreamWriter(BaseDirectories.GeneratedSchemas + "\\" + sSchemaFileName))
+                {
+                    writer.Write(rttInput.Text);
+                }
+                LoadSchemas();
+                //MessageBox.Show("Successfully uploaded schema", "Success",MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+
+                A.SetTimerErrorIndicator(false, null, "Successfully uploaded schema");
+                errorProvider2.Clear();
+
+            }
+            catch (Exception ex)
+            {
+                //MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                A.SetTimerErrorIndicator(true, ex);
+            }
+            finally
+            {
+                A.SetTimerThreadActive(false);
+            }
+        }
+        private void tsSetup_Click(object sender, EventArgs e)
+        {
+            Log.Clear();
+            Log.Add("Process Summary");
+            QPECHandler((Client)cmbProcess.SelectedValue);
+            QPECConfigHandler((Client)cmbProcess.SelectedValue);
+            Log.Add(" ");
+            Log.Add("GUI Summary");
+            UpstreamMainAppHandler((Client)cmbGUI.SelectedValue);
+            QEnvironmentDefinitionsHandler((Client)cmbGUI.SelectedValue);
+            MessageBoxEx.Show(String.Join("\n", Log), "Log");
+        }
+        private void tsSearch_Click(object sender, EventArgs e)
+        {
+            //Error handling
+            bool bSuccess = true;
+
+            if (string.IsNullOrWhiteSpace(txtSearchString.Text))
+            {
+                errorProvider4.SetError(txtSearchString, "Please Enter Search String");
+                bSuccess = false;
+            }
+            else
+            {
+                errorProvider4.SetError(txtSearchString, "");
+            }
+
+            try
+            {
+                if (Path.GetPathRoot(txtSearchPath.Text) == string.Empty)
+                {
+                    errorProvider5.SetError(btnOpenFileDialog, "Search Path must be a valid path");
+                    bSuccess = false;
+                }
+                else
+                {
+                    errorProvider5.SetError(btnOpenFileDialog, "");
+                }
+            }
+            catch (Exception)
+            {
+                errorProvider5.SetError(btnOpenFileDialog, "Search Path must be a valid path");
+                bSuccess = false;
+            }
+
+            if (!bSuccess) return;
+            string sTabName = tabControl1.SelectedTab.Tag.ToString();
+
+            TimerObjectState A = TimerObjectManager.Retrieve(sTabName);
+            A.SetTimerThreadActive(true);
+
+            TimerThread = new Thread(() => TimerThreadProcSafe(A));
+            TimerThread.Start();
+
+            string SearchPath = txtSearchPath.Text;
+            string SearchString = txtSearchString.Text;
+            string FilePattern = cmbFilePattern.Text;
+            SearchStringThread = new Thread(() => SearchStringThreadProcSafe(SearchPath, SearchString, FilePattern, A));
+            SearchStringThread.Start();
+            SearchStringThread.Name = SEARCH_STRING;
+            ManagedThreadList.Add(SearchStringThread);
+        }
+        #endregion EventHandlers
+
+
+    }
 }

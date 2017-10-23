@@ -17,3 +17,5 @@ C:\Users\robesali\Documents\Visual Studio 2017\Projects\QuickStart\QuickStart\ob
 C:\Users\robesali\Documents\Visual Studio 2017\Projects\QuickStart\QuickStart\obj\Debug\QuickStart.csproj.CoreCompileInputs.cache
 C:\Users\robesali\Documents\Visual Studio 2017\Projects\QuickStart\QuickStart\obj\Debug\QuickStart.exe
 C:\Users\robesali\Documents\Visual Studio 2017\Projects\QuickStart\QuickStart\obj\Debug\QuickStart.pdb
+C:\Users\robesali\Documents\Visual Studio 2017\Projects\QuickStart\QuickStart\bin\Debug\QuickStart.exe.CodeAnalysisLog.xml
+C:\Users\robesali\Documents\Visual Studio 2017\Projects\QuickStart\QuickStart\bin\Debug\QuickStart.exe.lastcodeanalysissucceeded

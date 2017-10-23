@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace QuickStart
@@ -56,47 +58,7 @@ namespace QuickStart
 
 			return FKResultsHashSet;
 		}
-        public static StringBuilder GenerateUpdateStatement(List<string> ColumnList, string sTableName, List<string> PKList)
-        {
-            StringBuilder sb = new StringBuilder();
-            StringBuilder sbWhereClause = new StringBuilder();
-
-            bool bWhereClauseFirstIter = true;
-            bool bSetClauseFirstIter = true;
-
-            for (int i = 0; i < ColumnList.Count; i++)
-            {
-                if (PKList.Contains(ColumnList[i]) && bWhereClauseFirstIter)
-                {
-                    sbWhereClause.Append(" WHERE " + ColumnList[i] + " = '{" + i + "}'");
-                    bWhereClauseFirstIter = false;
-                }
-                else if (PKList.Contains(ColumnList[i]) && !bWhereClauseFirstIter)
-                {
-                    sbWhereClause.Append(" AND " + ColumnList[i] + " = '{" + i + "}'");
-                }
-                else
-                {
-                    if (bSetClauseFirstIter)
-                    {
-                        sb.Append("UPDATE " + sTableName + " SET " + ColumnList[i] + " = '{" + i + "}'");
-                        bSetClauseFirstIter = false;
-                    }
-                    else
-                    {
-                        //last statement
-                        sb.Append(", " + ColumnList[i] + " = '{" + i + "}'");
-                    }
-                }
-
-            }
-            return sb.Append(sbWhereClause);
-        }
-        public static bool IsUpdateColumnPK(string sColumn, string sTableName)
-        {
-            return true;
-        }
-
+        
         public static StringBuilder GenerateInsertStatement(List<string> ColumnList, string sTableName)
 		{
 			StringBuilder sb = new StringBuilder();
@@ -475,11 +437,13 @@ namespace QuickStart
 
 			return sb;
 		}
-
         public static StringBuilder UpdateGenEngine(DataTable dtDatabaseSchema, string sTableName, string sSource)
         {
             StringBuilder sb = new StringBuilder();
+            StringBuilder sbWhereClause = new StringBuilder();
             string sRecordSet = sSource;
+            bool bWhereClauseFirstIter;
+            bool bSetClauseFirstIter;
 
             //Remove the first line. These are columns
             int iFirstNewLineIndex = sRecordSet.IndexOf("\n");
@@ -498,43 +462,65 @@ namespace QuickStart
             {
                 string sColumn = row["column"].ToString();
                 PKList.Add(sColumn);
-
             }
 
+            //Get Column list
             string sFirstLine = sSource.Substring(0, iFirstNewLineIndex);
             List<string> ColumnList = StringUtility.LowMemSplit(sFirstLine, "\t");
-            string sUpdateStatement = SqlGenEngine.GenerateUpdateStatement(ColumnList, sTableName, PKList).ToString();
-            sRecordSet = new StringBuilder(sRecordSet).Replace("\n", "\r\n" + sUpdateStatement).ToString();
 
+            int iColIndex = 0;
+            int iNewLines = sRecordSet.Split('\n').Length - 1;
+            sRecordSet = new StringBuilder(sRecordSet).Replace("\n", "\t").ToString();
+            List<string> Splitter = StringUtility.LowMemSplit(sRecordSet, "\t");
 
-            //Handle ending and beginning
-            sRecordSet = sRecordSet.Remove(0, 2);
-            List<string> Splitter = StringUtility.LowMemSplit(sRecordSet, "\r\n");
-            foreach(string s in Splitter)
+            //Generate Update Statements
+            for (int j = 0; j < iNewLines; j++)
             {
-                int iLast = s.LastIndexOf("}'");
-                string sLast = s.Substring(iLast + 2);
+                bWhereClauseFirstIter = true;
+                bSetClauseFirstIter = true;
+                sbWhereClause.Clear();
 
-                string sFirst = s.Substring(0, iLast + 2);
-
-                List<string> InnerSplitter = StringUtility.LowMemSplit(sLast, "\t");
-                for (int i = 0; i < InnerSplitter.Count(); i++)
+                for (int i = 0; i < ColumnList.Count; i++)
                 {
-                    sFirst = sFirst.Replace("{" + i + "}", InnerSplitter[i]);
+                    if (PKList.Contains(ColumnList[i]) && bWhereClauseFirstIter)
+                    {
+                        sbWhereClause.Append(" WHERE " + ColumnList[i] + " = '" + Splitter[iColIndex] + "'");
+                        bWhereClauseFirstIter = false;
+                    }
+                    else if (PKList.Contains(ColumnList[i]) && !bWhereClauseFirstIter)
+                    {
+                        sbWhereClause.Append(" AND " + ColumnList[i] + " = '" + Splitter[iColIndex] + "'");
+                    }
+                    else
+                    {
+                        if (bSetClauseFirstIter)
+                        {
+                            sb.Append("UPDATE " + sTableName + " SET " + ColumnList[i] + " = '" + Splitter[iColIndex] + "'");
+                            bSetClauseFirstIter = false;
+                        }
+                        else
+                        {
+                            //last statement
+                            sb.Append(", " + ColumnList[i] + " = '" + Splitter[iColIndex] + "'");
+                        }
+                    }
+                    iColIndex++;
                 }
-                sb.Append(sFirst + "\r\n");
-                
+                sb.Append(sbWhereClause);
+                sb.Append("\n");
             }
+
+            //Handle Nulls
             sb.Replace("'NULL'", "NULL");
 
-            if(PKList.Count == 0)
+            if (PKList.Count == 0)
             {
                 sb.Insert(0, "--@@Warning: Schema did not contain any primary keys for table " + sTableName + ". Where clause could not be generated \r\n");
                 return sb;
             }
             if (!StringUtility.ContainsAllItems(ColumnList, PKList))
             {
-                sb.Insert(0,"--@@Warning: Not all primary keys found for table " + sTableName + ". Verify your where clause \r\n");
+                sb.Insert(0, "--@@Warning: Not all primary keys found for table " + sTableName + ". Verify your where clause \r\n");
                 return sb;
             }
 
